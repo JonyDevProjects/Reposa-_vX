@@ -50,18 +50,23 @@
             <div class="row g-4">
                 @foreach($featuredProducts as $product)
                     <div class="col-md-3">
-                        <div class="card card-product h-100 shadow-sm border-0">
+                        <div class="card card-product h-100 shadow-sm border-0 position-relative">
                             <img src="https://placehold.co/400x300/182447/ffffff?text={{ urlencode($product->name) }}" class="card-img-top" alt="{{ $product->name }}">
-                            <div class="card-body">
+                            <div class="card-body d-flex flex-column">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <span class="badge bg-light text-primary border">{{ $product->material }}</span>
                                     <span class="text-muted small"><i class="bi bi-star-fill text-warning"></i> 4.8</span>
                                 </div>
-                                <h5 class="card-title fw-bold">{{ $product->name }}</h5>
-                                <p class="card-text text-muted small">{{ Str::limit($product->description, 60) }}</p>
-                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                <h5 class="card-title fw-bold">
+                                    <a href="{{ route('products.show', $product->id) }}" class="text-decoration-none text-dark stretched-link">{{ $product->name }}</a>
+                                </h5>
+                                <p class="card-text text-muted small flex-grow-1">{{ Str::limit($product->description, 60) }}</p>
+                                <div class="d-flex justify-content-between align-items-center mt-3 position-relative" style="z-index: 2;">
                                     <span class="fs-4 fw-bold text-primary">{{ number_format($product->price, 2) }}€</span>
-                                    <button class="btn btn-outline-primary btn-sm rounded-circle"><i class="bi bi-cart-plus"></i></button>
+                                    <form action="{{ route('cart.add', $product->id) }}" method="POST" class="m-0">
+                                        @csrf
+                                        <button type="submit" class="btn btn-outline-primary btn-sm rounded-circle"><i class="bi bi-cart-plus"></i></button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
