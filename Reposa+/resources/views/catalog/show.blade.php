@@ -62,19 +62,20 @@
 
                     <p class="text-muted mb-5 lead">{{ $product->description }}</p>
 
-                    <div class="d-flex gap-3 mb-5">
+                    <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-flex gap-3 mb-5">
+                        @csrf
                         <div class="input-group" style="width: 130px;">
-                            <button class="btn btn-outline-secondary" type="button">-</button>
-                            <input type="text" class="form-control text-center" value="1">
-                            <button class="btn btn-outline-secondary" type="button">+</button>
+                            <button class="btn btn-outline-secondary" type="button" onclick="this.nextElementSibling.stepDown()">-</button>
+                            <input type="number" name="quantity" class="form-control text-center" value="1" min="1" max="10">
+                            <button class="btn btn-outline-secondary" type="button" onclick="this.previousElementSibling.stepUp()">+</button>
                         </div>
-                        <button class="btn btn-primary flex-grow-1 py-3 fw-bold">
+                        <button type="submit" class="btn btn-primary flex-grow-1 py-3 fw-bold">
                             <i class="bi bi-cart-plus me-2"></i>Añadir al Carrito
                         </button>
-                        <button class="btn btn-outline-danger py-3 px-4">
+                        <button type="button" class="btn btn-outline-danger py-3 px-4" title="Añadir a Favoritos">
                             <i class="bi bi-heart"></i>
                         </button>
-                    </div>
+                    </form>
 
                     <div class="card bg-light border-0 p-4 rounded-4">
                         <div class="row g-3">

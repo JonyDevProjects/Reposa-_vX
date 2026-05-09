@@ -69,7 +69,7 @@
                                 <td>#{{ $order->id }}</td>
                                 <td>{{ $order->user->name }}</td>
                                 <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
-                                <td>{{ number_format($order->total_price, 2) }}€</td>
+                                <td>{{ number_format($order->total_amount, 2) }}€</td>
                                 <td><span class="badge bg-warning text-dark">{{ ucfirst($order->status) }}</span></td>
                             </tr>
                             @endforeach

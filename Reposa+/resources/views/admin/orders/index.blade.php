@@ -49,7 +49,7 @@
                                         @endforeach
                                     </ul>
                                 </td>
-                                <td class="fw-bold text-primary">{{ number_format($order->total_price, 2) }}€</td>
+                                <td class="fw-bold text-primary">{{ number_format($order->total_amount, 2) }}€</td>
                                 <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
                                 <td>
                                     <select class="form-select form-select-sm" disabled>

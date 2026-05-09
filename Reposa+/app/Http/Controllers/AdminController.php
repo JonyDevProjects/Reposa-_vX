@@ -12,7 +12,7 @@ class AdminController extends Controller
     public function dashboard()
     {
         $totalOrders = Order::count();
-        $totalRevenue = Order::sum('total_price');
+        $totalRevenue = Order::sum('total_amount');
         $totalProducts = Product::count();
         $recentOrders = Order::with('user')->latest()->take(5)->get();
 

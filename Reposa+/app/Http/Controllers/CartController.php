@@ -39,33 +39,47 @@ class CartController extends Controller
 
     public function add(Product $product)
     {
+        $quantity = (int) request('quantity', 1);
+
         if (Auth::check()) {
             $cartItem = CartItem::where('user_id', Auth::id())
                                 ->where('product_id', $product->id)
                                 ->first();
 
             if ($cartItem) {
-                $cartItem->increment('quantity');
+                $cartItem->increment('quantity', $quantity);
             } else {
                 CartItem::create([
                     'user_id' => Auth::id(),
                     'product_id' => $product->id,
-                    'quantity' => 1
+                    'quantity' => $quantity
                 ]);
             }
         } else {
             $cart = session()->get('cart', []);
             if (isset($cart[$product->id])) {
-                $cart[$product->id]['quantity']++;
+                $cart[$product->id]['quantity'] += $quantity;
             } else {
                 $cart[$product->id] = [
-                    'quantity' => 1
+                    'quantity' => $quantity
                 ];
             }
             session()->put('cart', $cart);
         }
 
-        return redirect()->route('cart.index')->with('success', 'Producto añadido al carrito');
+        if (request()->wantsJson()) {
+            $cartCount = Auth::check() 
+                ? \App\Models\CartItem::where('user_id', Auth::id())->sum('quantity')
+                : collect(session()->get('cart', []))->sum('quantity');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Producto añadido al carrito',
+                'cartCount' => $cartCount
+            ]);
+        }
+
+        return back()->with('success', 'Producto añadido al carrito');
     }
 
     public function update(Request $request, $id)
@@ -138,7 +152,7 @@ class CartController extends Controller
         // Crear el pedido
         $order = Order::create([
             'user_id' => $user->id,
-            'total_price' => $total,
+            'total_amount' => $total,
             'status' => 'pending'
         ]);
 
@@ -148,7 +162,7 @@ class CartController extends Controller
                 'order_id' => $order->id,
                 'product_id' => $item->product_id,
                 'quantity' => $item->quantity,
-                'price' => $item->product->price
+                'price_at_purchase' => $item->product->price
             ]);
             $item->delete(); // Vaciar el carrito
         }
@@ -156,12 +170,17 @@ class CartController extends Controller
         // Enviar el correo de confirmación
         Mail::to($user->email)->send(new OrderConfirmed($order));
 
-        return redirect()->route('orders.index')->with('success', '¡Pedido realizado con éxito! Se ha enviado un ticket a tu correo.');
+        return redirect('/profile#orders')->with('success', '¡Pedido realizado con éxito! Se ha enviado un ticket a tu correo.');
     }
 
     public function orders()
     {
-        $orders = Order::where('user_id', Auth::id())->with('orderItems.product')->latest()->get();
-        return view('profile.orders', compact('orders'));
+        return redirect('/profile#orders');
+    }
+
+    public function requireLogin()
+    {
+        session()->put('url.intended', route('cart.index'));
+        return redirect()->route('login');
     }
 }

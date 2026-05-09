@@ -9,9 +9,9 @@ Tu pedido #{{ $order->id }} ha sido confirmado con éxito.
 | Producto | Cantidad | Precio |
 | :--- | :---: | :--- |
 @foreach ($order->orderItems as $item)
-| {{ $item->product->name }} | {{ $item->quantity }} | {{ number_format($item->price, 2) }}€ |
+| {{ $item->product->name }} | {{ $item->quantity }} | {{ number_format($item->price_at_purchase, 2) }}€ |
 @endforeach
-| **Total** | | **{{ number_format($order->total_price, 2) }}€** |
+| **Total** | | **{{ number_format($order->total_amount, 2) }}€** |
 
 Nos pondremos en marcha para que recibas tus almohadas lo antes posible.
 
