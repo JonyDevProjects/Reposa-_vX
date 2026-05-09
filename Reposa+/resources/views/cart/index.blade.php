@@ -44,7 +44,7 @@
                                             </div>
                                         </td>
                                         <td style="width: 150px;">
-                                            <form action="{{ route('cart.update', $item) }}" method="POST" class="d-flex align-items-center justify-content-center">
+                                            <form action="{{ route('cart.update', $item->id) }}" method="POST" class="d-flex align-items-center justify-content-center">
                                                 @csrf
                                                 <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" class="form-control form-control-sm text-center me-2" style="width: 60px;">
                                                 <button type="submit" class="btn btn-sm btn-outline-primary border-0">
@@ -55,7 +55,7 @@
                                         <td class="text-end">{{ number_format($item->product->price, 2) }}€</td>
                                         <td class="text-end fw-bold">{{ number_format($item->product->price * $item->quantity, 2) }}€</td>
                                         <td class="text-center">
-                                            <form action="{{ route('cart.remove', $item) }}" method="POST">
+                                            <form action="{{ route('cart.remove', $item->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-link text-danger p-0">
@@ -92,12 +92,20 @@
                     </div>
 
                     @if(!$cartItems->isEmpty())
-                    <form action="{{ route('checkout') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow-sm">
+                        @guest
+                        <a href="{{ route('cart.login') }}" class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow-sm text-decoration-none">
                             FINALIZAR COMPRA <i class="bi bi-chevron-right ms-2"></i>
-                        </button>
-                    </form>
+                        </a>
+                        @endguest
+
+                        @auth
+                        <form action="{{ route('checkout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow-sm">
+                                FINALIZAR COMPRA <i class="bi bi-chevron-right ms-2"></i>
+                            </button>
+                        </form>
+                        @endauth
                     @endif
                     
                     <div class="mt-4 text-center">
