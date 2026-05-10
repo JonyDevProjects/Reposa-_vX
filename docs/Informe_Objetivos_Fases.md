@@ -44,18 +44,20 @@ El desarrollo se divide en fases incrementales alineadas con los problemas defin
 ---
 
 ## 4. Estado Actual del Proyecto (Actualizado)
-Al finalizar la sesión actual, el proyecto ha alcanzado la **v1.0-alpha**:
+Al finalizar la sesión actual, el proyecto ha consolidado su núcleo (*Core*) y está próximo a la **v1.0**:
 
-- **Ecosistema de Agentes:** 🟢 COMPLETADO. Estructura `.agents/` oficial configurada con reglas, skills y workflows.
-- **Base de Datos (Hito 1):** 🟢 COMPLETADO. Esquema UML íntegro con datos de prueba.
-- **Identidad y Catálogo (Hito 2):** 🟢 COMPLETADO. Home, Catálogo y Ficha de Producto funcionales.
-- **Autenticación y Perfil (Hito 3):** 🟢 COMPLETADO. Login/Registro y CRUD de direcciones activos.
+- **Ecosistema de Agentes:** COMPLETADO. Estructura `.agents/` oficial configurada con reglas, skills y workflows.
+- **Base de Datos (Hito 1):** COMPLETADO. Esquema UML íntegro con datos de prueba.
+- **Identidad y Catálogo (Hito 2):** COMPLETADO. Home, Catálogo y Ficha de Producto funcionales.
+- **Autenticación y Perfil (Hito 3):** COMPLETADO. Login/Registro y CRUD de direcciones activos.
+- **Carrito y Checkout (Hito 4):** COMPLETADO. Flujo de compra AJAX asíncrono y sincronización de cesta entre invitados/usuarios.
+- **Notificaciones SMTP (Hito 5):** COMPLETADO. Configuración Mailtrap, envío de tickets post-compra en segundo plano (Queues) y recuperación de contraseña operativa.
 
-**Próximo Paso Crítico:** Inicio del Hito 4 (Carrito de Compra y Checkout).
+**Próximo Paso Crítico:** Cierre de la Fase 1 con el Panel de Administración.
 
 ---
 
 ## 5. Próximos Pasos Inmediatos
-1.  **Validación de Modelos:** Asegurar que los modelos Eloquent reflejan exactamente el `EsquemaBBDD.md`.
-2.  **Desarrollo de Vistas Blade:** Empezar con la `Home` y el `Catálogo` aplicando el diseño Índigo.
-3.  **Configuración SMTP:** Verificar las credenciales en el `.env` para el envío de correos.
+1.  **Panel de Administración (v1):** Proteger las rutas `/admin/*` mediante middleware para acceso exclusivo del rol administrador.
+2.  **CRUD de Productos (Admin):** Permitir al administrador gestionar el inventario completo de almohadas desde su panel.
+3.  **Histórico Global (Admin):** Proveer al administrador una vista general de todos los pedidos tramitados por los usuarios en la tienda.

@@ -37,6 +37,21 @@
 
             <!-- Product Grid -->
             <div class="col-md-9">
+                <!-- Cajas Visuales de Categorías (Cross-categorization) -->
+                <div class="row g-3 mb-4">
+                    @foreach($categories as $category)
+                        <div class="col-6 col-md-4">
+                            <a href="/catalog?category={{ $category->slug }}" class="text-decoration-none">
+                                <div class="card border-0 shadow-sm text-center p-3 {{ request('category') == $category->slug ? 'bg-primary text-white' : 'bg-white text-dark hover-lift' }}">
+                                    <h6 class="fw-bold mb-0">
+                                        <i class="bi bi-tag-fill me-2 opacity-50"></i>{{ $category->name }}
+                                    </h6>
+                                </div>
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+
                 @if($products->isEmpty())
                     <div class="text-center py-5">
                         <i class="bi bi-search fs-1 text-muted"></i>
