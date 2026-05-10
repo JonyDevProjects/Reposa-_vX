@@ -53,11 +53,28 @@ Al finalizar la sesión actual, el proyecto ha consolidado su núcleo (*Core*) y
 - **Carrito y Checkout (Hito 4):** COMPLETADO. Flujo de compra AJAX asíncrono y sincronización de cesta entre invitados/usuarios.
 - **Notificaciones SMTP (Hito 5):** COMPLETADO. Configuración Mailtrap, envío de tickets post-compra en segundo plano (Queues) y recuperación de contraseña operativa.
 
-**Próximo Paso Crítico:** Cierre de la Fase 1 con el Panel de Administración.
+- **Panel de Administración v1:** COMPLETADO. Rutas protegidas, CRUD de productos e historial global de pedidos.
+- **Sistema y CRUD de Categorías (Fase 2):** COMPLETADO. Relación N:M, gestión administrativa y asignación en productos.
+
+**Próximo Paso Crítico:** Finalizar la Fase 2 con el filtrado en el Front-end e iniciar la Fase 3.
 
 ---
 
 ## 5. Próximos Pasos Inmediatos
-1.  **Panel de Administración (v1):** Proteger las rutas `/admin/*` mediante middleware para acceso exclusivo del rol administrador.
-2.  **CRUD de Productos (Admin):** Permitir al administrador gestionar el inventario completo de almohadas desde su panel.
-3.  **Histórico Global (Admin):** Proveer al administrador una vista general de todos los pedidos tramitados por los usuarios en la tienda.
+1.  **Filtrado por Categorías:** Navegación por categorías en el catálogo público (front-end).
+2.  **Internacionalización (Fase 3):** Traducción de la Home y vistas principales a Inglés y Español.
+3.  **Perfil Avanzado:** Panel de usuario para cambiar contraseña y ver historial de pedidos.
+
+---
+
+## 6. Documentación Técnica: Sistema de Categorías (Rama `sistema-categorias`)
+El desarrollo del commit actual ha implementado la gestión integral de categorías:
+
+- **Actualización de Rutas:** Se añadieron rutas CRUD para categorías en `routes/web.php` bajo el grupo del middleware `admin`.
+- **Modificaciones en Controlador (`AdminController`):**
+  - Implementación de la lógica CRUD para las categorías, incluyendo la generación automática de `slugs` amigables mediante `Str::slug()`.
+  - Modificación de los métodos `storeProduct` y `updateProduct` para incluir la sincronización de la relación N:M utilizando los métodos `attach()` y `sync()` de Eloquent tras separar los datos de categorías del resto de los atributos de la petición.
+- **Creación de Vistas CRUD:** Desarrollo de la interfaz gráfica en `resources/views/admin/categories/` (`index.blade.php` con el conteo de productos asociados, `create.blade.php` y `edit.blade.php`).
+- **Integración Transversal de UI:** 
+  - Incorporación del enlace a "Categorías" en el menú lateral (sidebar) unificado de todo el panel de administración (`dashboard`, `products`, `orders`).
+  - Adición de un campo `<select multiple>` en los formularios de creación y edición de productos, permitiendo asignar fácilmente las categorías de forma dinámica (con estado pre-seleccionado en base a `old()` o la base de datos).
