@@ -41,6 +41,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::put('/products/{product}', [AdminController::class, 'updateProduct'])->name('admin.products.update');
     Route::delete('/products/{product}', [AdminController::class, 'deleteProduct'])->name('admin.products.delete');
 
+    // Gestión de Categorías
+    Route::get('/categories', [AdminController::class, 'categories'])->name('admin.categories');
+    Route::get('/categories/create', [AdminController::class, 'createCategory'])->name('admin.categories.create');
+    Route::post('/categories', [AdminController::class, 'storeCategory'])->name('admin.categories.store');
+    Route::get('/categories/{category}/edit', [AdminController::class, 'editCategory'])->name('admin.categories.edit');
+    Route::put('/categories/{category}', [AdminController::class, 'updateCategory'])->name('admin.categories.update');
+    Route::delete('/categories/{category}', [AdminController::class, 'deleteCategory'])->name('admin.categories.delete');
+
     // Historial de Pedidos Global
     Route::get('/orders', [AdminController::class, 'orders'])->name('admin.orders');
 });

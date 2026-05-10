@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Gestión de Productos')
+@section('title', 'Gestión de Categorías')
 
 @section('content')
 <div class="row">
@@ -9,10 +9,10 @@
             <a href="{{ route('admin.dashboard') }}" class="list-group-item list-group-item-action">
                 <i class="bi bi-speedometer2 me-2"></i> Dashboard
             </a>
-            <a href="{{ route('admin.categories') }}" class="list-group-item list-group-item-action">
+            <a href="{{ route('admin.categories') }}" class="list-group-item list-group-item-action active">
                 <i class="bi bi-tags me-2"></i> Categorías
             </a>
-            <a href="{{ route('admin.products') }}" class="list-group-item list-group-item-action active">
+            <a href="{{ route('admin.products') }}" class="list-group-item list-group-item-action">
                 <i class="bi bi-box-seam me-2"></i> Productos
             </a>
             <a href="{{ route('admin.orders') }}" class="list-group-item list-group-item-action">
@@ -22,9 +22,9 @@
     </div>
     <div class="col-md-9">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold mb-0">Productos</h2>
-            <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg me-2"></i> Nuevo Producto
+            <h2 class="fw-bold mb-0">Categorías</h2>
+            <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-2"></i> Nueva Categoría
             </a>
         </div>
 
@@ -34,32 +34,30 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th>Imagen</th>
+                                <th>ID</th>
                                 <th>Nombre</th>
-                                <th>Precio</th>
-                                <th>Stock</th>
+                                <th>Slug</th>
+                                <th>Productos</th>
                                 <th class="text-end">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($products as $product)
+                            @foreach($categories as $category)
                             <tr>
+                                <td>{{ $category->id }}</td>
+                                <td class="fw-bold">{{ $category->name }}</td>
+                                <td class="text-muted">{{ $category->slug }}</td>
                                 <td>
-                                    <img src="{{ $product->image_url ?? 'https://via.placeholder.com/50' }}" alt="{{ $product->name }}" class="rounded shadow-sm" style="width: 40px; height: 40px; object-fit: cover;">
-                                </td>
-                                <td class="fw-bold">{{ $product->name }}</td>
-                                <td>{{ number_format($product->price, 2) }}€</td>
-                                <td>
-                                    <span class="badge {{ $product->stock > 10 ? 'bg-success' : 'bg-danger' }}">
-                                        {{ $product->stock }} uds
+                                    <span class="badge bg-info text-dark">
+                                        {{ $category->products_count }}
                                     </span>
                                 </td>
                                 <td class="text-end">
                                     <div class="btn-group">
-                                        <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-sm btn-outline-secondary">
+                                        <a href="{{ route('admin.categories.edit', $category) }}" class="btn btn-sm btn-outline-secondary">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        <form action="{{ route('admin.products.delete', $product) }}" method="POST" onsubmit="return confirm('¿Estás seguro?')">
+                                        <form action="{{ route('admin.categories.delete', $category) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar esta categoría?')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-danger">
@@ -70,6 +68,13 @@
                                 </td>
                             </tr>
                             @endforeach
+                            @if($categories->isEmpty())
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    No hay categorías registradas.
+                                </td>
+                            </tr>
+                            @endif
                         </tbody>
                     </table>
                 </div>

@@ -9,6 +9,9 @@
             <a href="{{ route('admin.dashboard') }}" class="list-group-item list-group-item-action">
                 <i class="bi bi-speedometer2 me-2"></i> Dashboard
             </a>
+            <a href="{{ route('admin.categories') }}" class="list-group-item list-group-item-action">
+                <i class="bi bi-tags me-2"></i> Categorías
+            </a>
             <a href="{{ route('admin.products') }}" class="list-group-item list-group-item-action">
                 <i class="bi bi-box-seam me-2"></i> Productos
             </a>

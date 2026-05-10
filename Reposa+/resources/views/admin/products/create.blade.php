@@ -28,6 +28,21 @@
                         @enderror
                     </div>
 
+                    <div class="mb-3">
+                        <label for="categories" class="form-label">Categorías</label>
+                        <select class="form-select @error('categories') is-invalid @enderror" id="categories" name="categories[]" multiple>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ (collect(old('categories'))->contains($category->id)) ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="form-text">Mantén pulsado Ctrl (Windows) o Cmd (Mac) para seleccionar varias categorías.</div>
+                        @error('categories')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="price" class="form-label">Precio (€)</label>
