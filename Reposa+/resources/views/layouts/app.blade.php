@@ -46,6 +46,9 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="/profile">Mi Perfil</a></li>
+                                @if(Auth::user()->role === 'admin')
+                                    <li><a class="dropdown-item text-danger" href="{{ route('admin.dashboard') }}">Panel de administración</a></li>
+                                @endif
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form action="/logout" method="POST">

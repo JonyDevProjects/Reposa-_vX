@@ -52,12 +52,13 @@ Al finalizar la sesión actual, el proyecto ha consolidado su núcleo (*Core*) y
 - **Autenticación y Perfil (Hito 3):** COMPLETADO. Login/Registro y CRUD de direcciones activos.
 - **Carrito y Checkout (Hito 4):** COMPLETADO. Flujo de compra AJAX asíncrono y sincronización de cesta entre invitados/usuarios.
 - **Notificaciones SMTP (Hito 5):** COMPLETADO. Configuración Mailtrap, envío de tickets post-compra en segundo plano (Queues) y recuperación de contraseña operativa.
+- **Panel de Administración (Hito 6):** COMPLETADO. Rutas protegidas, CRUD de inventario paginado, gestión activa de estados de pedido y atajo visual condicionado por rol.
 
-**Próximo Paso Crítico:** Cierre de la Fase 1 con el Panel de Administración.
+**Próximo Paso Crítico:** Inicio de la Fase 2: Clasificación y Gestión Avanzada de Categorías.
 
 ---
 
-## 5. Próximos Pasos Inmediatos
-1.  **Panel de Administración (v1):** Proteger las rutas `/admin/*` mediante middleware para acceso exclusivo del rol administrador.
-2.  **CRUD de Productos (Admin):** Permitir al administrador gestionar el inventario completo de almohadas desde su panel.
-3.  **Histórico Global (Admin):** Proveer al administrador una vista general de todos los pedidos tramitados por los usuarios en la tienda.
+## 5. Próximos Pasos Inmediatos (Fase 2)
+1.  **Sistema de Categorías:** Configurar el modelo y las relaciones necesarias para permitir a los productos (almohadas) pertenecer a múltiples categorías.
+2.  **CRUD de Categorías (Admin):** Ampliar el panel de administración incluyendo una nueva sección para crear, editar y eliminar categorías.
+3.  **Filtrado en el Catálogo:** Actualizar el front-end del catálogo público para permitir a los clientes filtrar los productos según su categoría.
