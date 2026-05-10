@@ -44,20 +44,20 @@ El desarrollo se divide en fases incrementales alineadas con los problemas defin
 ---
 
 ## 4. Estado Actual del Proyecto (Actualizado)
-Al finalizar la sesión actual, el proyecto ha alcanzado la **v1.1-beta**:
+Al finalizar la sesión actual, el proyecto ha consolidado su núcleo (*Core*) y está próximo a la **v1.0**:
 
-- **Ecosistema de Agentes:** 🟢 COMPLETADO. Estructura `.agents/` oficial configurada con reglas, skills y workflows.
-- **Base de Datos (Hito 1):** 🟢 COMPLETADO. Esquema UML íntegro con datos de prueba.
-- **Identidad y Catálogo (Hito 2):** 🟢 COMPLETADO. Home, Catálogo y Ficha de Producto funcionales.
-- **Autenticación y Perfil (Hito 3):** 🟢 COMPLETADO. Login/Registro y CRUD de direcciones activos.
-- **Flujo de Compra (Problema 2):** 🟢 COMPLETADO. Carrito sin barreras en sesión, Checkout protegido con volcado inmutable a BBDD (`orders` / `order_items`) y Notificaciones dinámicas visuales (Toasts).
-- **Filtrado Exploratorio (Problema 3):** 🟢 COMPLETADO. Navegación por categorías cruzadas con Sidebar y Cajas Visuales, integradas eficientemente con el modelo.
+- **Ecosistema de Agentes:** COMPLETADO. Estructura `.agents/` oficial configurada con reglas, skills y workflows.
+- **Base de Datos (Hito 1):** COMPLETADO. Esquema UML íntegro con datos de prueba.
+- **Identidad y Catálogo (Hito 2):** COMPLETADO. Home, Catálogo y Ficha de Producto funcionales.
+- **Autenticación y Perfil (Hito 3):** COMPLETADO. Login/Registro y CRUD de direcciones activos.
+- **Carrito y Checkout (Hito 4):** COMPLETADO. Flujo de compra AJAX asíncrono y sincronización de cesta entre invitados/usuarios.
+- **Notificaciones SMTP (Hito 5):** COMPLETADO. Configuración Mailtrap, envío de tickets post-compra en segundo plano (Queues) y recuperación de contraseña operativa.
 
-**Próximo Paso Crítico:** Continuar con la Fase 2 (CRUD administrativo de categorías) y Fase 3 (Internacionalización Multi-idioma).
+**Próximo Paso Crítico:** Cierre de la Fase 1 con el Panel de Administración.
 
 ---
 
 ## 5. Próximos Pasos Inmediatos
-1.  **Panel Admin (Gestión de Categorías):** Implementar la interfaz administrativa para el CRUD de categorías y su asociación con almohadas.
-2.  **Internacionalización (i18n):** Traducir la vista `Home` y el flujo de compra a Inglés y Español.
-3.  **Wishlist y Favoritos:** Iniciar la Fase 4 para añadir almohadas a favoritos (Problema 5).
+1.  **Panel de Administración (v1):** Proteger las rutas `/admin/*` mediante middleware para acceso exclusivo del rol administrador.
+2.  **CRUD de Productos (Admin):** Permitir al administrador gestionar el inventario completo de almohadas desde su panel.
+3.  **Histórico Global (Admin):** Proveer al administrador una vista general de todos los pedidos tramitados por los usuarios en la tienda.
