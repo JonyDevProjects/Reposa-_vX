@@ -44,18 +44,20 @@ El desarrollo se divide en fases incrementales alineadas con los problemas defin
 ---
 
 ## 4. Estado Actual del Proyecto (Actualizado)
-Al finalizar la sesión actual, el proyecto ha alcanzado la **v1.0-alpha**:
+Al finalizar la sesión actual, el proyecto ha alcanzado la **v1.1-beta**:
 
 - **Ecosistema de Agentes:** 🟢 COMPLETADO. Estructura `.agents/` oficial configurada con reglas, skills y workflows.
 - **Base de Datos (Hito 1):** 🟢 COMPLETADO. Esquema UML íntegro con datos de prueba.
 - **Identidad y Catálogo (Hito 2):** 🟢 COMPLETADO. Home, Catálogo y Ficha de Producto funcionales.
 - **Autenticación y Perfil (Hito 3):** 🟢 COMPLETADO. Login/Registro y CRUD de direcciones activos.
+- **Flujo de Compra (Problema 2):** 🟢 COMPLETADO. Carrito sin barreras en sesión, Checkout protegido con volcado inmutable a BBDD (`orders` / `order_items`) y Notificaciones dinámicas visuales (Toasts).
+- **Filtrado Exploratorio (Problema 3):** 🟢 COMPLETADO. Navegación por categorías cruzadas con Sidebar y Cajas Visuales, integradas eficientemente con el modelo.
 
-**Próximo Paso Crítico:** Inicio del Hito 4 (Carrito de Compra y Checkout).
+**Próximo Paso Crítico:** Continuar con la Fase 2 (CRUD administrativo de categorías) y Fase 3 (Internacionalización Multi-idioma).
 
 ---
 
 ## 5. Próximos Pasos Inmediatos
-1.  **Validación de Modelos:** Asegurar que los modelos Eloquent reflejan exactamente el `EsquemaBBDD.md`.
-2.  **Desarrollo de Vistas Blade:** Empezar con la `Home` y el `Catálogo` aplicando el diseño Índigo.
-3.  **Configuración SMTP:** Verificar las credenciales en el `.env` para el envío de correos.
+1.  **Panel Admin (Gestión de Categorías):** Implementar la interfaz administrativa para el CRUD de categorías y su asociación con almohadas.
+2.  **Internacionalización (i18n):** Traducir la vista `Home` y el flujo de compra a Inglés y Español.
+3.  **Wishlist y Favoritos:** Iniciar la Fase 4 para añadir almohadas a favoritos (Problema 5).

@@ -1,0 +1,5 @@
+jjquimal - Jonathan Javier Quispe Maldonado
+jmerjab - Javier Merino Jabalera
+mjcortor - Manuel Jesús Córdoba Toribio
+
+repositorio: https://github.com/mjcortor/TAD

@@ -19,3 +19,8 @@ Mantener la estética Premium e Índigo de Reposa+.
 - **SASS Wizardry:** Manejo de variables y mixins para temas dinámicos.
 - **Blade Templating:** Creación de componentes reutilizables y limpios.
 - **Visual WOW:** Capacidad de generar interfaces que se vean "costosas" y profesionales.
+
+## Patrones Identificados (Sesión de Refinamiento Core)
+- **Flujos sin Recarga (AJAX):** Las interacciones repetitivas (como añadir productos a la cesta) nunca deben recargar la página para evitar romper el flujo y la posición de lectura del usuario. Implementar siempre intercepción de formularios por JS (Fetch API).
+- **Aislamiento de Vite (ES Modules):** Las librerías de interfaz (como Bootstrap) cargadas a través de `app.js` de Vite no se exponen al objeto global automáticamente. Para inicializar componentes por JavaScript (ej: Toasts o Modales) en scripts "inline" dentro de Blade, es vital exponer la librería globalmente en `resources/js/app.js` (`window.bootstrap = bootstrap;`) y asegurar que los scripts inline usen `<script type="module">` para ejecutarse en el orden asíncrono correcto.
+- **Micro-interacciones Dinámicas:** Usar Toast notificaciones y pequeñas animaciones de CSS (rebote, pulso) en los componentes que cambian de estado (como el badge del carrito) para dar feedback instantáneo al usuario de que su acción (AJAX) tuvo éxito.
