@@ -44,7 +44,7 @@ El desarrollo se divide en fases incrementales alineadas con los problemas defin
 ---
 
 ## 4. Estado Actual del Proyecto (Actualizado)
-Al finalizar la sesión actual, el proyecto ha consolidado su núcleo (*Core*) y está próximo a la **v1.0**:
+Al finalizar la sesión actual, el proyecto ha superado el núcleo inicial y se encuentra consolidado en la **v2.0**:
 
 - **Ecosistema de Agentes:** COMPLETADO. Estructura `.agents/` oficial configurada con reglas, skills y workflows.
 - **Base de Datos (Hito 1):** COMPLETADO. Esquema UML íntegro con datos de prueba.
@@ -54,16 +54,17 @@ Al finalizar la sesión actual, el proyecto ha consolidado su núcleo (*Core*) y
 - **Notificaciones SMTP (Hito 5):** COMPLETADO. Configuración Mailtrap, envío de tickets post-compra en segundo plano (Queues) y recuperación de contraseña operativa.
 
 - **Panel de Administración v1:** COMPLETADO. Rutas protegidas, CRUD de productos e historial global de pedidos.
-- **Sistema y CRUD de Categorías (Fase 2):** COMPLETADO. Relación N:M, gestión administrativa y asignación en productos.
+- **Filtrado Exploratorio (Hito 6):** COMPLETADO. Sidebar y cajas visuales de categorización cruzada operativos en el catálogo público.
+- **Sistema y CRUD de Categorías (Fase 2):** COMPLETADO. Relación N:M, gestión administrativa integral y asignación dinámica en productos.
 
-**Próximo Paso Crítico:** Finalizar la Fase 2 con el filtrado en el Front-end e iniciar la Fase 3.
+**Próximo Paso Crítico:** Iniciar la Fase 3: Internacionalización (Multi-idioma) y completar el Perfil Avanzado (Cambio de Password e Historial).
 
 ---
 
 ## 5. Próximos Pasos Inmediatos
-1.  **Filtrado por Categorías:** Navegación por categorías en el catálogo público (front-end).
-2.  **Internacionalización (Fase 3):** Traducción de la Home y vistas principales a Inglés y Español.
-3.  **Perfil Avanzado:** Panel de usuario para cambiar contraseña y ver historial de pedidos.
+1.  **Internacionalización (Fase 3):** Implementar el sistema multi-idioma (Español/Inglés) con selector de idioma en el Header.
+2.  **Perfil Avanzado:** Finalizar la funcionalidad de cambio de contraseña y visualización detallada del historial de pedidos.
+3.  **Lista de Favoritos (Fase 4):** Implementar la lógica de "Wishlist" para que los usuarios guarden almohadas de interés.
 
 ---
 
@@ -78,3 +79,19 @@ El desarrollo del commit actual ha implementado la gestión integral de categor�
 - **Integración Transversal de UI:** 
   - Incorporación del enlace a "Categorías" en el menú lateral (sidebar) unificado de todo el panel de administración (`dashboard`, `products`, `orders`).
   - Adición de un campo `<select multiple>` en los formularios de creación y edición de productos, permitiendo asignar fácilmente las categorías de forma dinámica (con estado pre-seleccionado en base a `old()` o la base de datos).
+
+---
+
+## 7. Implementación: Experiencia de Usuario y Ciclo de Venta
+Se ha consolidado el flujo de usuario final, garantizando una transición fluida entre la exploración y la conversión segura:
+
+1. **Catálogo y Compra sin Barreras:**
+   - **Acceso Universal:** Todo visitante (registrado o anónimo) tiene visibilidad total del catálogo de almohadas.
+   - **Fichas de Producto:** Implementación de vistas detalladas donde se exponen los beneficios ergonómicos y técnicos de cada modelo.
+   - **Cesta de Pre-compra:** Los usuarios pueden añadir productos al carrito de forma inmediata sin interrupciones por formularios de registro.
+
+2. **Proceso de Compra (Checkout) y Autenticación:**
+   - **Barrera de Seguridad:** La acción de "Tramitar Pedido" y la revisión del ticket final están protegidas, exigiendo la validación del usuario (Login/Registro).
+   - **Persistencia de Datos:** Al completar la compra, el sistema genera registros inmutables en las tablas `ORDER` (Cabecera) y `ORDER_ITEM` (Detalle), descontando el inventario correspondiente.
+   - **Feedback Visual:** Se ha integrado un sistema de notificaciones dinámicas (Toasts/Alertas) en el front-end que confirma visualmente el éxito de la transacción tras la redirección.
+
