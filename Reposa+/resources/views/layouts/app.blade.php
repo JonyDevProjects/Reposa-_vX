@@ -25,19 +25,28 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/">Inicio</a>
+                        <a class="nav-link" href="/">{{ __('messages.nav.home') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/catalog">Catálogo</a>
+                        <a class="nav-link" href="/catalog">{{ __('messages.nav.catalog') }}</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-globe"></i> {{ strtoupper(app()->getLocale()) }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item {{ app()->getLocale() == 'es' ? 'active' : '' }}" href="{{ route('lang.switch', 'es') }}">Español</a></li>
+                            <li><a class="dropdown-item {{ app()->getLocale() == 'en' ? 'active' : '' }}" href="{{ route('lang.switch', 'en') }}">English</a></li>
+                        </ul>
+                    </li>
                     @guest
                         <li class="nav-item">
-                            <a class="nav-link" href="/login">Iniciar Sesión</a>
+                            <a class="nav-link" href="/login">{{ __('messages.nav.login') }}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link btn btn-secondary text-white ms-lg-2 px-4" href="/register">Registrarse</a>
+                            <a class="nav-link btn btn-secondary text-white ms-lg-2 px-4" href="/register">{{ __('messages.nav.register') }}</a>
                         </li>
                     @else
                         <li class="nav-item dropdown">
@@ -45,12 +54,12 @@
                                 {{ Auth::user()->name }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="/profile">Mi Perfil</a></li>
+                                <li><a class="dropdown-item" href="/profile">{{ __('messages.nav.profile') }}</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form action="/logout" method="POST">
                                         @csrf
-                                        <button type="submit" class="dropdown-item">Cerrar Sesión</button>
+                                        <button type="submit" class="dropdown-item">{{ __('messages.nav.logout') }}</button>
                                     </form>
                                 </li>
                             </ul>
@@ -83,36 +92,36 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-4">
-                    <h5 class="fw-bold mb-3">Reposa+</h5>
-                    <p class="text-light opacity-75">No vendemos almohadas, vendemos noches de sueño profundo y reparador. Tu salud cervical es nuestra prioridad.</p>
+                    <h5 class="fw-bold mb-3">{{ __('messages.footer.title') }}</h5>
+                    <p class="text-light opacity-75">{{ __('messages.footer.desc') }}</p>
                 </div>
                 <div class="col-md-2 mb-4">
-                    <h6 class="fw-bold mb-3">Tienda</h6>
+                    <h6 class="fw-bold mb-3">{{ __('messages.footer.shop') }}</h6>
                     <ul class="list-unstyled">
-                        <li><a href="/catalog" class="text-white text-decoration-none opacity-75">Catálogo</a></li>
-                        <li><a href="#" class="text-white text-decoration-none opacity-75">Ofertas</a></li>
-                        <li><a href="#" class="text-white text-decoration-none opacity-75">Favoritos</a></li>
+                        <li><a href="/catalog" class="text-white text-decoration-none opacity-75">{{ __('messages.nav.catalog') }}</a></li>
+                        <li><a href="#" class="text-white text-decoration-none opacity-75">{{ __('messages.footer.offers') }}</a></li>
+                        <li><a href="#" class="text-white text-decoration-none opacity-75">{{ __('messages.footer.favorites') }}</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3 mb-4">
-                    <h6 class="fw-bold mb-3">Soporte</h6>
+                    <h6 class="fw-bold mb-3">{{ __('messages.footer.support') }}</h6>
                     <ul class="list-unstyled">
-                        <li><a href="#" class="text-white text-decoration-none opacity-75">Contacto</a></li>
-                        <li><a href="#" class="text-white text-decoration-none opacity-75">Envíos y Devoluciones</a></li>
-                        <li><a href="#" class="text-white text-decoration-none opacity-75">Preguntas Frecuentes</a></li>
+                        <li><a href="#" class="text-white text-decoration-none opacity-75">{{ __('messages.footer.contact') }}</a></li>
+                        <li><a href="#" class="text-white text-decoration-none opacity-75">{{ __('messages.footer.shipping') }}</a></li>
+                        <li><a href="#" class="text-white text-decoration-none opacity-75">{{ __('messages.footer.faq') }}</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">
-                    <h6 class="fw-bold mb-3">Suscríbete</h6>
+                    <h6 class="fw-bold mb-3">{{ __('messages.footer.subscribe') }}</h6>
                     <div class="input-group mb-3">
                         <input type="text" class="form-control" placeholder="Email" aria-label="Email">
-                        <button class="btn btn-secondary" type="button">OK</button>
+                        <button class="btn btn-secondary" type="button">{{ __('messages.footer.subscribe_btn') }}</button>
                     </div>
                 </div>
             </div>
             <hr class="my-4 opacity-25">
             <div class="text-center opacity-75">
-                <small>&copy; 2026 Reposa+. Todos los derechos reservados.</small>
+                <small>&copy; 2026 Reposa+. {{ __('messages.footer.rights') }}</small>
             </div>
         </div>
     </footer>

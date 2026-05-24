@@ -6,11 +6,11 @@
     <!-- Hero Section -->
     <section class="hero-section text-center position-relative overflow-hidden">
         <div class="container position-relative z-1">
-            <h1 class="display-3 fw-bold mb-3">Tu descanso, nuestra prioridad</h1>
-            <p class="lead mb-5 opacity-75">Descubre la colección de almohadas ergonómicas diseñadas para transformar tus noches y cuidar tu salud cervical.</p>
+            <h1 class="display-3 fw-bold mb-3">{{ __('messages.home.hero.title') }}</h1>
+            <p class="lead mb-5 opacity-75">{{ __('messages.home.hero.subtitle') }}</p>
             <div class="d-flex justify-content-center gap-3">
-                <a href="/catalog" class="btn btn-secondary btn-lg px-5">Ver Catálogo</a>
-                <a href="#featured" class="btn btn-outline-light btn-lg px-5">Más Vendidos</a>
+                <a href="/catalog" class="btn btn-secondary btn-lg px-5">{{ __('messages.home.hero.btn_catalog') }}</a>
+                <a href="#featured" class="btn btn-outline-light btn-lg px-5">{{ __('messages.home.hero.btn_featured') }}</a>
             </div>
         </div>
         <!-- Decorative elements could go here -->
@@ -20,7 +20,7 @@
     <section class="py-5 bg-white">
         <div class="container">
             <div class="text-center mb-5">
-                <h2 class="fw-bold">Explora por Categoría</h2>
+                <h2 class="fw-bold">{{ __('messages.home.categories.title') }}</h2>
                 <div class="bg-secondary mx-auto" style="height: 3px; width: 60px;"></div>
             </div>
             <div class="row g-4 justify-content-center">
@@ -44,8 +44,8 @@
     <section id="featured" class="py-5 bg-light">
         <div class="container">
             <div class="text-center mb-5">
-                <h2 class="fw-bold">Nuestros Productos Destacados</h2>
-                <p class="text-muted">La mejor tecnología para tu confort nocturno.</p>
+                <h2 class="fw-bold">{{ __('messages.home.featured.title') }}</h2>
+                <p class="text-muted">{{ __('messages.home.featured.subtitle') }}</p>
             </div>
             <div class="row g-4">
                 @foreach($featuredProducts as $product)
@@ -74,7 +74,7 @@
                 @endforeach
             </div>
             <div class="text-center mt-5">
-                <a href="/catalog" class="btn btn-primary px-5">Ver toda la tienda</a>
+                <a href="/catalog" class="btn btn-primary px-5">{{ __('messages.home.featured.btn_all') }}</a>
             </div>
         </div>
     </section>
@@ -85,18 +85,18 @@
             <div class="row g-4 text-center">
                 <div class="col-md-4">
                     <i class="bi bi-truck fs-1 mb-3"></i>
-                    <h5 class="fw-bold">Envío Express</h5>
-                    <p class="opacity-75 small">Recibe tu almohada en 24/48h en la puerta de tu casa.</p>
+                    <h5 class="fw-bold">{{ __('messages.home.features.express.title') }}</h5>
+                    <p class="opacity-75 small">{{ __('messages.home.features.express.desc') }}</p>
                 </div>
                 <div class="col-md-4">
                     <i class="bi bi-shield-check fs-1 mb-3"></i>
-                    <h5 class="fw-bold">Garantía de Descanso</h5>
-                    <p class="opacity-75 small">Si no duermes mejor en 30 días, te devolvemos el dinero.</p>
+                    <h5 class="fw-bold">{{ __('messages.home.features.guarantee.title') }}</h5>
+                    <p class="opacity-75 small">{{ __('messages.home.features.guarantee.desc') }}</p>
                 </div>
                 <div class="col-md-4">
                     <i class="bi bi-heart-pulse fs-1 mb-3"></i>
-                    <h5 class="fw-bold">Salud Certificada</h5>
-                    <p class="opacity-75 small">Todos nuestros productos están avalados por expertos en ergonomía.</p>
+                    <h5 class="fw-bold">{{ __('messages.home.features.health.title') }}</h5>
+                    <p class="opacity-75 small">{{ __('messages.home.features.health.desc') }}</p>
                 </div>
             </div>
         </div>
