@@ -22,7 +22,6 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
     {
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
-
             'email' => [
                 'required',
                 'string',
@@ -30,6 +29,8 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
                 'max:255',
                 Rule::unique('users')->ignore($user->id),
             ],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'sleep_preference' => ['nullable', 'string', 'max:100'],
         ])->validateWithBag('updateProfileInformation');
 
         if ($input['email'] !== $user->email &&
@@ -41,6 +42,15 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
                 'email' => $input['email'],
             ])->save();
         }
+
+        $user->profile()->updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'full_name' => $input['name'],
+                'phone' => $input['phone'] ?? null,
+                'sleep_preference' => $input['sleep_preference'] ?? null,
+            ]
+        );
     }
 
     /**

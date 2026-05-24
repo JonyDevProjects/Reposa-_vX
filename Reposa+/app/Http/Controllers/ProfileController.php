@@ -38,4 +38,22 @@ class ProfileController extends Controller
 
         return back()->with('success', 'Dirección eliminada.');
     }
+
+    public function updateAddress(Request $request, \App\Models\Address $address)
+    {
+        if ($address->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'street' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'zip_code' => 'required|string|max:20',
+            'is_main' => 'boolean',
+        ]);
+
+        $address->update($validated);
+
+        return back()->with('success', 'Dirección actualizada correctamente.');
+    }
 }

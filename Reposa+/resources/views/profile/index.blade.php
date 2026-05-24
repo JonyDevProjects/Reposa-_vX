@@ -20,6 +20,10 @@
                     <a href="#orders" class="list-group-item list-group-item-action border-0 px-0"><i class="bi bi-box me-2"></i> Mis Pedidos</a>
                     <a href="#addresses" class="list-group-item list-group-item-action border-0 px-0"><i class="bi bi-geo-alt me-2"></i> Mis Direcciones</a>
                     <a href="#favorites" class="list-group-item list-group-item-action border-0 px-0"><i class="bi bi-heart me-2"></i> Favoritos</a>
+                    <form method="POST" action="{{ route('logout') }}" class="d-inline">
+                        @csrf
+                        <button type="submit" class="list-group-item list-group-item-action border-0 px-0 text-danger"><i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -28,28 +32,53 @@
         <div class="col-md-9">
             <!-- Overview Section -->
             <div id="overview" class="mb-5">
-                <div class="card border-0 shadow-sm rounded-4 p-5">
+                <div class="card border-0 shadow-sm rounded-4 p-5 mb-4">
                     <h4 class="fw-bold mb-4">Datos Personales</h4>
-                    <form>
+                    <form method="POST" action="{{ route('user-profile-information.update') }}">
+                        @csrf
+                        @method('PUT')
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted">Nombre Completo</label>
-                                <input type="text" class="form-control" value="{{ $user->name }}" readonly>
+                                <input type="text" name="name" class="form-control" value="{{ old('name', $user->name) }}">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted">Correo Electrónico</label>
-                                <input type="email" class="form-control" value="{{ $user->email }}" readonly>
+                                <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted">Teléfono</label>
-                                <input type="text" class="form-control" value="{{ $user->profile->phone ?? 'No especificado' }}" readonly>
+                                <input type="text" name="phone" class="form-control" value="{{ old('phone', $user->profile->phone ?? '') }}">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted">Preferencia de Sueño</label>
-                                <input type="text" class="form-control" value="{{ $user->profile->sleep_preference ?? 'No especificada' }}" readonly>
+                                <input type="text" name="sleep_preference" class="form-control" value="{{ old('sleep_preference', $user->profile->sleep_preference ?? '') }}">
                             </div>
                         </div>
-                        <button type="button" class="btn btn-outline-primary mt-4">Editar Perfil</button>
+                        <button type="submit" class="btn btn-primary mt-4">Guardar Cambios</button>
+                    </form>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 p-5">
+                    <h4 class="fw-bold mb-4">Cambiar Contraseña</h4>
+                    <form method="POST" action="{{ route('user-password.update') }}">
+                        @csrf
+                        @method('PUT')
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label small fw-bold text-muted">Contraseña Actual</label>
+                                <input type="password" name="current_password" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">Nueva Contraseña</label>
+                                <input type="password" name="password" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">Confirmar Nueva Contraseña</label>
+                                <input type="password" name="password_confirmation" class="form-control" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary mt-4">Actualizar Contraseña</button>
                     </form>
                 </div>
             </div>
@@ -88,7 +117,7 @@
                                                 </span>
                                             </td>
                                             <td class="text-end">
-                                                <a href="#" class="btn btn-sm btn-outline-secondary">Ver detalles</a>
+                                                <a href="{{ route('orders.show', $order) }}" class="btn btn-sm btn-outline-secondary">Ver detalles</a>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -104,7 +133,7 @@
                 <div class="card border-0 shadow-sm rounded-4 p-5">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h4 class="fw-bold mb-0">Mis Direcciones de Envío</h4>
-                        <button class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i> Nueva Dirección</button>
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addAddressModal"><i class="bi bi-plus-lg me-1"></i> Nueva Dirección</button>
                     </div>
                     @if($user->addresses->isEmpty())
                         <div class="text-center py-4">
@@ -121,9 +150,54 @@
                                         @endif
                                         <h6 class="fw-bold">{{ $address->street }}</h6>
                                         <p class="text-muted small mb-0">{{ $address->zip_code }} - {{ $address->city }}</p>
-                                        <div class="mt-3">
-                                            <a href="#" class="small text-decoration-none me-3">Editar</a>
-                                            <a href="#" class="small text-danger text-decoration-none">Eliminar</a>
+                                        <div class="mt-3 d-flex gap-3">
+                                            <a href="#" class="small text-decoration-none" data-bs-toggle="modal" data-bs-target="#editAddressModal{{ $address->id }}">Editar</a>
+                                            <form action="{{ route('profile.address.destroy', $address) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar esta dirección?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-link btn-sm text-danger p-0 text-decoration-none">Eliminar</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Edit Address Modal -->
+                                <div class="modal fade" id="editAddressModal{{ $address->id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form action="{{ route('profile.address.update', $address) }}" method="POST">
+                                                @csrf
+                                                @method('PUT')
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Editar Dirección</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Calle</label>
+                                                        <input type="text" name="street" class="form-control" value="{{ $address->street }}" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Ciudad</label>
+                                                        <input type="text" name="city" class="form-control" value="{{ $address->city }}" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Código Postal</label>
+                                                        <input type="text" name="zip_code" class="form-control" value="{{ $address->zip_code }}" required>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input type="hidden" name="is_main" value="0">
+                                                        <input class="form-check-input" type="checkbox" name="is_main" value="1" id="isMain{{ $address->id }}" {{ $address->is_main ? 'checked' : '' }}>
+                                                        <label class="form-check-label" for="isMain{{ $address->id }}">
+                                                            Marcar como principal
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                                                </div>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -132,6 +206,46 @@
                     @endif
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Address Modal -->
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ route('profile.address.store') }}" method="POST">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title">Nueva Dirección</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Calle</label>
+                        <input type="text" name="street" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ciudad</label>
+                        <input type="text" name="city" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Código Postal</label>
+                        <input type="text" name="zip_code" class="form-control" required>
+                    </div>
+                    <div class="form-check">
+                        <input type="hidden" name="is_main" value="0">
+                        <input class="form-check-input" type="checkbox" name="is_main" value="1" id="isMainNew">
+                        <label class="form-check-label" for="isMainNew">
+                            Marcar como principal
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Dirección</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
