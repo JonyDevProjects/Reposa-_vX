@@ -25,11 +25,13 @@ Route::get('/cart/login', [CartController::class, 'requireLogin'])->name('cart.l
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('/profile/address', [ProfileController::class, 'storeAddress'])->name('profile.address.store');
+    Route::put('/profile/address/{address}', [ProfileController::class, 'updateAddress'])->name('profile.address.update');
     Route::delete('/profile/address/{address}', [ProfileController::class, 'destroyAddress'])->name('profile.address.destroy');
 
     // Rutas de Checkout/Pedidos (Solo usuarios autenticados)
     Route::post('/checkout', [CartController::class, 'checkout'])->name('checkout');
     Route::get('/orders', [CartController::class, 'orders'])->name('orders.index');
+    Route::get('/orders/{order}', [CartController::class, 'showOrder'])->name('orders.show');
 });
 
 // Rutas de Administración

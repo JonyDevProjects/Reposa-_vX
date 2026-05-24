@@ -183,4 +183,15 @@ class CartController extends Controller
         session()->put('url.intended', route('cart.index'));
         return redirect()->route('login');
     }
+
+    public function showOrder(Order $order)
+    {
+        if ($order->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $order->load('orderItems.product');
+
+        return view('orders.show', compact('order'));
+    }
 }
