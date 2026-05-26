@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Reposa+') - Tu descanso, nuestra prioridad</title>
 
     <!-- Fonts -->
@@ -234,6 +235,106 @@
                 })
                 .finally(() => {
                     btn.innerHTML = originalHtml;
+                    btn.disabled = false;
+                });
+            }
+        });
+
+        // Interceptar clicks en botones de favorito
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.btn-favorite');
+            if (btn) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const url = btn.dataset.url;
+                const icon = btn.querySelector('i');
+                const originalHtml = btn.innerHTML;
+                
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm text-danger" role="status" aria-hidden="true"></span>';
+                btn.disabled = true;
+                
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+                
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                })
+                .then(response => {
+                    if (response.status === 401) {
+                        return response.json().then(data => {
+                            showToast('error', data.message);
+                            if (data.redirect) {
+                                setTimeout(() => window.location.href = data.redirect, 1500);
+                            }
+                            throw new Error('Unauthorized');
+                        });
+                    }
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        if (data.is_favorite) {
+                            icon.className = 'bi bi-heart-fill';
+                            btn.classList.add('btn-danger', 'text-white');
+                            btn.classList.remove('btn-outline-danger');
+                        } else {
+                            icon.className = 'bi bi-heart';
+                            btn.classList.remove('btn-danger', 'text-white');
+                            btn.classList.add('btn-outline-danger');
+                        }
+                        
+                        // Si estamos en la página de perfil y se desmarca como favorito, podemos ocultar la tarjeta
+                        const productId = btn.dataset.productId;
+                        if (productId) {
+                            const favCard = document.getElementById(`fav-card-${productId}`);
+                            if (favCard && !data.is_favorite) {
+                                favCard.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                                favCard.style.opacity = '0';
+                                favCard.style.transform = 'scale(0.8)';
+                                setTimeout(() => {
+                                    favCard.remove();
+                                    // Si ya no quedan favoritos, mostrar el mensaje de vacío
+                                    const container = document.getElementById('favorites');
+                                    if (container && container.querySelectorAll('[id^="fav-card-"]').length === 0) {
+                                        const title = container.querySelector('h4')?.innerText || 'Las almohadas que más me gustan';
+                                        container.querySelector('.card').innerHTML = `
+                                            <h4 class="fw-bold mb-4">${title}</h4>
+                                            <div class="text-center py-5">
+                                                <i class="bi bi-heart fs-1 text-muted"></i>
+                                                <p class="mt-3 text-muted">Aún no tienes almohadas en tus favoritos.</p>
+                                                <a href="/catalog" class="btn btn-primary mt-2">Explorar Almohadas</a>
+                                            </div>
+                                        `;
+                                    }
+                                }, 300);
+                            }
+                        }
+                        
+                        // Microanimación
+                        btn.style.transform = 'scale(1.25)';
+                        setTimeout(() => btn.style.transform = 'scale(1)', 150);
+                        btn.style.transition = 'transform 0.15s ease-in-out';
+                        
+                        showToast('success', data.message);
+                    }
+                })
+                .catch(error => {
+                    if (error.message !== 'Unauthorized') {
+                        console.error('Error:', error);
+                        showToast('error', 'Hubo un error al procesar la solicitud.');
+                    }
+                })
+                .finally(() => {
+                    btn.innerHTML = '';
+                    btn.appendChild(icon);
                     btn.disabled = false;
                 });
             }

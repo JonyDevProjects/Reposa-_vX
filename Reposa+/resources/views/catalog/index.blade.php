@@ -75,10 +75,22 @@
                                             <p class="card-text text-muted small mb-3">{{ Str::limit($product->description, 60) }}</p>
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <span class="fs-4 fw-bold text-primary">{{ number_format($product->price, 2) }}€</span>
-                                                <form action="{{ route('cart.add', $product) }}" method="POST">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-outline-primary btn-sm rounded-circle"><i class="bi bi-cart-plus"></i></button>
-                                                </form>
+                                                <div class="d-flex gap-2">
+                                                    @php
+                                                        $isFav = Auth::check() && Auth::user()->favorites->contains($product->id);
+                                                    @endphp
+                                                    <button type="button" 
+                                                            class="btn {{ $isFav ? 'btn-danger text-white' : 'btn-outline-danger' }} btn-sm rounded-circle btn-favorite" 
+                                                            data-product-id="{{ $product->id }}"
+                                                            data-url="{{ route('favorites.toggle', $product) }}"
+                                                            title="{{ __('messages.footer.favorites') }}">
+                                                        <i class="bi {{ $isFav ? 'bi-heart-fill' : 'bi-heart' }}"></i>
+                                                    </button>
+                                                    <form action="{{ route('cart.add', $product) }}" method="POST" class="m-0">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-outline-primary btn-sm rounded-circle"><i class="bi bi-cart-plus"></i></button>
+                                                    </form>
+                                                </div>
                                             </div>
                                         </div>
                                     </a>

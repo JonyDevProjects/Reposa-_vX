@@ -16,8 +16,20 @@ class AdminController extends Controller
         $totalRevenue = Order::sum('total_amount');
         $totalProducts = Product::count();
         $recentOrders = Order::with('user')->latest()->take(5)->get();
+        
+        // Top de Almohadas con mayores expectativas de compra (más marcados como favorito)
+        $topFavoritedProducts = Product::withCount('favoritedBy')
+            ->orderBy('favorited_by_count', 'desc')
+            ->take(5)
+            ->get();
 
-        return view('admin.dashboard', compact('totalOrders', 'totalRevenue', 'totalProducts', 'recentOrders'));
+        return view('admin.dashboard', compact(
+            'totalOrders', 
+            'totalRevenue', 
+            'totalProducts', 
+            'recentOrders', 
+            'topFavoritedProducts'
+        ));
     }
 
     public function products()

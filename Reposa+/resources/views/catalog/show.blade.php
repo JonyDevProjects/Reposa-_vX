@@ -72,8 +72,15 @@
                         <button type="submit" class="btn btn-primary flex-grow-1 py-3 fw-bold">
                             <i class="bi bi-cart-plus me-2"></i>Añadir al Carrito
                         </button>
-                        <button type="button" class="btn btn-outline-danger py-3 px-4" title="Añadir a Favoritos">
-                            <i class="bi bi-heart"></i>
+                        @php
+                            $isFav = Auth::check() && Auth::user()->favorites->contains($product->id);
+                        @endphp
+                        <button type="button" 
+                                class="btn {{ $isFav ? 'btn-danger text-white' : 'btn-outline-danger' }} py-3 px-4 btn-favorite" 
+                                data-product-id="{{ $product->id }}"
+                                data-url="{{ route('favorites.toggle', $product) }}"
+                                title="{{ __('messages.footer.favorites') }}">
+                            <i class="bi {{ $isFav ? 'bi-heart-fill' : 'bi-heart' }}"></i>
                         </button>
                     </form>
 

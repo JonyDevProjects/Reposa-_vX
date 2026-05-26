@@ -69,4 +69,12 @@ return [
             'btn' => 'View full catalog',
         ],
     ],
+    'favorites' => [
+        'added' => 'Pillow added to favorites.',
+        'removed' => 'Pillow removed from favorites.',
+        'login_required' => 'You must log in to save favorites.',
+        'title' => 'The pillows I like the most',
+        'empty' => 'You do not have any pillows in your favorites yet.',
+        'btn_catalog' => 'Explore Pillows',
+    ],
 ];

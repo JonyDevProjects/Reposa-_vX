@@ -69,4 +69,12 @@ return [
             'btn' => 'Ver todo el catálogo',
         ],
     ],
+    'favorites' => [
+        'added' => 'Almohada añadida a favoritos.',
+        'removed' => 'Almohada eliminada de favoritos.',
+        'login_required' => 'Debes iniciar sesión para guardar favoritos.',
+        'title' => 'Las almohadas que más me gustan',
+        'empty' => 'Aún no tienes almohadas en tus favoritos.',
+        'btn_catalog' => 'Explorar Almohadas',
+    ],
 ];

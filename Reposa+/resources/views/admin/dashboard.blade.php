@@ -50,34 +50,70 @@
             </div>
         </div>
 
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white py-3">
-                <h5 class="mb-0 fw-bold">Pedidos Recientes</h5>
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0 fw-bold">Pedidos Recientes</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Cliente</th>
+                                        <th>Fecha</th>
+                                        <th>Total</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($recentOrders as $order)
+                                    <tr>
+                                        <td>#{{ $order->id }}</td>
+                                        <td>{{ $order->user->name }}</td>
+                                        <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
+                                        <td>{{ number_format($order->total_amount, 2) }}€</td>
+                                        <td><span class="badge bg-warning text-dark">{{ ucfirst($order->status) }}</span></td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>ID</th>
-                                <th>Cliente</th>
-                                <th>Fecha</th>
-                                <th>Total</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($recentOrders as $order)
-                            <tr>
-                                <td>#{{ $order->id }}</td>
-                                <td>{{ $order->user->name }}</td>
-                                <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
-                                <td>{{ number_format($order->total_amount, 2) }}€</td>
-                                <td><span class="badge bg-warning text-dark">{{ ucfirst($order->status) }}</span></td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+            
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0 fw-bold">Top Almohadas Más Deseadas</h5>
+                    </div>
+                    <div class="card-body">
+                        @if($topFavoritedProducts->isEmpty())
+                            <p class="text-muted text-center py-4">No hay datos de favoritos aún.</p>
+                        @else
+                            <ul class="list-group list-group-flush">
+                                @foreach($topFavoritedProducts as $product)
+                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light p-2 rounded me-3 text-center" style="width: 45px; height: 40px;">
+                                                <i class="bi bi-heart-fill text-danger"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 fw-bold">{{ $product->name }}</h6>
+                                                <small class="text-muted">{{ number_format($product->price, 2) }}€</small>
+                                            </div>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill px-3 py-2">
+                                            {{ $product->favorited_by_count }} <i class="bi bi-person-heart ms-1"></i>
+                                        </span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
