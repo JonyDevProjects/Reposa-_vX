@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Reposa+') - Tu descanso, nuestra prioridad</title>
 
     <!-- Fonts -->
@@ -25,19 +26,28 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/">Inicio</a>
+                        <a class="nav-link" href="/">{{ __('messages.nav.home') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/catalog">Catálogo</a>
+                        <a class="nav-link" href="/catalog">{{ __('messages.nav.catalog') }}</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-globe"></i> {{ strtoupper(app()->getLocale()) }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item {{ app()->getLocale() == 'es' ? 'active' : '' }}" href="{{ route('lang.switch', 'es') }}">Español</a></li>
+                            <li><a class="dropdown-item {{ app()->getLocale() == 'en' ? 'active' : '' }}" href="{{ route('lang.switch', 'en') }}">English</a></li>
+                        </ul>
+                    </li>
                     @guest
                         <li class="nav-item">
-                            <a class="nav-link" href="/login">Iniciar Sesión</a>
+                            <a class="nav-link" href="/login">{{ __('messages.nav.login') }}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link btn btn-secondary text-white ms-lg-2 px-4" href="/register">Registrarse</a>
+                            <a class="nav-link btn btn-secondary text-white ms-lg-2 px-4" href="/register">{{ __('messages.nav.register') }}</a>
                         </li>
                     @else
                         <li class="nav-item dropdown">
@@ -45,12 +55,12 @@
                                 {{ Auth::user()->name }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="/profile">Mi Perfil</a></li>
+                                <li><a class="dropdown-item" href="/profile">{{ __('messages.nav.profile') }}</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form action="/logout" method="POST">
                                         @csrf
-                                        <button type="submit" class="dropdown-item">Cerrar Sesión</button>
+                                        <button type="submit" class="dropdown-item">{{ __('messages.nav.logout') }}</button>
                                     </form>
                                 </li>
                             </ul>
@@ -83,36 +93,36 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-4">
-                    <h5 class="fw-bold mb-3">Reposa+</h5>
-                    <p class="text-light opacity-75">No vendemos almohadas, vendemos noches de sueño profundo y reparador. Tu salud cervical es nuestra prioridad.</p>
+                    <h5 class="fw-bold mb-3">{{ __('messages.footer.title') }}</h5>
+                    <p class="text-light opacity-75">{{ __('messages.footer.desc') }}</p>
                 </div>
                 <div class="col-md-2 mb-4">
-                    <h6 class="fw-bold mb-3">Tienda</h6>
+                    <h6 class="fw-bold mb-3">{{ __('messages.footer.shop') }}</h6>
                     <ul class="list-unstyled">
-                        <li><a href="/catalog" class="text-white text-decoration-none opacity-75">Catálogo</a></li>
-                        <li><a href="#" class="text-white text-decoration-none opacity-75">Ofertas</a></li>
-                        <li><a href="#" class="text-white text-decoration-none opacity-75">Favoritos</a></li>
+                        <li><a href="/catalog" class="text-white text-decoration-none opacity-75">{{ __('messages.nav.catalog') }}</a></li>
+                        <li><a href="#" class="text-white text-decoration-none opacity-75">{{ __('messages.footer.offers') }}</a></li>
+                        <li><a href="#" class="text-white text-decoration-none opacity-75">{{ __('messages.footer.favorites') }}</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3 mb-4">
-                    <h6 class="fw-bold mb-3">Soporte</h6>
+                    <h6 class="fw-bold mb-3">{{ __('messages.footer.support') }}</h6>
                     <ul class="list-unstyled">
-                        <li><a href="#" class="text-white text-decoration-none opacity-75">Contacto</a></li>
-                        <li><a href="#" class="text-white text-decoration-none opacity-75">Envíos y Devoluciones</a></li>
-                        <li><a href="#" class="text-white text-decoration-none opacity-75">Preguntas Frecuentes</a></li>
+                        <li><a href="#" class="text-white text-decoration-none opacity-75">{{ __('messages.footer.contact') }}</a></li>
+                        <li><a href="#" class="text-white text-decoration-none opacity-75">{{ __('messages.footer.shipping') }}</a></li>
+                        <li><a href="#" class="text-white text-decoration-none opacity-75">{{ __('messages.footer.faq') }}</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">
-                    <h6 class="fw-bold mb-3">Suscríbete</h6>
+                    <h6 class="fw-bold mb-3">{{ __('messages.footer.subscribe') }}</h6>
                     <div class="input-group mb-3">
                         <input type="text" class="form-control" placeholder="Email" aria-label="Email">
-                        <button class="btn btn-secondary" type="button">OK</button>
+                        <button class="btn btn-secondary" type="button">{{ __('messages.footer.subscribe_btn') }}</button>
                     </div>
                 </div>
             </div>
             <hr class="my-4 opacity-25">
             <div class="text-center opacity-75">
-                <small>&copy; 2026 Reposa+. Todos los derechos reservados.</small>
+                <small>&copy; 2026 Reposa+. {{ __('messages.footer.rights') }}</small>
             </div>
         </div>
     </footer>
@@ -225,6 +235,106 @@
                 })
                 .finally(() => {
                     btn.innerHTML = originalHtml;
+                    btn.disabled = false;
+                });
+            }
+        });
+
+        // Interceptar clicks en botones de favorito
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.btn-favorite');
+            if (btn) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const url = btn.dataset.url;
+                const icon = btn.querySelector('i');
+                const originalHtml = btn.innerHTML;
+                
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm text-danger" role="status" aria-hidden="true"></span>';
+                btn.disabled = true;
+                
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+                
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                })
+                .then(response => {
+                    if (response.status === 401) {
+                        return response.json().then(data => {
+                            showToast('error', data.message);
+                            if (data.redirect) {
+                                setTimeout(() => window.location.href = data.redirect, 1500);
+                            }
+                            throw new Error('Unauthorized');
+                        });
+                    }
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        if (data.is_favorite) {
+                            icon.className = 'bi bi-heart-fill';
+                            btn.classList.add('btn-danger', 'text-white');
+                            btn.classList.remove('btn-outline-danger');
+                        } else {
+                            icon.className = 'bi bi-heart';
+                            btn.classList.remove('btn-danger', 'text-white');
+                            btn.classList.add('btn-outline-danger');
+                        }
+                        
+                        // Si estamos en la página de perfil y se desmarca como favorito, podemos ocultar la tarjeta
+                        const productId = btn.dataset.productId;
+                        if (productId) {
+                            const favCard = document.getElementById(`fav-card-${productId}`);
+                            if (favCard && !data.is_favorite) {
+                                favCard.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                                favCard.style.opacity = '0';
+                                favCard.style.transform = 'scale(0.8)';
+                                setTimeout(() => {
+                                    favCard.remove();
+                                    // Si ya no quedan favoritos, mostrar el mensaje de vacío
+                                    const container = document.getElementById('favorites');
+                                    if (container && container.querySelectorAll('[id^="fav-card-"]').length === 0) {
+                                        const title = container.querySelector('h4')?.innerText || 'Las almohadas que más me gustan';
+                                        container.querySelector('.card').innerHTML = `
+                                            <h4 class="fw-bold mb-4">${title}</h4>
+                                            <div class="text-center py-5">
+                                                <i class="bi bi-heart fs-1 text-muted"></i>
+                                                <p class="mt-3 text-muted">Aún no tienes almohadas en tus favoritos.</p>
+                                                <a href="/catalog" class="btn btn-primary mt-2">Explorar Almohadas</a>
+                                            </div>
+                                        `;
+                                    }
+                                }, 300);
+                            }
+                        }
+                        
+                        // Microanimación
+                        btn.style.transform = 'scale(1.25)';
+                        setTimeout(() => btn.style.transform = 'scale(1)', 150);
+                        btn.style.transition = 'transform 0.15s ease-in-out';
+                        
+                        showToast('success', data.message);
+                    }
+                })
+                .catch(error => {
+                    if (error.message !== 'Unauthorized') {
+                        console.error('Error:', error);
+                        showToast('error', 'Hubo un error al procesar la solicitud.');
+                    }
+                })
+                .finally(() => {
+                    btn.innerHTML = '';
+                    btn.appendChild(icon);
                     btn.disabled = false;
                 });
             }

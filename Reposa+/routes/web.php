@@ -7,10 +7,15 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\FavoriteController;
 
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/catalog', [ProductController::class, 'index']);
 Route::get('/catalog/{product}', [ProductController::class, 'show'])->name('products.show');
+Route::post('/favorites/toggle/{product}', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
+
+Route::get('/lang/{locale}', [LanguageController::class, 'switchLang'])->name('lang.switch');
 
 // Rutas del Carrito (Abiertas a invitados)
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');

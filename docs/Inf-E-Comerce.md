@@ -132,6 +132,6 @@ El ciclo vital de entrega obligatoria requerirá un proceso documental perenne a
 3. **Contrastación con la Realidad (Mockups vs Realidad):** Proveer las pruebas documentales que atestiguan cómo las pantallas planeadas preliminarmente contrastan respecto al aplicativo HTML final emitido por el compilador Blade de Laravel.
 4. **Validaciones Release:** Cargar copias empaquetadas correctas localizadas mediante URL y links dentro del registro original o memoria de final del periodo en la Asignatura.
 
-**Estado de Ejecución:** La fase de cimentación (v1.0) y la gestión compleja de categorías (v2.0) han sido completadas con éxito, incluyendo el sistema de notificaciones dinámicas y el filtrado avanzado.
+**Estado de Ejecución:** La fase de cimentación (v1.0), la gestión compleja de categorías (v2.0) y la internacionalización de la plataforma (i18n) para la Home y el Catálogo han sido completadas con éxito en la rama `features/soporte-multi-idioma`.
 
-**Próximo plan de acción técnico:** Iniciar la Fase 3 (v2.1) implementando el soporte multi-idioma (i18n) en la Home y Catálogo, y extender las capacidades del Perfil de Usuario con el cambio de credenciales y el historial detallado de pedidos.
+**Próximo plan de acción técnico:** Continuar la Fase 3 (v2.1) extendiendo las capacidades del Perfil de Usuario con el cambio de credenciales, gestión de direcciones y el historial detallado de pedidos en su rama correspondiente (`features/perfil-cliente`).

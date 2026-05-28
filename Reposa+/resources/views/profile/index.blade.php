@@ -268,6 +268,54 @@
                     @endif
                 </div>
             </div>
+
+            <!-- Favorites Section -->
+            <div id="favorites" class="mt-5 mb-5">
+                <div class="card border-0 shadow-sm rounded-4 p-5">
+                    <h4 class="fw-bold mb-4">{{ __('messages.favorites.title') }}</h4>
+                    @if($user->favorites->isEmpty())
+                        <div class="text-center py-5">
+                            <i class="bi bi-heart fs-1 text-muted"></i>
+                            <p class="mt-3 text-muted">{{ __('messages.favorites.empty') }}</p>
+                            <a href="/catalog" class="btn btn-primary mt-2">{{ __('messages.favorites.btn_catalog') }}</a>
+                        </div>
+                    @else
+                        <div class="row g-4">
+                            @foreach($user->favorites as $product)
+                                <div class="col-md-6" id="fav-card-{{ $product->id }}">
+                                    <div class="card h-100 shadow-sm border-0 position-relative">
+                                        <button type="button" 
+                                                class="btn btn-danger text-white btn-sm rounded-circle position-absolute top-0 end-0 m-3 btn-favorite" 
+                                                data-product-id="{{ $product->id }}"
+                                                data-url="{{ route('favorites.toggle', $product) }}"
+                                                title="{{ __('messages.favorites.removed') }}">
+                                            <i class="bi bi-heart-fill"></i>
+                                        </button>
+                                        <a href="{{ route('products.show', $product) }}" class="text-decoration-none text-dark">
+                                            <img src="https://placehold.co/400x300/182447/ffffff?text={{ urlencode($product->name) }}" class="card-img-top" alt="{{ $product->name }}">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <span class="badge bg-light text-primary border">{{ $product->material }}</span>
+                                                    <span class="text-muted small"><i class="bi bi-star-fill text-warning"></i> 4.8</span>
+                                                </div>
+                                                <h5 class="card-title fw-bold mb-1">{{ $product->name }}</h5>
+                                                <p class="card-text text-muted small mb-3">{{ Str::limit($product->description, 60) }}</p>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="fs-5 fw-bold text-primary">{{ number_format($product->price, 2) }}€</span>
+                                                    <form action="{{ route('cart.add', $product) }}" method="POST" class="m-0">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-outline-primary btn-sm rounded-circle"><i class="bi bi-cart-plus"></i></button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
         </div>
     </div>
 </div>

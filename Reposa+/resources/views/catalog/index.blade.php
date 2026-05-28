@@ -5,11 +5,11 @@
 @section('content')
     <div class="bg-light py-4 border-bottom mb-5">
         <div class="container">
-            <h1 class="fw-bold mb-0">Nuestro Catálogo</h1>
+            <h1 class="fw-bold mb-0">{{ __('messages.catalog.title') }}</h1>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 mt-2">
-                    <li class="breadcrumb-item"><a href="/">Inicio</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Catálogo</li>
+                    <li class="breadcrumb-item"><a href="/">{{ __('messages.catalog.breadcrumb.home') }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ __('messages.catalog.breadcrumb.catalog') }}</li>
                 </ol>
             </nav>
         </div>
@@ -20,10 +20,10 @@
             <!-- Sidebar / Filters -->
             <div class="col-md-3">
                 <div class="card border-0 shadow-sm p-4 sticky-top" style="top: 100px;">
-                    <h5 class="fw-bold mb-4">Filtrar por Categoría</h5>
+                    <h5 class="fw-bold mb-4">{{ __('messages.catalog.filter.title') }}</h5>
                     <div class="list-group list-group-flush">
                         <a href="/catalog" class="list-group-item list-group-item-action border-0 px-0 {{ !request('category') ? 'text-primary fw-bold' : '' }}">
-                            Todas las almohadas
+                            {{ __('messages.catalog.filter.all') }}
                         </a>
                         @foreach($categories as $category)
                             <a href="/catalog?category={{ $category->slug }}" 
@@ -55,9 +55,9 @@
                 @if($products->isEmpty())
                     <div class="text-center py-5">
                         <i class="bi bi-search fs-1 text-muted"></i>
-                        <h4 class="mt-3">No se encontraron productos</h4>
-                        <p class="text-muted">Prueba a cambiar tus filtros.</p>
-                        <a href="/catalog" class="btn btn-primary mt-3">Ver todo el catálogo</a>
+                        <h4 class="mt-3">{{ __('messages.catalog.empty.title') }}</h4>
+                        <p class="text-muted">{{ __('messages.catalog.empty.desc') }}</p>
+                        <a href="/catalog" class="btn btn-primary mt-3">{{ __('messages.catalog.empty.btn') }}</a>
                     </div>
                 @else
                     <div class="row g-4">

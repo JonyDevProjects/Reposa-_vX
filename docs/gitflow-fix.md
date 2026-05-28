@@ -15,3 +15,14 @@ Este tipo de duplicidad generalmente responde a una de estas causas:
 
 ## Decisión Tomada
 Dado que los últimos trabajos (incluyendo el inicio de la **Fase 2**) utilizan la nomenclatura plural, nos hemos alineado a este formato. El entorno local ha sido cambiado exitosamente a la rama **`features/sistema-categorias`**.
+
+## Hallazgo Adicional: Ramas del Problema 4 (Internacionalización y Perfil)
+Se ha detectado confusión respecto a las ramas destinadas a la Fase 3 - Problema 4 (Internacionalización y Perfil de Usuario v2.1). En el repositorio coexisten tres ramas relacionadas:
+- `features/internacionalizacion-perfil-usuario`
+- `features/soporte-multi-idioma`
+- `features/perfil-cliente`
+
+### Explicación y Estado Actual
+1. **`features/internacionalizacion-perfil-usuario`**: Esta es una rama antigua remota. Su último commit (`5361139 zip grupo indigo`) **ya se encuentra integrado (merged) en `develop`**. Dado que su código ya forma parte del historial principal, la rama puede ser eliminada del remoto con seguridad para evitar confusión en el equipo.
+2. **`fix/update-agent-workflows`**: Esta rama fue utilizada para actualizar las reglas de Gitflow y el ecosistema de agentes, y **también se encuentra mergeada en `develop`** correctamente. El ecosistema de agentes se actualizó de forma independiente.
+3. **Nuevas Ramas Oficiales (`features/soporte-multi-idioma` y `features/perfil-cliente`)**: Para mantener la estricta separación de responsabilidades (Single Responsibility Principle) y facilitar el trabajo en paralelo, el Problema 4 se dividió de forma proactiva en estas dos ramas independientes. Ambas son las ramas oficiales y limpias sobre las que el equipo debe implementar la Fase 3.
