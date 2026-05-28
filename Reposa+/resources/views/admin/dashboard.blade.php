@@ -81,6 +81,40 @@
                 </div>
             </div>
         </div>
+
+        <div class="card border-0 shadow-sm mt-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold">Top Almohadas (Expectativa de Compra)</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Producto</th>
+                                <th>Precio</th>
+                                <th>Favoritos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($topExpectedProducts as $product)
+                            <tr>
+                                <td>#{{ $product->id }}</td>
+                                <td>{{ $product->name }}</td>
+                                <td>{{ number_format($product->price, 2) }}€</td>
+                                <td><span class="badge bg-secondary"><i class="bi bi-heart-fill text-danger me-1"></i> {{ $product->favorited_by_count }}</span></td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">Aún no hay productos añadidos a favoritos.</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 @endsection
