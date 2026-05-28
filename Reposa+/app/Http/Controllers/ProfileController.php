@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class ProfileController extends Controller
@@ -9,9 +10,32 @@ class ProfileController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $user->load(['profile', 'addresses', 'orders']);
+        $user->load(['profile', 'addresses', 'orders', 'favorites.categories']);
         
         return view('profile.index', compact('user'));
+    }
+
+    public function toggleFavorite(Product $product)
+    {
+        $user = auth()->user();
+
+        if ($user->favorites()->where('product_id', $product->id)->exists()) {
+            $user->favorites()->detach($product->id);
+
+            return back()->with('success', 'Producto eliminado de tus favoritos.');
+        }
+
+        $user->favorites()->attach($product->id);
+
+        return back()->with('success', 'Producto añadido a tus favoritos.');
+    }
+
+    public function removeFavorite(Product $product)
+    {
+        $user = auth()->user();
+        $user->favorites()->detach($product->id);
+
+        return redirect('/profile#favorites')->with('success', 'Producto eliminado de tus favoritos.');
     }
 
     public function storeAddress(Request $request)

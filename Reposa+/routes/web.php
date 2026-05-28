@@ -29,6 +29,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/checkout', [CartController::class, 'checkout'])->name('checkout');
     Route::get('/orders', [CartController::class, 'orders'])->name('orders.index');
     Route::get('/orders/{order}', [CartController::class, 'showOrder'])->name('orders.show');
+    Route::post('/favorites/{product}', [ProfileController::class, 'toggleFavorite'])->name('favorites.toggle');
+    Route::delete('/favorites/{product}', [ProfileController::class, 'removeFavorite'])->name('favorites.destroy');
 });
 
 // Rutas de Administración

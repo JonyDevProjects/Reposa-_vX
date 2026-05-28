@@ -62,20 +62,33 @@
 
                     <p class="text-muted mb-5 lead">{{ $product->description }}</p>
 
-                    <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-flex gap-3 mb-5">
-                        @csrf
-                        <div class="input-group" style="width: 130px;">
-                            <button class="btn btn-outline-secondary" type="button" onclick="this.nextElementSibling.stepDown()">-</button>
-                            <input type="number" name="quantity" class="form-control text-center" value="1" min="1" max="10">
-                            <button class="btn btn-outline-secondary" type="button" onclick="this.previousElementSibling.stepUp()">+</button>
-                        </div>
-                        <button type="submit" class="btn btn-primary flex-grow-1 py-3 fw-bold">
-                            <i class="bi bi-cart-plus me-2"></i>Añadir al Carrito
-                        </button>
-                        <button type="button" class="btn btn-outline-danger py-3 px-4" title="Añadir a Favoritos">
-                            <i class="bi bi-heart"></i>
-                        </button>
-                    </form>
+                    <div class="d-flex flex-column flex-md-row gap-3 mb-5">
+                        <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-flex gap-3 w-100">
+                            @csrf
+                            <div class="input-group" style="width: 130px;">
+                                <button class="btn btn-outline-secondary" type="button" onclick="this.nextElementSibling.stepDown()">-</button>
+                                <input type="number" name="quantity" class="form-control text-center" value="1" min="1" max="10">
+                                <button class="btn btn-outline-secondary" type="button" onclick="this.previousElementSibling.stepUp()">+</button>
+                            </div>
+                            <button type="submit" class="btn btn-primary flex-grow-1 py-3 fw-bold">
+                                <i class="bi bi-cart-plus me-2"></i>Añadir al Carrito
+                            </button>
+                        </form>
+
+                        @auth
+                            <form action="{{ route('favorites.toggle', $product) }}" method="POST" class="m-0">
+                                @csrf
+                                <button type="submit" class="btn {{ $isFavorite ? 'btn-danger' : 'btn-outline-danger' }} py-3 px-4" title="{{ $isFavorite ? 'Eliminar de favoritos' : 'Añadir a favoritos' }}">
+                                    <i class="bi {{ $isFavorite ? 'bi-heart-fill' : 'bi-heart' }}"></i>
+                                    {{ $isFavorite ? 'Favorito' : 'Añadir a Favoritos' }}
+                                </button>
+                            </form>
+                        @else
+                            <a href="{{ route('login') }}" class="btn btn-outline-danger py-3 px-4" title="Inicia sesión para añadir a favoritos">
+                                <i class="bi bi-heart"></i> Añadir a Favoritos
+                            </a>
+                        @endauth
+                    </div>
 
                     <div class="card bg-light border-0 p-4 rounded-4">
                         <div class="row g-3">

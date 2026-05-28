@@ -18,12 +18,15 @@ class ProductController extends Controller
 
         $products = $query->paginate(12);
         $categories = \App\Models\Category::all();
+        $favoriteIds = auth()->check() ? auth()->user()->favorites()->pluck('product_id')->toArray() : [];
 
-        return view('catalog.index', compact('products', 'categories'));
+        return view('catalog.index', compact('products', 'categories', 'favoriteIds'));
     }
 
     public function show(\App\Models\Product $product)
     {
-        return view('catalog.show', compact('product'));
+        $isFavorite = auth()->check() && auth()->user()->favorites()->where('product_id', $product->id)->exists();
+
+        return view('catalog.show', compact('product', 'isFavorite'));
     }
 }
