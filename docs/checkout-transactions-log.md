@@ -8,4 +8,4 @@ Este documento detalla las resoluciones de errores y mejoras implementadas sobre
 - **Qué pasaba:** El proceso de compra no estaba envuelto en una transacción de base de datos.
 - **Por qué:** El método `CartController@checkout` realizaba múltiples operaciones de escritura secuenciales sin protección `DB::transaction()`.
 - **Qué decisiones se tomaron:** 
-    - (Por documentar durante el fix)
+    - Se envolvió la creación del `Order`, sus `OrderItem`s y el vaciado del `CartItem` en el método `checkout` dentro de `DB::transaction()` para garantizar la atomicidad de las operaciones y evitar pedidos huérfanos en caso de error.

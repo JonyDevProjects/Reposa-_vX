@@ -9,6 +9,7 @@ use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderConfirmed;
 
@@ -149,23 +150,27 @@ class CartController extends Controller
             return $item->product->price * $item->quantity;
         });
 
-        // Crear el pedido
-        $order = Order::create([
-            'user_id' => $user->id,
-            'total_amount' => $total,
-            'status' => 'pending'
-        ]);
-
-        // Mover items del carrito a order_items
-        foreach ($cartItems as $item) {
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $item->product_id,
-                'quantity' => $item->quantity,
-                'price_at_purchase' => $item->product->price
+        // Crear el pedido dentro de una transacción
+        $order = DB::transaction(function () use ($user, $total, $cartItems) {
+            $order = Order::create([
+                'user_id' => $user->id,
+                'total_amount' => $total,
+                'status' => 'pending'
             ]);
-            $item->delete(); // Vaciar el carrito
-        }
+
+            // Mover items del carrito a order_items
+            foreach ($cartItems as $item) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item->product_id,
+                    'quantity' => $item->quantity,
+                    'price_at_purchase' => $item->product->price
+                ]);
+                $item->delete(); // Vaciar el carrito
+            }
+
+            return $order;
+        });
 
         // Enviar el correo de confirmación
         Mail::to($user->email)->send(new OrderConfirmed($order));
