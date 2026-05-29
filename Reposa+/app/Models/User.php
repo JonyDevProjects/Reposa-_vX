@@ -54,4 +54,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Product::class, 'favorite_product');
     }
+
+    public function orderSummary()
+    {
+        return $this->hasOne(OrderSummary::class, 'user_id');
+    }
 }

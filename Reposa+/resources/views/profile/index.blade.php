@@ -32,6 +32,30 @@
         <div class="col-md-9">
             <!-- Overview Section -->
             <div id="overview" class="mb-5">
+                <!-- Resumen de Pedidos (Vía SQL View) -->
+                @if($user->orderSummary)
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm bg-primary bg-opacity-10 rounded-4 p-3 d-flex flex-row align-items-center">
+                            <div class="fs-1 text-primary me-3"><i class="bi bi-wallet2"></i></div>
+                            <div>
+                                <h6 class="text-muted small mb-1">Total Gastado</h6>
+                                <h4 class="fw-bold mb-0 text-primary">{{ number_format($user->orderSummary->total_spent, 2) }}€</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm bg-primary bg-opacity-10 rounded-4 p-3 d-flex flex-row align-items-center">
+                            <div class="fs-1 text-primary me-3"><i class="bi bi-bag-check"></i></div>
+                            <div>
+                                <h6 class="text-muted small mb-1">Pedidos Realizados</h6>
+                                <h4 class="fw-bold mb-0 text-primary">{{ $user->orderSummary->total_orders }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
                 <div class="card border-0 shadow-sm rounded-4 p-5 mb-4">
                     <h4 class="fw-bold mb-4">Datos Personales</h4>
                     <form method="POST" action="{{ route('user-profile-information.update') }}">

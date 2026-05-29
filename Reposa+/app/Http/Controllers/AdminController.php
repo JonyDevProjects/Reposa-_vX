@@ -18,9 +18,8 @@ class AdminController extends Controller
         $recentOrders = Order::with('user')->latest()->take(5)->get();
         
         // Analítica de demanda: Top Almohadas con mayores expectativas de compra
-        $topExpectedProducts = Product::withCount('favoritedBy')
-                                      ->having('favorited_by_count', '>', 0)
-                                      ->orderBy('favorited_by_count', 'desc')
+        $topExpectedProducts = \App\Models\TopFavoritedProduct::orderBy('favorited_by_count', 'desc')
+                                      ->where('favorited_by_count', '>', 0)
                                       ->take(5)
                                       ->get();
 
