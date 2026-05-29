@@ -9,7 +9,7 @@ class ProfileController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $user->load(['profile', 'addresses', 'orders']);
+        $user->load(['profile', 'addresses', 'orders', 'favorites']);
         
         return view('profile.index', compact('user'));
     }
