@@ -46,6 +46,8 @@ El esquema está diseñado para garantizar la integridad referencial y cumplir c
 - **N:M**: Productos (`PRODUCT`) se relacionan de forma múltiple con Categorías (`CATEGORY`) mediante la tabla pivote `CATEGORY_PRODUCT`.
 - **N:M**: Lista de deseos, en la que un usuario marca como favorito múltiples productos (`FAVORITE_PRODUCT`).
 
+Adicionalmente, se han empleado **Seeders** y *Factories* para poblar la base de datos de manera automatizada con datos de prueba realistas. Para facilitar el análisis de datos en el panel de administración (Dashboard), se han creado **Vistas SQL** personalizadas (ej. `v_order_summary` y `v_top_favorited_products`), encapsuladas mediante modelos de Eloquent para optimizar el rendimiento de lectura.
+
 Ver diagrama completo en `docs/artefactos/EsquemaBBDD.md`.
 
 ### 4.3. Tecnologías Seleccionadas
@@ -69,7 +71,7 @@ El control de versiones utiliza un flujo organizado (ver `docs/artefactos/gitflo
 El aplicativo cumple con todas las reglas del patrón **Modelo-Vista-Controlador (MVC)**, aplicando buenas prácticas del ecosistema Laravel:
 - **Seguridad:** Uso nativo de Middleware para segmentación de zonas de usuario/administrador y prevención de inyecciones a través del ORM Eloquent.
 - **Calidad de Código:** Funciones delegadas a controladores atómicos. Sincronización ágil en tablas N:M mediante el método `sync()` de Eloquent sin afectar el rendimiento.
-- **Persistencia Segura:** Todo pedido tramitado inserta su información mediante registros inmutables, protegiendo el inventario e impidiendo alteraciones retroactivas de los tickets.
+- **Persistencia Segura y Transacciones:** Todo pedido tramitado inserta su información mediante registros inmutables, protegiendo el inventario e impidiendo alteraciones retroactivas de los tickets. El proceso crítico de "Checkout" se encuentra protegido mediante **Transacciones de Base de Datos** (`DB::transaction`), garantizando que la creación del pedido y el vaciado del carrito se ejecuten de manera atómica, previniendo cualquier inconsistencia de datos (rollback automático en caso de fallo).
 
 La solución abarca los requisitos funcionales con creces, demostrando la capacidad del framework de ofrecer un desarrollo ágil de tipo "Enterprise".
 
