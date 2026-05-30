@@ -1,58 +1,68 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Reposa+ (Tienda de Almohadas y Descanso)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Este proyecto es la solución a la **EPD3 de Tecnologías Avanzadas de Desarrollo**. Consiste en un e-commerce completamente funcional desarrollado en **Laravel 10** y **Bootstrap 5**, con un diseño personalizado, sistema de carrito, wishlist y panel de administración.
 
-## About Laravel
+## Características Principales
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+*   **Autenticación de Usuarios**: Sistema de login y registro integrado (Fortify).
+*   **Gestor de Perfil**: Panel donde el usuario puede editar sus datos, direcciones y ver su historial de pedidos.
+*   **Wishlist Interactiva**: Sistema de Favoritos asíncrono, los usuarios pueden añadir/quitar productos con un click.
+*   **Carrito Dual**: 
+    *   **Invitados**: El carrito se guarda en sesión temporalmente.
+    *   **Autenticados**: El carrito se guarda en base de datos de manera persistente.
+*   **Checkout y Notificaciones**: Flujo de compra con control transaccional (`DB::transaction`) y envío real de correos de confirmación (SMTP / Mailtrap).
+*   **Panel de Administración**: CRUD completo para Productos y Categorías, además de estadísticas usando Vistas SQL puras.
+*   **Internacionalización (i18n)**: Traducción de la interfaz (Español e Inglés).
+*   **Diseño Custom**: Uso avanzado de Bootstrap 5 con una paleta de colores corporativa (Índigo) y CSS personalizado para microinteracciones.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Requisitos Previos
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+*   PHP >= 8.1
+*   Composer
+*   Node.js & NPM
+*   Base de datos (MySQL/MariaDB/SQLite)
 
-## Learning Laravel
+## Instalación
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1.  **Clonar el repositorio** y entrar en la carpeta del proyecto.
+2.  **Instalar dependencias de PHP y JS**:
+    ```bash
+    composer install
+    npm install
+    npm run build
+    ```
+3.  **Configurar entorno**:
+    *   Copia el archivo `.env.example` a `.env`
+    *   Genera la clave de la aplicación: `php artisan key:generate`
+    *   Configura las credenciales de tu base de datos en el `.env`.
+    *   Configura Mailtrap en el `.env` (MAIL_MAILER=smtp, MAIL_HOST, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD) para que los correos de confirmación se envíen.
+4.  **Ejecutar migraciones, vistas SQL y Seeders**:
+    ```bash
+    php artisan migrate:fresh --seed
+    ```
+5.  **Arrancar el servidor de desarrollo**:
+    ```bash
+    php artisan serve
+    ```
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Usuarios de Demostración (Seeders)
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+La base de datos viene precargada con categorías, 8 productos de alta calidad, pedidos de prueba y los siguientes usuarios:
 
-## Agentic Development
+**Administrador**
+*   **Email**: admin@reposaplus.com
+*   **Password**: admin123
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+**Usuario Cliente**
+*   **Email**: user@reposaplus.com
+*   **Password**: user123
 
-```bash
-composer require laravel/boost --dev
+## Vistas SQL Implementadas (Problema 3)
 
-php artisan boost:install
-```
+Se han creado vistas a nivel de base de datos para optimizar reportes en el panel de administrador:
+*   `v_order_summary`: Agrupa y resume los gastos y número de pedidos por usuario.
+*   `v_top_favorited_products`: Cuenta y ordena los productos más marcados como favoritos.
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Integrantes del Grupo
 
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+*(Rellenar aquí los nombres de los integrantes según se especifica en la EPD3)*
