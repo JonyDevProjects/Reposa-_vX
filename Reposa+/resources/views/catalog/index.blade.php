@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Catálogo')
+@section('title', __('messages.nav.catalog'))
 
 @section('content')
     <div class="bg-light py-4 border-bottom mb-5">

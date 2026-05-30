@@ -6,8 +6,8 @@
     <div class="container py-5">
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
-                <li class="breadcrumb-item"><a href="/catalog">Catálogo</a></li>
+                <li class="breadcrumb-item"><a href="/">{{ __('messages.catalog.breadcrumb.home') }}</a></li>
+                <li class="breadcrumb-item"><a href="/catalog">{{ __('messages.catalog.breadcrumb.catalog') }}</a></li>
                 <li class="breadcrumb-item active" aria-current="page">{{ $product->name }}</li>
             </ol>
         </nav>
@@ -46,17 +46,17 @@
                             <i class="bi bi-star-fill"></i>
                             <i class="bi bi-star-half"></i>
                         </div>
-                        <span class="text-muted">(124 reseñas de clientes)</span>
+                        <span class="text-muted">{{ __('messages.product.reviews_count') }}</span>
                     </div>
 
                     <h2 class="display-6 fw-bold text-primary mb-4">{{ number_format($product->price, 2) }}€</h2>
 
                     <div class="mb-4">
-                        <h6 class="fw-bold">Especificaciones clave:</h6>
+                        <h6 class="fw-bold">{{ __('messages.product.specs_title') }}</h6>
                         <ul class="list-unstyled">
-                            <li><i class="bi bi-check2-circle text-success me-2"></i><strong>Material:</strong> {{ $product->material }}</li>
-                            <li><i class="bi bi-check2-circle text-success me-2"></i><strong>Firmeza:</strong> {{ $product->firmness }}</li>
-                            <li><i class="bi bi-check2-circle text-success me-2"></i><strong>Dimensiones:</strong> {{ $product->dimensions }}</li>
+                            <li><i class="bi bi-check2-circle text-success me-2"></i><strong>{{ __('messages.product.material') }}</strong> {{ $product->material }}</li>
+                            <li><i class="bi bi-check2-circle text-success me-2"></i><strong>{{ __('messages.product.firmness') }}</strong> {{ $product->firmness }}</li>
+                            <li><i class="bi bi-check2-circle text-success me-2"></i><strong>{{ __('messages.product.dimensions') }}</strong> {{ $product->dimensions }}</li>
                         </ul>
                     </div>
 
@@ -70,7 +70,7 @@
                             <button class="btn btn-outline-secondary" type="button" onclick="this.previousElementSibling.stepUp()">+</button>
                         </div>
                         <button type="submit" class="btn btn-primary flex-grow-1 py-3 fw-bold">
-                            <i class="bi bi-cart-plus me-2"></i>Añadir al Carrito
+                            <i class="bi bi-cart-plus me-2"></i>{{ __('messages.product.add_to_cart') }}
                         </button>
                         @php
                             $isFav = Auth::check() && Auth::user()->favorites->contains($product->id);
@@ -90,8 +90,8 @@
                                 <div class="d-flex align-items-center">
                                     <i class="bi bi-truck fs-3 text-primary me-3"></i>
                                     <div>
-                                        <small class="d-block fw-bold">Envío Gratis</small>
-                                        <small class="text-muted">En pedidos > 50€</small>
+                                        <small class="d-block fw-bold">{{ __('messages.product.free_shipping') }}</small>
+                                        <small class="text-muted">{{ __('messages.product.free_shipping_desc') }}</small>
                                     </div>
                                 </div>
                             </div>
@@ -99,8 +99,8 @@
                                 <div class="d-flex align-items-center">
                                     <i class="bi bi-arrow-return-left fs-3 text-primary me-3"></i>
                                     <div>
-                                        <small class="d-block fw-bold">30 Días Pruebas</small>
-                                        <small class="text-muted">Devolución gratuita</small>
+                                        <small class="d-block fw-bold">{{ __('messages.product.trial_days') }}</small>
+                                        <small class="text-muted">{{ __('messages.product.free_returns') }}</small>
                                     </div>
                                 </div>
                             </div>

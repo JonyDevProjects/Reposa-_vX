@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Reposa+') - Tu descanso, nuestra prioridad</title>
+    <title>@yield('title', 'Reposa+') - {{ __('messages.app.tagline') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -231,7 +231,7 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    showToast('error', 'Hubo un error al añadir el producto.');
+                    showToast('error', '{{ __('messages.errors.add_to_cart') }}');
                 })
                 .finally(() => {
                     btn.innerHTML = originalHtml;
@@ -309,8 +309,8 @@
                                             <h4 class="fw-bold mb-4">${title}</h4>
                                             <div class="text-center py-5">
                                                 <i class="bi bi-heart fs-1 text-muted"></i>
-                                                <p class="mt-3 text-muted">Aún no tienes almohadas en tus favoritos.</p>
-                                                <a href="/catalog" class="btn btn-primary mt-2">Explorar Almohadas</a>
+                                                <p class="mt-3 text-muted">{{ __('messages.favorites.empty') }}</p>
+                                                <a href="/catalog" class="btn btn-primary mt-2">{{ __('messages.favorites.btn_catalog') }}</a>
                                             </div>
                                         `;
                                     }
@@ -329,7 +329,7 @@
                 .catch(error => {
                     if (error.message !== 'Unauthorized') {
                         console.error('Error:', error);
-                        showToast('error', 'Hubo un error al procesar la solicitud.');
+                        showToast('error', '{{ __('messages.errors.process_request') }}');
                     }
                 })
                 .finally(() => {
