@@ -173,7 +173,12 @@ class CartController extends Controller
         });
 
         // Enviar el correo de confirmación
-        Mail::to($user->email)->send(new OrderConfirmed($order));
+        try {
+            Mail::to($user->email)->send(new OrderConfirmed($order));
+        } catch (\Exception $e) {
+            // Si falla el envío del correo, el pedido sigue siendo válido
+            return redirect('/profile#orders')->with('success', '¡Pedido realizado con éxito! No se pudo enviar el correo de confirmación, pero tu pedido ha sido procesado.');
+        }
 
         return redirect('/profile#orders')->with('success', '¡Pedido realizado con éxito! Se ha enviado un ticket a tu correo.');
     }
