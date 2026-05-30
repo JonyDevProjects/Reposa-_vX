@@ -53,8 +53,7 @@ class DatabaseSeeder extends Seeder
             'street' => 'Calle Principal 123',
             'city' => 'Madrid',
             'zip_code' => '28001',
-            'country' => 'España',
-            'is_default' => true
+            'is_main' => true
         ]);
 
         // Crear productos específicos (Almohadas)

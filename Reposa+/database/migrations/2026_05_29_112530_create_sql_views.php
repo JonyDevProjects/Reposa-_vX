@@ -10,6 +10,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        DB::statement("DROP VIEW IF EXISTS v_order_summary");
         DB::statement("
             CREATE VIEW v_order_summary AS
             SELECT
@@ -23,6 +24,7 @@ return new class extends Migration
             GROUP BY u.id, u.name, u.email
         ");
 
+        DB::statement("DROP VIEW IF EXISTS v_top_favorited_products");
         DB::statement("
             CREATE VIEW v_top_favorited_products AS
             SELECT
