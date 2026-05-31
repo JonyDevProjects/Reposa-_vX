@@ -77,27 +77,32 @@
 
                     <p class="text-muted mb-5 lead">{{ $product->description }}</p>
 
-                    <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-flex gap-3 mb-5">
-                        @csrf
-                        <div class="input-group" style="width: 130px;">
-                            <button class="btn btn-outline-secondary" type="button" onclick="this.nextElementSibling.stepDown()">-</button>
-                            <input type="number" name="quantity" class="form-control text-center" value="1" min="1" max="10">
-                            <button class="btn btn-outline-secondary" type="button" onclick="this.previousElementSibling.stepUp()">+</button>
-                        </div>
-                        <button type="submit" class="btn btn-primary flex-grow-1 py-3 fw-bold">
-                            <i class="bi bi-cart-plus me-2"></i>{{ __('messages.product.add_to_cart') }}
-                        </button>
-                        @php
-                            $isFav = Auth::check() && Auth::user()->favorites->contains($product->id);
-                        @endphp
-                        <button type="button" 
-                                class="btn {{ $isFav ? 'btn-danger text-white' : 'btn-outline-danger' }} py-3 px-4 btn-favorite" 
-                                data-product-id="{{ $product->id }}"
-                                data-url="{{ route('favorites.toggle', $product) }}"
-                                title="{{ __('messages.footer.favorites') }}">
-                            <i class="bi {{ $isFav ? 'bi-heart-fill' : 'bi-heart' }}"></i>
-                        </button>
-                    </form>
+                    <div class="d-flex flex-column flex-md-row gap-3 mb-5">
+                        <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-flex gap-3 w-100">
+                            @csrf
+                            <div class="input-group" style="width: 130px;">
+                                <button class="btn btn-outline-secondary" type="button" onclick="this.nextElementSibling.stepDown()">-</button>
+                                <input type="number" name="quantity" class="form-control text-center" value="1" min="1" max="10">
+                                <button class="btn btn-outline-secondary" type="button" onclick="this.previousElementSibling.stepUp()">+</button>
+                            </div>
+                            <button type="submit" class="btn btn-primary flex-grow-1 py-3 fw-bold">
+                                <i class="bi bi-cart-plus me-2"></i>{{ __('messages.product.add_to_cart') }}
+                            </button>
+                        </form>
+
+                        @auth
+                            <form action="{{ route('favorites.toggle', $product) }}" method="POST" class="m-0">
+                                @csrf
+                                <button type="submit" class="btn {{ $isFavorite ? 'btn-danger' : 'btn-outline-danger' }} py-3 px-4" title="{{ __('messages.footer.favorites') }}">
+                                    <i class="bi {{ $isFavorite ? 'bi-heart-fill' : 'bi-heart' }}"></i>
+                                </button>
+                            </form>
+                        @else
+                            <a href="{{ route('login') }}" class="btn btn-outline-danger py-3 px-4" title="{{ __('messages.footer.favorites') }}">
+                                <i class="bi bi-heart"></i>
+                            </a>
+                        @endauth
+                    </div>
 
                     <div class="card bg-light border-0 p-4 rounded-4">
                         <div class="row g-3">

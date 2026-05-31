@@ -66,34 +66,36 @@
                                 <div class="card card-product h-100 shadow-sm border-0">
                                     <a href="{{ route('products.show', $product) }}" class="text-decoration-none text-dark">
                                         <img src="{{ $product->image_url ?? 'https://placehold.co/400x300/182447/ffffff?text=' . urlencode($product->name) }}" class="card-img-top" alt="{{ $product->name }}">
-                                        <div class="card-body">
-                                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <span class="badge bg-light text-primary border">{{ $product->material }}</span>
-                                                <span class="text-muted small"><i class="bi bi-star-fill text-warning"></i> 4.8</span>
-                                            </div>
-                                            <h5 class="card-title fw-bold mb-1">{{ $product->name }}</h5>
-                                            <p class="card-text text-muted small mb-3">{{ Str::limit($product->description, 60) }}</p>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <span class="fs-4 fw-bold text-primary">{{ number_format($product->price, 2) }}€</span>
-                                                <div class="d-flex gap-2">
-                                                    @php
-                                                        $isFav = Auth::check() && Auth::user()->favorites->contains($product->id);
-                                                    @endphp
-                                                    <button type="button" 
-                                                            class="btn {{ $isFav ? 'btn-danger text-white' : 'btn-outline-danger' }} btn-sm rounded-circle btn-favorite" 
-                                                            data-product-id="{{ $product->id }}"
-                                                            data-url="{{ route('favorites.toggle', $product) }}"
-                                                            title="{{ __('messages.footer.favorites') }}">
-                                                        <i class="bi {{ $isFav ? 'bi-heart-fill' : 'bi-heart' }}"></i>
-                                                    </button>
-                                                    <form action="{{ route('cart.add', $product) }}" method="POST" class="m-0">
+                                    </a>
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-light text-primary border">{{ $product->material }}</span>
+                                            <span class="text-muted small"><i class="bi bi-star-fill text-warning"></i> 4.8</span>
+                                        </div>
+                                        <h5 class="card-title fw-bold mb-1"><a href="{{ route('products.show', $product) }}" class="text-decoration-none text-dark">{{ $product->name }}</a></h5>
+                                        <p class="card-text text-muted small mb-3">{{ Str::limit($product->description, 60) }}</p>
+                                        <div class="d-flex justify-content-between align-items-center gap-2">
+                                            <span class="fs-4 fw-bold text-primary">{{ number_format($product->price, 2) }}€</span>
+                                            <div class="d-flex gap-2">
+                                                <form action="{{ route('cart.add', $product) }}" method="POST" class="m-0">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-outline-primary btn-sm rounded-circle"><i class="bi bi-cart-plus"></i></button>
+                                                </form>
+                                                @auth
+                                                    <form action="{{ route('favorites.toggle', $product) }}" method="POST" class="m-0">
                                                         @csrf
-                                                        <button type="submit" class="btn btn-outline-primary btn-sm rounded-circle"><i class="bi bi-cart-plus"></i></button>
+                                                        <button type="submit" class="btn btn-sm rounded-circle {{ in_array($product->id, $favoriteIds) ? 'btn-danger text-white' : 'btn-outline-danger' }}" title="{{ in_array($product->id, $favoriteIds) ? 'Eliminar de favoritos' : 'Añadir a favoritos' }}">
+                                                            <i class="bi {{ in_array($product->id, $favoriteIds) ? 'bi-heart-fill' : 'bi-heart' }}"></i>
+                                                        </button>
                                                     </form>
-                                                </div>
+                                                @else
+                                                    <a href="{{ route('login') }}" class="btn btn-sm btn-outline-danger rounded-circle" title="Inicia sesión para añadir a favoritos">
+                                                        <i class="bi bi-heart"></i>
+                                                    </a>
+                                                @endauth
                                             </div>
                                         </div>
-                                    </a>
+                                    </div>
                                 </div>
                             </div>
                         @endforeach

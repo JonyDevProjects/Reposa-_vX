@@ -152,6 +152,68 @@
                 </div>
             </div>
 
+            <!-- Favorites Section -->
+            <div id="favorites" class="mb-5">
+                <div class="card border-0 shadow-sm rounded-4 p-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h4 class="fw-bold mb-0">Las almohadas que más me gustan</h4>
+                            <p class="text-muted mb-0">Guarda aquí tus productos favoritos para volver a ellos cuando quieras.</p>
+                        </div>
+                    </div>
+
+                    @if($user->favorites->isEmpty())
+                        <div class="text-center py-4">
+                            <i class="bi bi-heart fs-1 text-muted"></i>
+                            <p class="mt-3">Aún no has marcado ninguna almohada como favorita.</p>
+                            <a href="/catalog" class="btn btn-primary">Ir al catálogo</a>
+                        </div>
+                    @else
+                        <div class="row g-4">
+                            @foreach($user->favorites as $favorite)
+                                <div class="col-md-6">
+                                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                                        <div class="row g-0">
+                                            <div class="col-4">
+                                                <img src="https://placehold.co/300x300/182447/ffffff?text={{ urlencode($favorite->name) }}" class="img-fluid h-100 object-fit-cover" alt="{{ $favorite->name }}">
+                                            </div>
+                                            <div class="col-8">
+                                                <div class="card-body d-flex flex-column h-100 justify-content-between">
+                                                    <div>
+                                                        <h5 class="card-title fw-bold mb-2">{{ $favorite->name }}</h5>
+                                                        <p class="text-muted small mb-3">{{ Str::limit($favorite->description, 90) }}</p>
+                                                        <div class="mb-3">
+                                                            @foreach($favorite->categories as $category)
+                                                                <span class="badge bg-light text-primary border me-1">{{ $category->name }}</span>
+                                                            @endforeach
+                                                        </div>
+                                                        <div class="fw-bold fs-5 text-primary">{{ number_format($favorite->price, 2) }}€</div>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between align-items-center mt-3 gap-2">
+                                                        <a href="{{ route('products.show', $favorite) }}" class="btn btn-outline-secondary btn-sm">Ver producto</a>
+                                                        <div class="d-flex gap-2">
+                                                            <form action="{{ route('cart.add', $favorite) }}" method="POST" class="m-0">
+                                                                @csrf
+                                                                <button type="submit" class="btn btn-outline-primary btn-sm">Añadir al carrito</button>
+                                                            </form>
+                                                            <form action="{{ route('favorites.destroy', $favorite) }}" method="POST" class="m-0">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn btn-danger btn-sm">Quitar</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+
             <!-- Addresses Section -->
             <div id="addresses">
                 <div class="card border-0 shadow-sm rounded-4 p-5">
