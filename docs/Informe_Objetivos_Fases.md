@@ -52,6 +52,7 @@ Al finalizar la sesión actual, el proyecto ha superado el núcleo inicial y se 
 - **Autenticación y Perfil (Hito 3):** COMPLETADO. Login/Registro y CRUD de direcciones activos.
 - **Carrito y Checkout (Hito 4):** COMPLETADO. Flujo de compra AJAX asíncrono y sincronización de cesta entre invitados/usuarios.
 - **Notificaciones SMTP (Hito 5):** COMPLETADO. Configuración Mailtrap, envío de tickets post-compra en segundo plano (Queues) y recuperación de contraseña operativa.
+- **Panel de Administración (Hito 6):** COMPLETADO. Rutas protegidas, CRUD de inventario paginado, gestión activa de estados de pedido y atajo visual condicionado por rol.
 
 - **Panel de Administración v1:** COMPLETADO. Rutas protegidas, CRUD de productos e historial global de pedidos.
 - **Filtrado Exploratorio (Hito 6):** COMPLETADO. Sidebar y cajas visuales de categorización cruzada operativos en el catálogo público.
@@ -94,4 +95,3 @@ Se ha consolidado el flujo de usuario final, garantizando una transición fluida
    - **Barrera de Seguridad:** La acción de "Tramitar Pedido" y la revisión del ticket final están protegidas, exigiendo la validación del usuario (Login/Registro).
    - **Persistencia de Datos:** Al completar la compra, el sistema genera registros inmutables en las tablas `ORDER` (Cabecera) y `ORDER_ITEM` (Detalle), descontando el inventario correspondiente.
    - **Feedback Visual:** Se ha integrado un sistema de notificaciones dinámicas (Toasts/Alertas) en el front-end que confirma visualmente el éxito de la transacción tras la redirección.
-

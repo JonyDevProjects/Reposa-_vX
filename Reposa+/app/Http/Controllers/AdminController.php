@@ -28,7 +28,7 @@ class AdminController extends Controller
 
     public function products()
     {
-        $products = Product::with('categories')->get();
+        $products = Product::with('categories')->paginate(10);
         return view('admin.products.index', compact('products'));
     }
 
@@ -96,7 +96,7 @@ class AdminController extends Controller
 
     public function orders()
     {
-        $orders = Order::with('user', 'orderItems.product')->latest()->get();
+        $orders = Order::with('user', 'orderItems.product')->latest()->paginate(15);
         return view('admin.orders.index', compact('orders'));
     }
 
@@ -149,5 +149,16 @@ class AdminController extends Controller
     {
         $category->delete();
         return back()->with('success', 'Categoría eliminada.');
+    }
+
+    public function updateOrderStatus(Request $request, Order $order)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,processing,shipped,delivered,cancelled'
+        ]);
+
+        $order->update(['status' => $request->status]);
+
+        return back()->with('success', 'Estado del pedido actualizado.');
     }
 }

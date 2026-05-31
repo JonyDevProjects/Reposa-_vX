@@ -74,7 +74,7 @@
         </div>
 
         <div class="col-md-4">
-            <div class="card shadow-sm border-0 sticky-top" style="top: 100px;">
+            <div class="card shadow-sm border-0 sticky-top" style="top: 100px; z-index: 10;">
                 <div class="card-body py-4">
                     <h5 class="fw-bold mb-4">{{ __('messages.cart.order_summary') }}</h5>
                     <div class="d-flex justify-content-between mb-2">
