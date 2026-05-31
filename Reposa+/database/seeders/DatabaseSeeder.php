@@ -66,7 +66,7 @@ class DatabaseSeeder extends Seeder
                 'material' => 'Viscoelástica',
                 'firmness' => 'Media-Alta',
                 'dimensions' => '70x40 cm',
-                'image_url' => 'https://images.unsplash.com/photo-1632150821033-d9229987f651?auto=format&fit=crop&q=80&w=400'
+                'image_url' => 'https://images.unsplash.com/photo-1592789705501-f9ae4287c4a9?auto=format&fit=crop&q=80&w=400'
             ],
             [
                 'name' => 'Almohada de Gel Refrescante',
@@ -76,7 +76,7 @@ class DatabaseSeeder extends Seeder
                 'material' => 'Gel y Espuma',
                 'firmness' => 'Media',
                 'dimensions' => '70x40 cm',
-                'image_url' => 'https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&q=80&w=400'
+                'image_url' => 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&q=80&w=400'
             ],
             [
                 'name' => 'Almohada Cervical Ergonómica',
@@ -86,7 +86,7 @@ class DatabaseSeeder extends Seeder
                 'material' => 'Látex',
                 'firmness' => 'Alta',
                 'dimensions' => '60x35 cm',
-                'image_url' => 'https://images.unsplash.com/photo-1629732047847-50bad75599e5?auto=format&fit=crop&q=80&w=400'
+                'image_url' => 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&q=80&w=400'
             ],
             [
                 'name' => 'Almohada de Plumas Naturales',
@@ -96,7 +96,7 @@ class DatabaseSeeder extends Seeder
                 'material' => 'Plumón de Oca',
                 'firmness' => 'Suave',
                 'dimensions' => '80x40 cm',
-                'image_url' => 'https://images.unsplash.com/photo-1572970720491-179fbca82247?auto=format&fit=crop&q=80&w=400'
+                'image_url' => 'https://images.unsplash.com/photo-1629140727571-9b5c6f6267b4?auto=format&fit=crop&q=80&w=400'
             ],
             [
                 'name' => 'Almohada Antiácaros Hipoalergénica',
@@ -106,7 +106,7 @@ class DatabaseSeeder extends Seeder
                 'material' => 'Microfibra',
                 'firmness' => 'Media',
                 'dimensions' => '75x40 cm',
-                'image_url' => 'https://images.unsplash.com/photo-1629977873229-28c4ea78e3cc?auto=format&fit=crop&q=80&w=400'
+                'image_url' => 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&q=80&w=400'
             ],
             [
                 'name' => 'Almohada Viaje Cuello 360',
@@ -116,7 +116,7 @@ class DatabaseSeeder extends Seeder
                 'material' => 'Espuma',
                 'firmness' => 'Alta',
                 'dimensions' => '30x30 cm',
-                'image_url' => 'https://images.unsplash.com/photo-1550225725-75e1140e69ff?auto=format&fit=crop&q=80&w=400'
+                'image_url' => 'https://images.unsplash.com/photo-1615874959474-d609969a20ed?auto=format&fit=crop&q=80&w=400'
             ],
             [
                 'name' => 'Almohada de Bambú Ecológica',
@@ -126,7 +126,7 @@ class DatabaseSeeder extends Seeder
                 'material' => 'Bambú y Fibras Recicladas',
                 'firmness' => 'Media-Suave',
                 'dimensions' => '70x40 cm',
-                'image_url' => 'https://images.unsplash.com/photo-1625907409419-75574ebbf0f0?auto=format&fit=crop&q=80&w=400'
+                'image_url' => 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&q=80&w=400'
             ],
             [
                 'name' => 'Almohada Terapéutica con Aloe Vera',
@@ -136,7 +136,7 @@ class DatabaseSeeder extends Seeder
                 'material' => 'Algodón y Aloe Vera',
                 'firmness' => 'Media',
                 'dimensions' => '70x40 cm',
-                'image_url' => 'https://images.unsplash.com/photo-1631526463991-64d5f470a1a0?auto=format&fit=crop&q=80&w=400'
+                'image_url' => 'https://images.unsplash.com/photo-1631049552057-403cdb8f0658?auto=format&fit=crop&q=80&w=400'
             ]
         ];
 
