@@ -487,6 +487,19 @@ El producto final es una plataforma de comercio electrónico altamente responsiv
 *   El **Panel de Administración** provee herramientas reales de gestión (CRUD completo) y analítica útil para la toma de decisiones del negocio (ej. seguimiento de los productos más deseados).
 *   La **Experiencia de Usuario (UX)**, regida por la paleta de colores Índigo, evoca exitosamente tranquilidad y enfoque en el descanso, alineando el diseño del software con el propósito biológico del producto comercializado.
 
+### 6.4. Credenciales de Prueba
+Para facilitar la evaluación y revisión funcional de la plataforma por parte del tribunal o usuarios de QA, el sistema cuenta con un generador automático de datos base (*Seeders*) que inyecta los siguientes perfiles de prueba en la base de datos:
+
+*   **Usuario Administrador (Acceso total al Panel Admin y tienda):**
+    *   **Email:** `admin@reposaplus.com`
+    *   **Contraseña:** `admin123`
+
+*   **Usuario Estándar/Cliente (Acceso a la tienda, carrito y perfil privado):**
+    *   **Email:** `user@reposaplus.com`
+    *   **Contraseña:** `user123`
+
+*Nota: Cualquier visitante no autenticado (Usuario Invitado) tiene acceso completo al catálogo público, búsqueda de productos y vista en detalle, pero se le requerirá iniciar sesión o registrarse para tramitar un pedido, usar el carrito o guardar productos en favoritos.*
+
 ---
 
 ## 7. Conclusiones y Trabajo Futuro
