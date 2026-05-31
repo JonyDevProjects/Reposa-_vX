@@ -65,7 +65,7 @@
                             <div class="col-md-4">
                                 <div class="card card-product h-100 shadow-sm border-0">
                                     <a href="{{ route('products.show', $product) }}" class="text-decoration-none text-dark">
-                                        <img src="https://placehold.co/400x300/182447/ffffff?text={{ urlencode($product->name) }}" class="card-img-top" alt="{{ $product->name }}">
+                                        <img src="{{ $product->image_url ?? 'https://placehold.co/400x300/182447/ffffff?text=' . urlencode($product->name) }}" class="card-img-top" alt="{{ $product->name }}">
                                         <div class="card-body">
                                             <div class="d-flex justify-content-between align-items-center mb-2">
                                                 <span class="badge bg-light text-primary border">{{ $product->material }}</span>

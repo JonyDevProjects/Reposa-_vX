@@ -16,14 +16,14 @@
             <!-- Product Image -->
             <div class="col-md-6">
                 <div class="card border-0 shadow-sm overflow-hidden rounded-4">
-                    <img src="/images/pillow-detail.png" class="img-fluid" alt="{{ $product->name }}">
+                    <img src="{{ $product->image_url ?? '/images/pillow-detail.png' }}" class="img-fluid" alt="{{ $product->name }}">
                 </div>
                 <div class="row mt-3 g-2">
                     <div class="col-3">
-                        <img src="https://placehold.co/200x200/182447/ffffff?text=Vista+1" class="img-fluid rounded border cursor-pointer" alt="thumbnail">
+                        <img src="{{ $product->image_url ?? 'https://placehold.co/200x200/182447/ffffff?text=Vista+1' }}" class="img-fluid rounded border cursor-pointer" alt="thumbnail">
                     </div>
                     <div class="col-3">
-                        <img src="https://placehold.co/200x200/182447/ffffff?text=Vista+2" class="img-fluid rounded border cursor-pointer" alt="thumbnail">
+                        <img src="{{ $product->image_url ?? 'https://placehold.co/200x200/182447/ffffff?text=Vista+2' }}" class="img-fluid rounded border cursor-pointer opacity-75" alt="thumbnail">
                     </div>
                 </div>
             </div>
