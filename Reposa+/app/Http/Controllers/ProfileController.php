@@ -10,11 +10,7 @@ class ProfileController extends Controller
     public function index()
     {
         $user = auth()->user();
-<<<<<<< HEAD
-        $user->load(['profile', 'addresses', 'orders', 'orderSummary', 'favorites']);
-=======
-        $user->load(['profile', 'addresses', 'orders', 'favorites.categories']);
->>>>>>> origin/features/perfil-cliente
+        $user->load(['profile', 'addresses', 'orders', 'orderSummary', 'favorites.categories']);
         
         return view('profile.index', compact('user'));
     }
