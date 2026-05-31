@@ -87,6 +87,8 @@ return [
     'product.free_shipping_desc' => 'En pedidos > 50€',
     'product.trial_days' => '30 Días Pruebas',
     'product.free_returns' => 'Devolución gratuita',
+    'product.in_stock' => 'En stock',
+    'product.certified' => 'Calidad certificada',
     'cart.title' => 'Tu Carrito de Almohadas',
     'cart.empty_message' => 'Vaya, parece que tu descanso aún no ha empezado. ¡Añade alguna almohada!',
     'cart.view_catalog' => 'Ver Catálogo',

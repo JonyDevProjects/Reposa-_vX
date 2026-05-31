@@ -87,6 +87,8 @@ return [
     'product.free_shipping_desc' => 'On orders > 50€',
     'product.trial_days' => '30 Days Trial',
     'product.free_returns' => 'Free returns',
+    'product.in_stock' => 'In stock',
+    'product.certified' => 'Certified quality',
     'cart.title' => 'Your Pillow Cart',
     'cart.empty_message' => 'Oops, looks like your rest hasn\'t started yet. Add some pillows!',
     'cart.view_catalog' => 'View Catalog',

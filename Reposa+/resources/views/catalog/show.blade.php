@@ -15,15 +15,30 @@
         <div class="row g-5">
             <!-- Product Image -->
             <div class="col-md-6">
-                <div class="card border-0 shadow-sm overflow-hidden rounded-4">
-                    <img src="{{ $product->image_url ?? '/images/pillow-detail.png' }}" class="img-fluid" alt="{{ $product->name }}">
+                <div class="card border-0 shadow-sm overflow-hidden rounded-4 position-relative">
+                    <img src="{{ $product->image_url ?? '/images/pillow-detail.png' }}" class="img-fluid product-main-img" alt="{{ $product->name }}">
+                    <span class="badge bg-success position-absolute top-0 end-0 m-3 px-3 py-2 rounded-pill shadow">
+                        <i class="bi bi-check-circle me-1"></i>{{ __('messages.product.in_stock') ?? 'En stock' }}
+                    </span>
                 </div>
                 <div class="row mt-3 g-2">
-                    <div class="col-3">
-                        <img src="{{ $product->image_url ?? 'https://placehold.co/200x200/182447/ffffff?text=Vista+1' }}" class="img-fluid rounded border cursor-pointer" alt="thumbnail">
+                    <div class="col-4">
+                        <div class="card border-0 bg-light rounded-3 p-3 text-center h-100">
+                            <i class="bi bi-truck text-primary fs-4"></i>
+                            <small class="d-block mt-1 fw-semibold text-dark" style="font-size: 0.7rem;">{{ __('messages.product.free_shipping') }}</small>
+                        </div>
                     </div>
-                    <div class="col-3">
-                        <img src="{{ $product->image_url ?? 'https://placehold.co/200x200/182447/ffffff?text=Vista+2' }}" class="img-fluid rounded border cursor-pointer opacity-75" alt="thumbnail">
+                    <div class="col-4">
+                        <div class="card border-0 bg-light rounded-3 p-3 text-center h-100">
+                            <i class="bi bi-shield-check text-primary fs-4"></i>
+                            <small class="d-block mt-1 fw-semibold text-dark" style="font-size: 0.7rem;">{{ __('messages.product.trial_days') }}</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card border-0 bg-light rounded-3 p-3 text-center h-100">
+                            <i class="bi bi-award text-primary fs-4"></i>
+                            <small class="d-block mt-1 fw-semibold text-dark" style="font-size: 0.7rem;">{{ __('messages.product.certified') ?? 'Calidad certificada' }}</small>
+                        </div>
                     </div>
                 </div>
             </div>
