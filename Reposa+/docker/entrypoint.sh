@@ -4,9 +4,10 @@ set -e
 # Asegura que el fichero SQLite existe (vive en el volumen persistente)
 touch /var/www/html/database/database.sqlite
 
-# Genera APP_KEY solo si no se ha definido por entorno/.env
+# Genera APP_KEY solo si no se ha definido por entorno
 if [ -z "$APP_KEY" ]; then
-    php artisan key:generate --force
+    APP_KEY=$(php artisan key:generate --show --no-ansi)
+    export APP_KEY
 fi
 
 # Migraciones: idempotentes, Laravel registra cuáles ya se ejecutaron

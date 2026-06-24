@@ -1,0 +1,6 @@
+Email: admin@reposaplus.com
+Password: admin123
+Usuario normal:
+
+Email: user@reposaplus.com
+Password: user123
