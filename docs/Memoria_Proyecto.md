@@ -388,15 +388,16 @@ Para segregar el acceso entre clientes y el *staff* de la tienda, se añadió un
 
 ```php
 // app/Http/Middleware/AdminMiddleware.php
-public function handle(Request $request, Closure $next)
+public function handle(Request $request, Closure $next): Response
 {
-    if (Auth::check() && Auth::user()->role === "admin") {
+    if (Auth::check() && Auth::user()->role === 'admin') {
         return $next($request);
     }
-    abort(403, "Acceso denegado. Se requieren privilegios de administrador.");
+
+    return redirect('/')->with('error', 'No tienes permisos para acceder a esta sección.');
 }
 ```
-Este middleware se inyectó en el archivo de rutas `web.php` encapsulando todo el grupo de rutas bajo el prefijo `/admin`, sellando el panel de control ante ataques de elevación de privilegios.
+Este middleware se inyectó en el archivo de rutas `web.php` encapsulando todo el grupo de rutas bajo el prefijo `/admin`. Cuando el usuario no tiene el rol `admin`, es redirigido a la página principal con un mensaje de error flash —en lugar de recibir un código HTTP 403— lo que proporciona una experiencia de usuario más amigable y coherente con el resto de la aplicación.
 
 ### 5.3. El Carrito Asíncrono (AJAX) y la Experiencia de Usuario
 Uno de los mayores retos de UX durante el desarrollo de la Versión 1.0 fue la gestión de la cesta de la compra. En las iteraciones iniciales, añadir un producto al carrito provocaba una recarga completa de la página (`POST` seguido de un `redirect()->back()`). Esto destruía la posición de *scroll* del usuario y rompía la inmersión de navegación fluida.
@@ -476,8 +477,8 @@ Como paso previo a la entrega, se ejecutó una auditoría intensiva ("Auditoría
 
 1.  **Falta de Vistas SQL:** Se detectó que las métricas del panel de administración dependían exclusivamente de Eloquent, incumpliendo el requisito técnico de utilizar vistas puras.
     *   *Resolución:* Se implementaron las vistas `v_order_summary` y `v_top_favorited_products` (detallado en la sección 5.4), mejorando los tiempos de respuesta del dashboard en un 30%.
-2.  **Transacciones Inseguras en el Checkout:** El vaciado de la cesta, la creación de la orden (`ORDER`) y la inyección de los items (`ORDER_ITEM`) se realizaban de forma secuencial. Si el servidor colapsaba a mitad del proceso, la base de datos quedaba corrupta (pedidos huérfanos).
-    *   *Resolución:* Se envolvió toda la lógica del checkout en un bloque `DB::transaction(function() { ... })`. Ahora, si ocurre una excepción, el framework ejecuta automáticamente un *Rollback* y ninguna tabla es alterada.
+2.  **Transacciones Inseguras en el Checkout:** El vaciado de la cesta, la creación de la orden (`ORDER`) y la inyección de los items (`ORDER_ITEM`) se realizaban de forma secuencial sin verificar el stock disponible. Si el servidor colapsaba a mitad del proceso, la base de datos quedaba corrupta (pedidos huérfanos) o el stock podía quedar en negativo ante compras concurrentes.
+    *   *Resolución:* Se envolvió toda la lógica del checkout en un bloque `DB::transaction(function() { ... })` con bloqueo pesimista (`lockForUpdate()`). Dentro de la transacción, el sistema verifica el stock de cada producto antes de crear el `ORDER_ITEM` y lo decrementa de forma atómica. Si el stock es insuficiente o se produce cualquier excepción, el framework ejecuta automáticamente un *Rollback* y ninguna tabla es alterada; el usuario recibe un mensaje de error claro indicando qué producto no tiene stock suficiente.
 3.  **Fuga de Datos (N+1 Query Problem):** La vista del perfil de usuario generaba decenas de consultas a la base de datos para recuperar las direcciones y los favoritos de un cliente.
     *   *Resolución:* Se aplicó *Eager Loading* en el Controlador (`$user->load(["profile", "addresses", "orders", "favorites"])`), empaquetando todas las sub-consultas en una única petición inicial.
 
