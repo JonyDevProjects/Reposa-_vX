@@ -143,16 +143,17 @@ public function handle($request, Closure $next)
 Fortify gestiona la autenticación (¿está el usuario logueado?), pero no la autorización por roles. Nuestro middleware complementa a Fortify verificando que el usuario autenticado tenga el rol `admin` antes de permitir el acceso a las rutas del panel de administración:
 
 ```php
-public function handle($request, Closure $next)
+public function handle(Request $request, Closure $next): Response
 {
-    if (Auth::user()->role !== 'admin') {
-        abort(403);
+    if (Auth::check() && Auth::user()->role === 'admin') {
+        return $next($request);
     }
-    return $next($request);
+
+    return redirect('/')->with('error', 'No tienes permisos para acceder a esta sección.');
 }
 ```
 
-Esto separa limpiamente las responsabilidades: Fortify se encarga de la **autenticación** y `AdminMiddleware` de la **autorización**.
+Esto separa limpiamente las responsabilidades: Fortify se encarga de la **autenticación** y `AdminMiddleware` de la **autorización**. Cuando el usuario no tiene el rol `admin`, en lugar de devolver un error HTTP 403, es redirigido a la página principal con un mensaje flash de error, lo que resulta en una experiencia de usuario más coherente con el resto de la aplicación.
 
 ---
 
