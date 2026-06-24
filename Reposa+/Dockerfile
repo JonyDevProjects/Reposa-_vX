@@ -8,12 +8,13 @@ COPY vite.config.js ./
 RUN npm run build
 
 # ---------- Etapa 2: aplicación (PHP-FPM + Nginx + Supervisor) ----------
-FROM php:8.3-fpm AS app
+FROM php:8.4-fpm AS app
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
         libsqlite3-dev libzip-dev libicu-dev \
         zip unzip git nginx supervisor \
-    && docker-php-ext-install pdo pdo_sqlite mbstring bcmath intl zip opcache \
+    && docker-php-ext-install pdo_sqlite bcmath intl zip \
+    && docker-php-ext-enable opcache \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -22,10 +23,11 @@ WORKDIR /var/www/html
 
 # Capa cacheable: solo dependencias PHP
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+RUN composer install --no-scripts --no-autoloader --prefer-dist
 
 # Resto del código de la aplicación
 COPY . .
+RUN rm -f public/hot
 
 # Assets ya compilados en la etapa "frontend"
 COPY --from=frontend /app/public/build ./public/build
