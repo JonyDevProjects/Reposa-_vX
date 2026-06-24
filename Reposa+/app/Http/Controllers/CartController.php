@@ -151,26 +151,38 @@ class CartController extends Controller
         });
 
         // Crear el pedido dentro de una transacción
-        $order = DB::transaction(function () use ($user, $total, $cartItems) {
-            $order = Order::create([
-                'user_id' => $user->id,
-                'total_amount' => $total,
-                'status' => 'pending'
-            ]);
-
-            // Mover items del carrito a order_items
-            foreach ($cartItems as $item) {
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $item->product_id,
-                    'quantity' => $item->quantity,
-                    'price_at_purchase' => $item->product->price
+        try {
+            $order = DB::transaction(function () use ($user, $total, $cartItems) {
+                $order = Order::create([
+                    'user_id' => $user->id,
+                    'total_amount' => $total,
+                    'status' => 'pending'
                 ]);
-                $item->delete(); // Vaciar el carrito
-            }
 
-            return $order;
-        });
+                // Mover items del carrito a order_items, verificando y decrementando stock
+                foreach ($cartItems as $item) {
+                    $product = Product::lockForUpdate()->find($item->product_id);
+
+                    if ($product->stock < $item->quantity) {
+                        throw new \Exception("Stock insuficiente para \"{$product->name}\". Disponible: {$product->stock}, solicitado: {$item->quantity}.");
+                    }
+
+                    $product->decrement('stock', $item->quantity);
+
+                    OrderItem::create([
+                        'order_id' => $order->id,
+                        'product_id' => $item->product_id,
+                        'quantity' => $item->quantity,
+                        'price_at_purchase' => $item->product->price
+                    ]);
+                    $item->delete(); // Vaciar el carrito
+                }
+
+                return $order;
+            });
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
 
         // Enviar el correo de confirmación
         try {

@@ -172,7 +172,11 @@ class DatabaseSeeder extends Seeder
             'quantity' => 1,
             'price_at_purchase' => $createdProducts[2]->price
         ]);
-        
+
+        // Decrementar stock para reflejar los productos vendidos en order1
+        $createdProducts[0]->decrement('stock', 1);
+        $createdProducts[2]->decrement('stock', 1);
+
         // Simular que el pedido se hizo hace 1 mes
         $order1->update(['created_at' => now()->subMonth()]);
 
@@ -188,5 +192,8 @@ class DatabaseSeeder extends Seeder
             'quantity' => 2,
             'price_at_purchase' => $createdProducts[4]->price
         ]);
+
+        // Decrementar stock para reflejar los productos vendidos en order2
+        $createdProducts[4]->decrement('stock', 2);
     }
 }
