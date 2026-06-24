@@ -1,0 +1,41 @@
+services:
+  app:
+    build:
+      context: .
+      target: app
+    container_name: reposaplus_app
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - sqlite_data:/var/www/html/database
+      - storage_data:/var/www/html/storage
+    env_file:
+      - .env
+    networks:
+      - reposaplus
+
+  queue:
+    build:
+      context: .
+      target: app
+    container_name: reposaplus_queue
+    restart: unless-stopped
+    command: php artisan queue:work --tries=3 --sleep=3
+    volumes:
+      - sqlite_data:/var/www/html/database
+      - storage_data:/var/www/html/storage
+    env_file:
+      - .env
+    depends_on:
+      - app
+    networks:
+      - reposaplus
+
+volumes:
+  sqlite_data:
+  storage_data:
+
+networks:
+  reposaplus:
+    driver: bridge

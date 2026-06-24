@@ -1,0 +1,16 @@
+.git
+.github
+node_modules
+vendor
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+database/database.sqlite
+.env
+tests
+docs
+*.md
+.idea
+.vscode
+.DS_Store
