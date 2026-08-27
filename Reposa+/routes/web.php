@@ -7,6 +7,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\LanguageController;
 
 Route::get('/', [HomeController::class, 'index']);
@@ -22,6 +23,11 @@ Route::post('/cart/update/{id}', [CartController::class, 'update'])->name('cart.
 Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
 Route::get('/cart/login', [CartController::class, 'requireLogin'])->name('cart.login');
 
+// Favoritos: endpoint JSON/AJAX. No lleva el middleware de auth para poder devolver
+// 401 cuando el usuario no está autenticado (el cliente redirige al login). El
+// propio controlador verifica la autenticación.
+Route::post('/favorites/{product}', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('/profile/address', [ProfileController::class, 'storeAddress'])->name('profile.address.store');
@@ -32,14 +38,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/checkout', [CartController::class, 'checkout'])->name('checkout');
     Route::get('/orders', [CartController::class, 'orders'])->name('orders.index');
     Route::get('/orders/{order}', [CartController::class, 'showOrder'])->name('orders.show');
-    Route::post('/favorites/{product}', [ProfileController::class, 'toggleFavorite'])->name('favorites.toggle');
-    Route::delete('/favorites/{product}', [ProfileController::class, 'removeFavorite'])->name('favorites.destroy');
 });
 
 // Rutas de Administración
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    
+
     // Gestión de Productos
     Route::get('/products', [AdminController::class, 'products'])->name('admin.products');
     Route::get('/products/create', [AdminController::class, 'createProduct'])->name('admin.products.create');

@@ -27,4 +27,7 @@ Homestead.json
 .env.backup
 .env.production
 .phpactor.json
-auth.json
+ auth.json
+
+# CommandCode agent tooling (session-local, not part of the TFG deliverable)
+/.commandcode/

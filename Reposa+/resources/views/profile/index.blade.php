@@ -196,11 +196,13 @@
                                                                 @csrf
                                                                 <button type="submit" class="btn btn-outline-primary btn-sm">Añadir al carrito</button>
                                                             </form>
-                                                            <form action="{{ route('favorites.destroy', $favorite) }}" method="POST" class="m-0">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit" class="btn btn-danger btn-sm">Quitar</button>
-                                                            </form>
+                                                            <button type="button"
+                                                                    class="btn btn-danger btn-sm btn-favorite"
+                                                                    data-product-id="{{ $favorite->id }}"
+                                                                    data-url="{{ route('favorites.toggle', $favorite) }}"
+                                                                    title="Quitar de favoritos">
+                                                                <i class="bi bi-heart-fill"></i>
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>

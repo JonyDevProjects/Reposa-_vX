@@ -91,12 +91,13 @@
                         </form>
 
                         @auth
-                            <form action="{{ route('favorites.toggle', $product) }}" method="POST" class="m-0">
-                                @csrf
-                                <button type="submit" class="btn {{ $isFavorite ? 'btn-danger' : 'btn-outline-danger' }} py-3 px-4" title="{{ __('messages.footer.favorites') }}">
-                                    <i class="bi {{ $isFavorite ? 'bi-heart-fill' : 'bi-heart' }}"></i>
-                                </button>
-                            </form>
+                            <button type="button"
+                                    class="btn {{ $isFavorite ? 'btn-danger' : 'btn-outline-danger' }} py-3 px-4 btn-favorite"
+                                    data-product-id="{{ $product->id }}"
+                                    data-url="{{ route('favorites.toggle', $product) }}"
+                                    title="{{ __('messages.footer.favorites') }}">
+                                <i class="bi {{ $isFavorite ? 'bi-heart-fill' : 'bi-heart' }}"></i>
+                            </button>
                         @else
                             <a href="{{ route('login') }}" class="btn btn-outline-danger py-3 px-4" title="{{ __('messages.footer.favorites') }}">
                                 <i class="bi bi-heart"></i>

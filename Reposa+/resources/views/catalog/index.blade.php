@@ -82,12 +82,13 @@
                                                     <button type="submit" class="btn btn-outline-primary btn-sm rounded-circle"><i class="bi bi-cart-plus"></i></button>
                                                 </form>
                                                 @auth
-                                                    <form action="{{ route('favorites.toggle', $product) }}" method="POST" class="m-0">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-sm rounded-circle {{ in_array($product->id, $favoriteIds) ? 'btn-danger text-white' : 'btn-outline-danger' }}" title="{{ in_array($product->id, $favoriteIds) ? 'Eliminar de favoritos' : 'Añadir a favoritos' }}">
-                                                            <i class="bi {{ in_array($product->id, $favoriteIds) ? 'bi-heart-fill' : 'bi-heart' }}"></i>
-                                                        </button>
-                                                    </form>
+                                                    <button type="button"
+                                                            class="btn btn-sm rounded-circle btn-favorite {{ in_array($product->id, $favoriteIds) ? 'btn-danger text-white' : 'btn-outline-danger' }}"
+                                                            data-product-id="{{ $product->id }}"
+                                                            data-url="{{ route('favorites.toggle', $product) }}"
+                                                            title="{{ in_array($product->id, $favoriteIds) ? 'Eliminar de favoritos' : 'Añadir a favoritos' }}">
+                                                        <i class="bi {{ in_array($product->id, $favoriteIds) ? 'bi-heart-fill' : 'bi-heart' }}"></i>
+                                                    </button>
                                                 @else
                                                     <a href="{{ route('login') }}" class="btn btn-sm btn-outline-danger rounded-circle" title="Inicia sesión para añadir a favoritos">
                                                         <i class="bi bi-heart"></i>
