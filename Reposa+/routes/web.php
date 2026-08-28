@@ -65,4 +65,5 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     // Historial de Pedidos Global
     Route::get('/orders', [AdminController::class, 'orders'])->name('admin.orders');
     Route::patch('/orders/{order}/status', [AdminController::class, 'updateOrderStatus'])->name('admin.orders.updateStatus');
+    Route::post('/orders/{order}/refund', [AdminController::class, 'refundOrder'])->name('admin.orders.refund');
 });

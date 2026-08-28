@@ -5,8 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Order;
+use App\Models\Refund;
 use App\Models\Category;
+use App\Mail\OrderRefunded;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Laravel\Cashier\Cashier;
 
 class AdminController extends Controller
 {
@@ -209,5 +215,63 @@ class AdminController extends Controller
         $order->update(['status' => $newStatus]);
 
         return back()->with('success', 'Estado del pedido actualizado a "' . Order::getStatusLabel($newStatus) . '".');
+    }
+
+    public function refundOrder(Request $request, Order $order)
+    {
+        if (! in_array($order->status, [Order::STATUS_COMPLETED, Order::STATUS_DELIVERED])) {
+            return back()->with('error', 'Solo se pueden reembolsar pedidos completados o entregados.');
+        }
+
+        if (! $order->payment_intent_id) {
+            return back()->with('error', 'Este pedido no tiene un pago de Stripe asociado para reembolsar.');
+        }
+
+        if ($order->refunds()->where('status', 'succeeded')->exists()) {
+            return back()->with('error', 'Este pedido ya ha sido reembolsado.');
+        }
+
+        $request->validate([
+            'reason' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $stripeRefund = Cashier::stripe()->paymentIntents->refund(
+                $order->payment_intent_id,
+                []
+            );
+
+            $refund = Refund::create([
+                'order_id' => $order->id,
+                'amount' => $order->total_amount,
+                'reason' => $request->input('reason', 'Reembolso solicitado por administrador'),
+                'stripe_refund_id' => $stripeRefund->id,
+                'status' => $stripeRefund->status,
+            ]);
+
+            if ($stripeRefund->status === 'succeeded') {
+                DB::transaction(function () use ($order) {
+                    foreach ($order->orderItems as $item) {
+                        $item->product->increment('stock', $item->quantity);
+                    }
+                    $order->update(['status' => Order::STATUS_REFUNDED]);
+                });
+            }
+
+            try {
+                Mail::to($order->user->email)->send(new OrderRefunded($order, $refund));
+            } catch (\Exception $e) {
+                Log::error("Failed to send refund email for order {$order->id}", [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            return back()->with('success', 'Reembolso procesado correctamente. Importe: ' . number_format($order->total_amount, 2) . '€');
+        } catch (\Exception $e) {
+            Log::error("Refund failed for order {$order->id}", [
+                'error' => $e->getMessage(),
+            ]);
+            return back()->with('error', 'Error al procesar el reembolso: ' . $e->getMessage());
+        }
     }
 }

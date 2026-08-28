@@ -349,7 +349,10 @@ class CartController extends Controller
             'managed_payments' => ['enabled' => false],
         ]);
 
-        $order->update(['stripe_session_id' => $session->id]);
+        $order->update([
+            'stripe_session_id' => $session->id,
+            'payment_intent_id' => $session->payment_intent,
+        ]);
 
         return redirect($session->url);
     }

@@ -10,6 +10,19 @@
     <div class="col-md-9">
         <h2 class="fw-bold mb-4">Historial Global de Transacciones</h2>
 
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
         <div class="card border-0 shadow-sm">
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -22,6 +35,7 @@
                                 <th>Total</th>
                                 <th>Fecha</th>
                                 <th>Estado</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -62,6 +76,46 @@
                                         <span class="badge bg-{{ \App\Models\Order::getStatusColor($order->status) }}">
                                             {{ \App\Models\Order::getStatusLabel($order->status) }}
                                         </span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if(in_array($order->status, ['completed', 'delivered']) && $order->payment_intent_id && !$order->refunds()->where('status', 'succeeded')->exists())
+                                        <button class="btn btn-sm btn-outline-danger" type="button"
+                                                data-bs-toggle="modal" data-bs-target="#refundModal{{ $order->id }}">
+                                            <i class="bi bi-arrow-counterclockwise"></i> Reembolsar
+                                        </button>
+
+                                        <div class="modal fade" id="refundModal{{ $order->id }}" tabindex="-1">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <form action="{{ route('admin.orders.refund', $order) }}" method="POST">
+                                                        @csrf
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Reembolsar Pedido #{{ $order->id }}</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>Se reembolsará <strong>{{ number_format($order->total_amount, 2) }}€</strong> al cliente <strong>{{ $order->user->name }}</strong>.</p>
+                                                            <p class="text-muted small">El stock se restaurará automáticamente.</p>
+                                                            <div class="mb-3">
+                                                                <label for="reason{{ $order->id }}" class="form-label">Motivo (opcional)</label>
+                                                                <input type="text" class="form-control" id="reason{{ $order->id }}" name="reason" maxlength="500" placeholder="Ej: Producto defectuoso, solicitud del cliente...">
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                            <button type="submit" class="btn btn-danger" onclick="return confirm('¿Confirmar reembolso de {{ number_format($order->total_amount, 2) }}€?')">
+                                                                Confirmar Reembolso
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @elseif($order->status === 'refunded')
+                                        <span class="badge bg-secondary">Reembolsado</span>
+                                    @else
+                                        <span class="text-muted small">—</span>
                                     @endif
                                 </td>
                             </tr>

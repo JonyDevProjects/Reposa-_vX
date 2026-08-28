@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Mail\OrderConfirmed;
+use App\Mail\OrderRefunded;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Refund;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -110,6 +112,70 @@ class StripeWebhookController extends CashierController
                 }
             }
         }
+
+        return $this->successMethod();
+    }
+
+    /**
+     * Handle the charge.refunded event.
+     * Safety net — if the refund is initiated from Stripe dashboard or
+     * the admin action webhook didn't complete, this syncs the state.
+     */
+    protected function handleChargeRefunded(array $payload): Response
+    {
+        $charge = $payload['data']['object'];
+        $paymentIntentId = $charge['payment_intent'] ?? null;
+
+        if (! $paymentIntentId) {
+            Log::warning('Stripe webhook: charge.refunded without payment_intent');
+            return $this->successMethod();
+        }
+
+        $order = Order::where('payment_intent_id', $paymentIntentId)->first();
+
+        if (! $order) {
+            Log::warning("Stripe webhook: charge.refunded — no order found for payment_intent {$paymentIntentId}");
+            return $this->successMethod();
+        }
+
+        if ($order->status === Order::STATUS_REFUNDED) {
+            Log::info("Stripe webhook: order {$order->id} already refunded, skipping");
+            return $this->successMethod();
+        }
+
+        $refundId = $charge['id'] ?? null;
+
+        if ($refundId && ! $order->refunds()->where('stripe_refund_id', $refundId)->exists()) {
+            Refund::create([
+                'order_id' => $order->id,
+                'amount' => ($charge['amount_refunded'] ?? $order->total_amount) / 100,
+                'reason' => 'Reembolsado vía Stripe dashboard',
+                'stripe_refund_id' => $refundId,
+                'status' => 'succeeded',
+            ]);
+        }
+
+        if ($order->status !== Order::STATUS_REFUNDED) {
+            DB::transaction(function () use ($order) {
+                foreach ($order->orderItems as $item) {
+                    $item->product->increment('stock', $item->quantity);
+                }
+                $order->update(['status' => Order::STATUS_REFUNDED]);
+            });
+
+            try {
+                $refund = $order->refunds()->latest()->first();
+                if ($refund) {
+                    Mail::to($order->user->email)->send(new OrderRefunded($order, $refund));
+                }
+            } catch (\Exception $e) {
+                Log::error("Stripe webhook: failed to send refund email for order {$order->id}", [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        Log::info("Stripe webhook: order {$order->id} refunded via charge.refunded webhook");
 
         return $this->successMethod();
     }
