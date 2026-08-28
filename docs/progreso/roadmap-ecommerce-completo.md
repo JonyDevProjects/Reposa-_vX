@@ -36,6 +36,8 @@ Este documento define las fases restantes para llevar Reposa+ al nivel de un e-c
 | 19 | Email de confirmación mejorado (Stripe + factura) | ✅ |
 | 20 | Búsqueda, paginación y filtros del catálogo | ✅ |
 | 21 | Estados de pedido expandidos + dashboard admin con Chart.js | ✅ |
+| 22 | **Sistema de reembolsos con Stripe** | ✅ |
+| 23 | **Suite de PHPUnit (46 tests, 107 assertions)** | ✅ |
 
 ---
 
@@ -285,8 +287,8 @@ composer require dompdf/dompdf
 | 8 — Email post-pago | ✅ Completada |
 | 9 — Búsqueda y paginación | ✅ Completada |
 | 10 — Estados de pedido | ✅ Completada |
-| 11 — Reembolsos | ⬜ Pendiente |
-| 12 — Tests PHPUnit | ⬜ Pendiente |
+| 11 — Reembolsos | ✅ Completada |
+| 12 — Tests PHPUnit | ✅ Completada |
 | 13 — CI/CD | ⬜ Pendiente |
 
 ---
@@ -307,12 +309,16 @@ Registro de cambios respecto al plan original. Se actualiza al final de cada ses
 | 28/08/2026 | Fase 7+8 | Se implementaron juntas en una sola feature branch (`feature/pdf-invoices-and-emails`) | Son complementarias: la factura PDF se vincula al email de confirmación |
 | 28/08/2026 | Fase 10 (Dashboard) | Se usó Chart.js CDN en lugar de librería local | Para un TFG no es necesario bundlar Chart.js; CDN simplifica el setup |
 | 28/08/2026 | Fase 10 (Estados) | Se añadió `completed` al mapa de estados (no estaba en el roadmap) | El webhook de Stripe necesita un estado terminal distinto de `delivered` para pedidos pagados online |
+| 28/08/2026 | Fase 11 (Reembolsos) | Se creó tabla `refunds` y columna `payment_intent_id` en orders | Necesario para rastrear reembolsos y conectar con Stripe PaymentIntents |
+| 28/08/2026 | Fase 11 (Reembolsos) | Se añadió webhook `charge.refunded` como safety net | Cubre reembolsos iniciados desde el dashboard de Stripe directamente |
+| 28/08/2026 | Fase 12 (Tests) | Se crearon factories faltantes (Order, OrderItem, CartItem) | Los modelos originales no tenían `HasFactory`; se añadió el trait |
+| 28/08/2026 | Fase 12 (Tests) | Se omitieron tests de llamada real a Stripe API | La API de Stripe no es mockable con `Cashier::stripe()` estático; se testean validaciones y estados de modelo |
 
 ---
 
 ## Notas para la Siguiente Sesión
 
-1. **Siguiente:** Fase 11 (Reembolsos), Fase 12 (Tests PHPUnit) o Fase 13 (CI/CD)
+1. **Siguiente:** Fase 13 (CI/CD — GitHub Actions)
 2. **GitFlow:** Cada nueva funcionalidad debe implementarse en una `feature/*` branch desde `develop`
 
 ### Pendiente para producción — Webhook de Stripe
@@ -322,7 +328,7 @@ El webhook `checkout.session.completed` está implementado y funcional, pero usa
 1. **Registrar el endpoint en Stripe Dashboard:**
    - Ir a Developers → Webhooks → Add endpoint
    - URL: `https://tudominio.com/stripe/webhook`
-   - Eventos: `checkout.session.completed`, `payment_intent.payment_failed`
+   - Eventos: `checkout.session.completed`, `payment_intent.payment_failed`, `charge.refunded`
    - Copiar el Signing Secret generado
 
 2. **Alternativa local con Stripe CLI** (para desarrollo):
