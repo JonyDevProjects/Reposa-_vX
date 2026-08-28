@@ -13,17 +13,58 @@ class AdminController extends Controller
     public function dashboard()
     {
         $totalOrders = Order::count();
-        $totalRevenue = Order::sum('total_amount');
+        $totalRevenue = Order::where('status', 'completed')->sum('total_amount');
         $totalProducts = Product::count();
         $recentOrders = Order::with('user')->latest()->take(5)->get();
-        
-        // Analítica de demanda: Top Almohadas con mayores expectativas de compra
-        $topExpectedProducts = \App\Models\TopFavoritedProduct::orderBy('favorited_by_count', 'desc')
-                                      ->where('favorited_by_count', '>', 0)
-                                      ->take(5)
-                                      ->get();
 
-        return view('admin.dashboard', compact('totalOrders', 'totalRevenue', 'totalProducts', 'recentOrders', 'topExpectedProducts'));
+        // Orders by status
+        $ordersByStatus = Order::select('status', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        // Monthly sales for the last 6 months (Chart.js)
+        $monthlySales = Order::where('status', 'completed')
+            ->where('created_at', '>=', now()->subMonths(5)->startOfMonth())
+            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month, SUM(total_amount) as total")
+            ->groupBy('month')
+            ->orderBy('month')
+            ->pluck('total', 'month');
+
+        $chartLabels = collect();
+        $chartData = collect();
+        for ($i = 5; $i >= 0; $i--) {
+            $key = now()->subMonths($i)->format('Y-m');
+            $chartLabels->push(now()->subMonths($i)->format('M Y'));
+            $chartData->push((float) ($monthlySales[$key] ?? 0));
+        }
+
+        // Top selling products
+        $topSellingProducts = \App\Models\OrderItem::select('product_id', \Illuminate\Support\Facades\DB::raw('SUM(quantity) as total_sold'))
+            ->whereHas('order', fn($q) => $q->where('status', 'completed'))
+            ->groupBy('product_id')
+            ->orderByDesc('total_sold')
+            ->with('product')
+            ->take(5)
+            ->get();
+
+        // Top favorited products
+        $topExpectedProducts = \App\Models\TopFavoritedProduct::orderBy('favorited_by_count', 'desc')
+            ->where('favorited_by_count', '>', 0)
+            ->take(5)
+            ->get();
+
+        // Recent completed orders for reference
+        $recentCompleted = Order::where('status', 'completed')
+            ->with('user')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('admin.dashboard', compact(
+            'totalOrders', 'totalRevenue', 'totalProducts', 'recentOrders',
+            'ordersByStatus', 'chartLabels', 'chartData',
+            'topSellingProducts', 'topExpectedProducts', 'recentCompleted'
+        ));
     }
 
     public function products()
@@ -154,11 +195,19 @@ class AdminController extends Controller
     public function updateOrderStatus(Request $request, Order $order)
     {
         $request->validate([
-            'status' => 'required|in:pending,processing,shipped,delivered,cancelled'
+            'status' => 'required|in:' . implode(',', array_keys(Order::STATUSES)),
         ]);
 
-        $order->update(['status' => $request->status]);
+        $newStatus = $request->status;
 
-        return back()->with('success', 'Estado del pedido actualizado.');
+        if (! Order::canTransition($order->status, $newStatus)) {
+            $current = Order::getStatusLabel($order->status);
+            $target = Order::getStatusLabel($newStatus);
+            return back()->with('error', "No se puede cambiar de \"{$current}\" a \"{$target}\".");
+        }
+
+        $order->update(['status' => $newStatus]);
+
+        return back()->with('success', 'Estado del pedido actualizado a "' . Order::getStatusLabel($newStatus) . '".');
     }
 }

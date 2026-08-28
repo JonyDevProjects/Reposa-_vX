@@ -42,17 +42,27 @@
                                 <td class="fw-bold text-primary">{{ number_format($order->total_amount, 2) }}€</td>
                                 <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
                                 <td>
-                                    <form action="{{ route('admin.orders.updateStatus', $order) }}" method="POST" class="d-flex gap-2">
-                                        @csrf
-                                        @method('PATCH')
-                                        <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
-                                            <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Pendiente</option>
-                                            <option value="processing" {{ $order->status == 'processing' ? 'selected' : '' }}>Procesando</option>
-                                            <option value="shipped" {{ $order->status == 'shipped' ? 'selected' : '' }}>Enviado</option>
-                                            <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Entregado</option>
-                                            <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Cancelado</option>
-                                        </select>
-                                    </form>
+                                    @php $transitions = \App\Models\Order::getAllowedTransitions($order->status); @endphp
+                                    @if(!empty($transitions))
+                                        <form action="{{ route('admin.orders.updateStatus', $order) }}" method="POST">
+                                            @csrf
+                                            @method('PATCH')
+                                            <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                <option value="{{ $order->status }}" disabled selected>
+                                                    {{ \App\Models\Order::getStatusLabel($order->status) }}
+                                                </option>
+                                                @foreach($transitions as $transition)
+                                                    <option value="{{ $transition }}">
+                                                        → {{ \App\Models\Order::getStatusLabel($transition) }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </form>
+                                    @else
+                                        <span class="badge bg-{{ \App\Models\Order::getStatusColor($order->status) }}">
+                                            {{ \App\Models\Order::getStatusLabel($order->status) }}
+                                        </span>
+                                    @endif
                                 </td>
                             </tr>
                             @endforeach
@@ -61,7 +71,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="mt-4">
             {{ $orders->links('pagination::bootstrap-5') }}
         </div>
