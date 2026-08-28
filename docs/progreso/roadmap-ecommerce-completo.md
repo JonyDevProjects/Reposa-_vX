@@ -303,6 +303,10 @@ Registro de cambios respecto al plan original. Se actualiza al final de cada ses
 | 28/08/2026 | Fase 12 (Stripe) | Se eliminó `payment_method_types` de los parámetros de Checkout | Stripe API v2025-06-30.basil no permite este parámetro con Managed Payments habilitado |
 | 28/08/2026 | Fases 5 y 6 | Se implementaron las fases 5 y 6 en sesiones separadas del roadmap original | Webhooks y reserva de stock son críticos para integridad de pagos |
 | 28/08/2026 | Fase 5 (Webhook) | Se creó `StripeWebhookController` en lugar de `StripeEventListener` del roadmap | Enfoque más limpio: extender Cashier WebhookController evita registrar rutas manuales y reutiliza verificación de firma |
+| 28/08/2026 | Fase 7 (Facturas PDF) | Se usó dompdf v3.1.6 en lugar de `downloadInvoice()` de Cashier | Cashier's `downloadInvoice()` genera facturas básicas; dompdf permite diseño personalizado con paleta índigo |
+| 28/08/2026 | Fase 7+8 | Se implementaron juntas en una sola feature branch (`feature/pdf-invoices-and-emails`) | Son complementarias: la factura PDF se vincula al email de confirmación |
+| 28/08/2026 | Fase 10 (Dashboard) | Se usó Chart.js CDN en lugar de librería local | Para un TFG no es necesario bundlar Chart.js; CDN simplifica el setup |
+| 28/08/2026 | Fase 10 (Estados) | Se añadió `completed` al mapa de estados (no estaba en el roadmap) | El webhook de Stripe necesita un estado terminal distinto de `delivered` para pedidos pagados online |
 
 ---
 
