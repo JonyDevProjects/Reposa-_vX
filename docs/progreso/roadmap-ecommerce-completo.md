@@ -38,6 +38,7 @@ Este documento define las fases restantes para llevar Reposa+ al nivel de un e-c
 | 21 | Estados de pedido expandidos + dashboard admin con Chart.js | ✅ |
 | 22 | **Sistema de reembolsos con Stripe** | ✅ |
 | 23 | **Suite de PHPUnit (46 tests, 107 assertions)** | ✅ |
+| 24 | **CI/CD con GitHub Actions (lint + tests + build)** | ✅ |
 
 ---
 
@@ -289,7 +290,7 @@ composer require dompdf/dompdf
 | 10 — Estados de pedido | ✅ Completada |
 | 11 — Reembolsos | ✅ Completada |
 | 12 — Tests PHPUnit | ✅ Completada |
-| 13 — CI/CD | ⬜ Pendiente |
+| 13 — CI/CD | ✅ Completada |
 
 ---
 
@@ -318,8 +319,8 @@ Registro de cambios respecto al plan original. Se actualiza al final de cada ses
 
 ## Notas para la Siguiente Sesión
 
-1. **Siguiente:** Fase 13 (CI/CD — GitHub Actions)
-2. **GitFlow:** Cada nueva funcionalidad debe implementarse en una `feature/*` branch desde `develop`
+1. **Todas las fases del roadmap completadas (1-13)**
+2. **Siguiente paso:** Push a origin para activar el pipeline CI en GitHub
 
 ### Pendiente para producción — Webhook de Stripe
 
