@@ -8,7 +8,14 @@
         <div class="col-md-8">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h3 class="fw-bold mb-0">Detalles del Pedido #{{ $order->id }}</h3>
-                <a href="{{ route('profile') }}#orders" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Volver a Mis Pedidos</a>
+                <div class="d-flex gap-2">
+                    @if($order->status === 'completed')
+                        <a href="{{ route('orders.invoice', $order) }}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-file-earmark-pdf me-1"></i>Descargar factura
+                        </a>
+                    @endif
+                    <a href="{{ route('profile') }}#orders" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Volver a Mis Pedidos</a>
+                </div>
             </div>
 
             <div class="card border-0 shadow-sm rounded-4 p-5 mb-4">
