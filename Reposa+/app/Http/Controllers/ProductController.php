@@ -3,27 +3,74 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Product;
+use App\Models\Category;
 
 class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = \App\Models\Product::query();
+        $query = Product::query();
 
-        if ($request->has('category')) {
+        // Search by name and description
+        if ($request->filled('q')) {
+            $search = $request->input('q');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('description', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Filter by category
+        if ($request->filled('category')) {
             $query->whereHas('categories', function ($q) use ($request) {
                 $q->where('slug', $request->category);
             });
         }
 
-        $products = $query->paginate(12);
-        $categories = \App\Models\Category::all();
+        // Filter by material
+        if ($request->filled('material')) {
+            $query->where('material', $request->material);
+        }
+
+        // Filter by firmness
+        if ($request->filled('firmness')) {
+            $query->where('firmness', $request->firmness);
+        }
+
+        // Filter by price range
+        if ($request->filled('min_price')) {
+            $query->where('price', '>=', $request->input('min_price', 0));
+        }
+        if ($request->filled('max_price')) {
+            $query->where('price', '<=', $request->input('max_price', 999));
+        }
+
+        // Sorting
+        $sort = $request->input('sort', 'newest');
+        match ($sort) {
+            'price_asc' => $query->orderBy('price', 'asc'),
+            'price_desc' => $query->orderBy('price', 'desc'),
+            'name_asc' => $query->orderBy('name', 'asc'),
+            'name_desc' => $query->orderBy('name', 'desc'),
+            default => $query->latest(),
+        };
+
+        $products = $query->paginate(12)->withQueryString();
+        $categories = Category::all();
         $favoriteIds = auth()->check() ? auth()->user()->favorites()->pluck('product_id')->toArray() : [];
 
-        return view('catalog.index', compact('products', 'categories', 'favoriteIds'));
+        // Get distinct values for filter dropdowns
+        $materials = Product::distinct()->pluck('material')->filter()->sort()->values();
+        $firmnesses = Product::distinct()->pluck('firmness')->filter()->sort()->values();
+
+        return view('catalog.index', compact(
+            'products', 'categories', 'favoriteIds',
+            'materials', 'firmnesses'
+        ));
     }
 
-    public function show(\App\Models\Product $product)
+    public function show(Product $product)
     {
         $isFavorite = auth()->check() && auth()->user()->favorites()->where('product_id', $product->id)->exists();
 
