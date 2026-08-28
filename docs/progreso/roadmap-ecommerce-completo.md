@@ -297,15 +297,41 @@ Registro de cambios respecto al plan original. Se actualiza al final de cada ses
 | 28/08/2026 | Fase 12 (Stripe) | Se implementó antes de lo previsto en el roadmap original | El cliente solicitó integrar la pasarela de pagos como prioridad, adelantando las fases 5-6 del roadmap |
 | 28/08/2026 | Fase 12 (Stripe) | Se usó `managed_payments[enabled]=false` en la sesión de Checkout | Stripe activa Managed Payments por defecto en cuentas nuevas, requiriendo `tax_code` por producto. Se desactivó para simplificar |
 | 28/08/2026 | Fase 12 (Stripe) | Se eliminó `payment_method_types` de los parámetros de Checkout | Stripe API v2025-06-30.basil no permite este parámetro con Managed Payments habilitado |
+| 28/08/2026 | Fases 5 y 6 | Se implementaron las fases 5 y 6 en sesiones separadas del roadmap original | Webhooks y reserva de stock son críticos para integridad de pagos |
+| 28/08/2026 | Fase 5 (Webhook) | Se creó `StripeWebhookController` en lugar de `StripeEventListener` del roadmap | Enfoque más limpio: extender Cashier WebhookController evita registrar rutas manuales y reutiliza verificación de firma |
 
 ---
 
 ## Notas para la Siguiente Sesión
 
-1. **Lo primero:** Implementar el webhook de Stripe (Fase 5) — es la pieza de seguridad más crítica
-2. **Segundo:** Reserva de stock (Fase 6) — previene problemas de concurrencia
-3. **En paralelo:** Se pueden trabajar las fases 7, 8 y 9 de forma independiente
-4. **GitFlow:** Cada nueva funcionalidad debe implementarse en una `feature/*` branch desde `develop`
+1. **Siguiente:** Fases 7 (Facturas PDF), 8 (Email post-pago) y 9 (Búsqueda) — independientes entre sí
+2. **GitFlow:** Cada nueva funcionalidad debe implementarse en una `feature/*` branch desde `develop`
+
+### Pendiente para producción — Webhook de Stripe
+
+El webhook `checkout.session.completed` está implementado y funcional, pero usa un secreto placeholder (`whsec_test_placeholder`). **Antes de desplegar en producción** se debe:
+
+1. **Registrar el endpoint en Stripe Dashboard:**
+   - Ir a Developers → Webhooks → Add endpoint
+   - URL: `https://tudominio.com/stripe/webhook`
+   - Eventos: `checkout.session.completed`, `payment_intent.payment_failed`
+   - Copiar el Signing Secret generado
+
+2. **Alternativa local con Stripe CLI** (para desarrollo):
+   ```bash
+   stripe login
+   stripe listen --forward-to localhost:8080/stripe/webhook
+   ```
+   El CLI muestra un `whsec_...` específico de la sesión → copiarlo a `STRIPE_WEBHOOK_SECRET` en `.env`
+
+3. **Actualizar `.env`** con el secreto real:
+   ```
+   STRIPE_WEBHOOK_SECRET=whsec_1ABC...tu_secreto_real
+   ```
+
+4. **Verificar** que `config/cashier.php` carga el secreto desde la env var (ya configurado).
+
+> **Nota:** Sin el secreto real, la verificación de firma se salta silenciosamente (Cashier solo aplica `VerifyWebhookSignature` cuando `cashier.webhook.secret` tiene un valor distinto de placeholder). En producción, un webhook sin firma válida no debería procesarse.
 
 ---
 
