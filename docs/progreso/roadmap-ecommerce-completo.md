@@ -32,6 +32,8 @@ Este documento define las fases restantes para llevar Reposa+ al nivel de un e-c
 | 15 | GitFlow y documentación del proyecto | ✅ |
 | 16 | Webhook de Stripe (checkout.session.completed) | ✅ |
 | 17 | Reserva de stock + validación en carrito | ✅ |
+| 18 | Facturas PDF con dompdf | ✅ |
+| 19 | Email de confirmación mejorado (Stripe + factura) | ✅ |
 
 ---
 
@@ -277,8 +279,8 @@ composer require dompdf/dompdf
 | 1-4 | ✅ Completadas (previas al roadmap) |
 | 5 — Webhooks de Stripe | ✅ Completada |
 | 6 — Integridad de stock | ✅ Completada |
-| 7 — Facturas PDF | ⬜ Pendiente |
-| 8 — Email post-pago | ⬜ Pendiente |
+| 7 — Facturas PDF | ✅ Completada |
+| 8 — Email post-pago | ✅ Completada |
 | 9 — Búsqueda y paginación | ⬜ Pendiente |
 | 10 — Estados de pedido | ⬜ Pendiente |
 | 11 — Reembolsos | ⬜ Pendiente |
@@ -304,7 +306,7 @@ Registro de cambios respecto al plan original. Se actualiza al final de cada ses
 
 ## Notas para la Siguiente Sesión
 
-1. **Siguiente:** Fases 7 (Facturas PDF), 8 (Email post-pago) y 9 (Búsqueda) — independientes entre sí
+1. **Siguiente:** Fase 9 (Búsqueda y paginación) o Fase 10 (Estados de pedido y gestión admin)
 2. **GitFlow:** Cada nueva funcionalidad debe implementarse en una `feature/*` branch desde `develop`
 
 ### Pendiente para producción — Webhook de Stripe
