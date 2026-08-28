@@ -316,15 +316,18 @@ Registro de cambios respecto al plan original. Se actualiza al final de cada ses
 | 28/08/2026 | Fase 12 (Tests) | Se crearon factories faltantes (Order, OrderItem, CartItem) | Los modelos originales no tenían `HasFactory`; se añadió el trait |
 | 28/08/2026 | Fase 12 (Tests) | Se omitieron tests de llamada real a Stripe API | La API de Stripe no es mockable con `Cashier::stripe()` estático; se testean validaciones y estados de modelo |
 | 28/08/2026 | Fase 25 (E2E) | Se añadió suite E2E con Pest + Playwright (no estaba en roadmap) | El cliente solicitó tests de navegador para flujos críticos (carrito, checkout, webhooks, admin) |
+| 28/08/2026 | Fase 25 (E2E) | Tests reescritos de Playwright a HTTP (actingAs) | pest-plugin-browser: visit() crea contextos separados, sesión login no persiste. HTTP tests son más rápidos y confiables |
+| 28/08/2026 | Fase 25 (E2E) | Registrada ruta POST /stripe/webhook en web.php | Faltaba: Cashier no auto-registra la ruta, el webhook endpoint no existía |
+| 28/08/2026 | Fase 25 (E2E) | Eliminados overrides DB de phpunit.xml | phpunit.xml forzaba SQLite para todos los tests; .env.testing ya configura MySQL para browser tests |
 
 ---
 
 ## Notas para la Siguiente Sesión
 
 1. **Todas las fases del roadmap completadas (1-25)**
-2. **Siguiente paso:** Push de `feature/e2e-tests` a origin y merge a `develop`
-3. **Verificar:** Los tests E2E que usan `visit()` requieren `php artisan serve --port=8080` corriendo
-4. **Pendiente:** Ejecutar la suite completa con el servidor levantado para validar los tests de navegador
+2. **Siguiente paso:** Merge `feature/e2e-tests` a `develop` con `--no-ff`
+3. **Estado de tests:** 39 E2E tests pasan (112 assertions), 58 Feature tests pasan
+4. **Branch:** `feature/e2e-tests` en origin, commit `e9a271e`
 
 ### Pendiente para producción — Webhook de Stripe
 
