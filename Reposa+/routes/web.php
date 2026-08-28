@@ -34,6 +34,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/orders/{order}', [CartController::class, 'showOrder'])->name('orders.show');
     Route::post('/favorites/{product}', [ProfileController::class, 'toggleFavorite'])->name('favorites.toggle');
     Route::delete('/favorites/{product}', [ProfileController::class, 'removeFavorite'])->name('favorites.destroy');
+
+    // Stripe Checkout
+    Route::get('/checkout/stripe', [CartController::class, 'stripeCheckout'])->name('stripe.checkout');
+    Route::get('/checkout/stripe/success', [CartController::class, 'stripeSuccess'])->name('stripe.success');
+    Route::get('/checkout/stripe/cancel', [CartController::class, 'stripeCancel'])->name('stripe.cancel');
 });
 
 // Rutas de Administración

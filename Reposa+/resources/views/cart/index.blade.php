@@ -99,12 +99,9 @@
                         @endguest
 
                         @auth
-                        <form action="{{ route('checkout') }}" method="POST">
-                            @csrf
-                            <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow-sm">
-                                {{ __('messages.cart.checkout') }} <i class="bi bi-chevron-right ms-2"></i>
-                            </button>
-                        </form>
+                        <a href="{{ route('stripe.checkout') }}" class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow-sm text-decoration-none">
+                            <i class="bi bi-credit-card me-2"></i>Pagar
+                        </a>
                         @endauth
                     @endif
                     
