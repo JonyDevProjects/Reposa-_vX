@@ -11,8 +11,11 @@ use App\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Response;
 use App\Mail\OrderConfirmed;
 use Laravel\Cashier\Cashier;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class CartController extends Controller
 {
@@ -395,5 +398,27 @@ class CartController extends Controller
     public function stripeCancel()
     {
         return redirect('/cart')->with('error', 'El pago fue cancelado. Tu carrito se mantiene intacto.');
+    }
+
+    public function downloadInvoice(Order $order)
+    {
+        if ($order->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $order->load(['orderItems.product', 'user.addresses']);
+
+        $options = new Options();
+        $options->set('isRemoteEnabled', true);
+        $options->set('isHtml5ParserEnabled', true);
+
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml(view('invoices.invoice', compact('order'))->render());
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        $filename = 'Factura_Reposa+' . '_' . str_pad($order->id, 6, '0', STR_PAD_LEFT) . '.pdf';
+
+        return $dompdf->stream($filename, ['Attachment' => true]);
     }
 }
