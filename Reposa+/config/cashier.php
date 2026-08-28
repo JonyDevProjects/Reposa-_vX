@@ -22,6 +22,7 @@ return [
         'events' => [
             'checkout.session.completed',
             'payment_intent.payment_failed',
+            'charge.refunded',
         ],
     ],
 
