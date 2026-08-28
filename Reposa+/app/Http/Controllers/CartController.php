@@ -43,10 +43,26 @@ class CartController extends Controller
     {
         $quantity = (int) request('quantity', 1);
 
+        if ($product->stock <= 0) {
+            if (request()->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Producto sin stock disponible'], 422);
+            }
+            return back()->with('error', 'Producto sin stock disponible');
+        }
+
         if (Auth::check()) {
             $cartItem = CartItem::where('user_id', Auth::id())
                                 ->where('product_id', $product->id)
                                 ->first();
+
+            $currentQty = $cartItem ? $cartItem->quantity : 0;
+            if ($currentQty + $quantity > $product->stock) {
+                $msg = "No hay suficiente stock. Disponible: {$product->stock}, en carrito: {$currentQty}.";
+                if (request()->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => $msg], 422);
+                }
+                return back()->with('error', $msg);
+            }
 
             if ($cartItem) {
                 $cartItem->increment('quantity', $quantity);
@@ -59,6 +75,11 @@ class CartController extends Controller
             }
         } else {
             $cart = session()->get('cart', []);
+            $currentQty = isset($cart[$product->id]) ? $cart[$product->id]['quantity'] : 0;
+            if ($currentQty + $quantity > $product->stock) {
+                $msg = "No hay suficiente stock. Disponible: {$product->stock}, en carrito: {$currentQty}.";
+                return back()->with('error', $msg);
+            }
             if (isset($cart[$product->id])) {
                 $cart[$product->id]['quantity'] += $quantity;
             } else {
@@ -90,10 +111,20 @@ class CartController extends Controller
 
         if (Auth::check()) {
             $cartItem = CartItem::findOrFail($id);
+            $product = Product::find($cartItem->product_id);
+
+            if ($product && $request->quantity > $product->stock) {
+                return back()->with('error', "Solo quedan {$product->stock} unidades disponibles de \"{$product->name}\".");
+            }
+
             $cartItem->update(['quantity' => $request->quantity]);
         } else {
             $cart = session()->get('cart', []);
             if (isset($cart[$id])) {
+                $product = Product::find($id);
+                if ($product && $request->quantity > $product->stock) {
+                    return back()->with('error', "Solo quedan {$product->stock} unidades disponibles de \"{$product->name}\".");
+                }
                 $cart[$id]['quantity'] = $request->quantity;
                 session()->put('cart', $cart);
             }
@@ -248,21 +279,40 @@ class CartController extends Controller
             return back()->with('error', 'El carrito está vacío');
         }
 
-        // Crear order pendiente con los items del carrito
-        $order = Order::create([
-            'user_id' => $user->id,
-            'total_amount' => $cartItems->sum(fn($item) => $item->product->price * $item->quantity),
-            'status' => 'pending',
-        ]);
+        // Verify stock availability before creating the order
+        try {
+            $order = DB::transaction(function () use ($user, $cartItems) {
+                foreach ($cartItems as $item) {
+                    $product = Product::lockForUpdate()->find($item->product_id);
 
-        // Crear order items (sin decrementar stock aún — se hará al confirmar pago)
-        foreach ($cartItems as $item) {
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $item->product_id,
-                'quantity' => $item->quantity,
-                'price_at_purchase' => $item->product->price,
-            ]);
+                    if (! $product || $product->stock < $item->quantity) {
+                        $name = $product?->name ?? 'Producto #' . $item->product_id;
+                        $available = $product?->stock ?? 0;
+                        throw new \Exception(
+                            "Stock insuficiente para \"{$name}\". Disponible: {$available}, solicitado: {$item->quantity}."
+                        );
+                    }
+                }
+
+                $order = Order::create([
+                    'user_id' => $user->id,
+                    'total_amount' => $cartItems->sum(fn($item) => $item->product->price * $item->quantity),
+                    'status' => 'pending',
+                ]);
+
+                foreach ($cartItems as $item) {
+                    OrderItem::create([
+                        'order_id' => $order->id,
+                        'product_id' => $item->product_id,
+                        'quantity' => $item->quantity,
+                        'price_at_purchase' => $item->product->price,
+                    ]);
+                }
+
+                return $order;
+            });
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
 
         // Vaciar carrito

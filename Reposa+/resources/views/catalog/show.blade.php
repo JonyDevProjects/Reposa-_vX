@@ -17,9 +17,15 @@
             <div class="col-md-6">
                 <div class="card border-0 shadow-sm overflow-hidden rounded-4 position-relative">
                     <img src="{{ $product->image_url ?? '/images/pillow-detail.png' }}" class="img-fluid product-main-img" alt="{{ $product->name }}">
-                    <span class="badge bg-success position-absolute top-0 end-0 m-3 px-3 py-2 rounded-pill shadow">
-                        <i class="bi bi-check-circle me-1"></i>{{ __('messages.product.in_stock') ?? 'En stock' }}
-                    </span>
+                    @if($product->stock > 0)
+                        <span class="badge bg-success position-absolute top-0 end-0 m-3 px-3 py-2 rounded-pill shadow">
+                            <i class="bi bi-check-circle me-1"></i>{{ __('messages.product.in_stock') ?? 'En stock' }}
+                        </span>
+                    @else
+                        <span class="badge bg-danger position-absolute top-0 end-0 m-3 px-3 py-2 rounded-pill shadow">
+                            <i class="bi bi-x-circle me-1"></i>{{ __('messages.product.out_of_stock') ?? 'Agotado' }}
+                        </span>
+                    @endif
                 </div>
                 <div class="row mt-3 g-2">
                     <div class="col-4">
@@ -64,7 +70,22 @@
                         <span class="text-muted">{{ __('messages.product.reviews_count') }}</span>
                     </div>
 
-                    <h2 class="display-6 fw-bold text-primary mb-4">{{ number_format($product->price, 2) }}€</h2>
+                    <h2 class="display-6 fw-bold text-primary mb-2">{{ number_format($product->price, 2) }}€</h2>
+
+                    @if($product->stock > 0)
+                        <p class="text-muted mb-4" style="font-size: 0.9rem;">
+                            <i class="bi bi-box-seam me-1"></i>
+                            @if($product->stock <= 5)
+                                <span class="text-warning fw-semibold">¡Quedan solo {{ $product->stock }} unidades!</span>
+                            @else
+                                Quedan {{ $product->stock }} unidades disponibles
+                            @endif
+                        </p>
+                    @else
+                        <p class="text-danger mb-4 fw-semibold" style="font-size: 0.9rem;">
+                            <i class="bi bi-exclamation-triangle me-1"></i>Agotado — avísame cuando vuelva a estar disponible
+                        </p>
+                    @endif
 
                     <div class="mb-4">
                         <h6 class="fw-bold">{{ __('messages.product.specs_title') }}</h6>
@@ -78,17 +99,23 @@
                     <p class="text-muted mb-5 lead">{{ $product->description }}</p>
 
                     <div class="d-flex flex-column flex-md-row gap-3 mb-5">
-                        <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-flex gap-3 w-100">
-                            @csrf
-                            <div class="input-group" style="width: 130px;">
-                                <button class="btn btn-outline-secondary" type="button" onclick="this.nextElementSibling.stepDown()">-</button>
-                                <input type="number" name="quantity" class="form-control text-center" value="1" min="1" max="10">
-                                <button class="btn btn-outline-secondary" type="button" onclick="this.previousElementSibling.stepUp()">+</button>
-                            </div>
-                            <button type="submit" class="btn btn-primary flex-grow-1 py-3 fw-bold">
-                                <i class="bi bi-cart-plus me-2"></i>{{ __('messages.product.add_to_cart') }}
+                        @if($product->stock > 0)
+                            <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-flex gap-3 w-100">
+                                @csrf
+                                <div class="input-group" style="width: 130px;">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="this.nextElementSibling.stepDown()">-</button>
+                                    <input type="number" name="quantity" class="form-control text-center" value="1" min="1" max="{{ $product->stock }}">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="this.previousElementSibling.stepUp()">+</button>
+                                </div>
+                                <button type="submit" class="btn btn-primary flex-grow-1 py-3 fw-bold">
+                                    <i class="bi bi-cart-plus me-2"></i>{{ __('messages.product.add_to_cart') }}
+                                </button>
+                            </form>
+                        @else
+                            <button class="btn btn-secondary flex-grow-1 py-3 fw-bold" disabled>
+                                <i class="bi bi-cart-x me-2"></i>Sin stock disponible
                             </button>
-                        </form>
+                        @endif
 
                         @auth
                             <form action="{{ route('favorites.toggle', $product) }}" method="POST" class="m-0">
