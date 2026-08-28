@@ -39,6 +39,7 @@ Este documento define las fases restantes para llevar Reposa+ al nivel de un e-c
 | 22 | **Sistema de reembolsos con Stripe** | ✅ |
 | 23 | **Suite de PHPUnit (46 tests, 107 assertions)** | ✅ |
 | 24 | **CI/CD con GitHub Actions (lint + tests + build)** | ✅ |
+| 25 | **Suite E2E con Pest + Playwright (8 archivos de test, 38 tests)** | ✅ |
 
 ---
 
@@ -314,13 +315,16 @@ Registro de cambios respecto al plan original. Se actualiza al final de cada ses
 | 28/08/2026 | Fase 11 (Reembolsos) | Se añadió webhook `charge.refunded` como safety net | Cubre reembolsos iniciados desde el dashboard de Stripe directamente |
 | 28/08/2026 | Fase 12 (Tests) | Se crearon factories faltantes (Order, OrderItem, CartItem) | Los modelos originales no tenían `HasFactory`; se añadió el trait |
 | 28/08/2026 | Fase 12 (Tests) | Se omitieron tests de llamada real a Stripe API | La API de Stripe no es mockable con `Cashier::stripe()` estático; se testean validaciones y estados de modelo |
+| 28/08/2026 | Fase 25 (E2E) | Se añadió suite E2E con Pest + Playwright (no estaba en roadmap) | El cliente solicitó tests de navegador para flujos críticos (carrito, checkout, webhooks, admin) |
 
 ---
 
 ## Notas para la Siguiente Sesión
 
-1. **Todas las fases del roadmap completadas (1-13)**
-2. **Siguiente paso:** Push a origin para activar el pipeline CI en GitHub
+1. **Todas las fases del roadmap completadas (1-25)**
+2. **Siguiente paso:** Push de `feature/e2e-tests` a origin y merge a `develop`
+3. **Verificar:** Los tests E2E que usan `visit()` requieren `php artisan serve --port=8080` corriendo
+4. **Pendiente:** Ejecutar la suite completa con el servidor levantado para validar los tests de navegador
 
 ### Pendiente para producción — Webhook de Stripe
 

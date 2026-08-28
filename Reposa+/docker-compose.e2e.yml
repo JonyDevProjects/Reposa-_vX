@@ -1,0 +1,116 @@
+/*
+|--------------------------------------------------------------------------
+| Docker Compose — E2E Testing Stack
+|--------------------------------------------------------------------------
+|
+| Stack completo para ejecutar tests E2E de forma aislada:
+| - MySQL 8.0 (base de datos de pruebas)
+| - Redis (caché y sesiones)
+| - MailHog (captura de correos)
+| - Laravel App (servidor de aplicación)
+|
+| Uso:
+|   docker compose -f docker-compose.e2e.yml up -d
+|   docker compose -f docker-compose.e2e.yml exec app php artisan migrate:fresh --seed
+|   docker compose -f docker-compose.e2e.yml exec app php artisan test --testsuite=Browser
+|   docker compose -f docker-compose.e2e.yml down -v
+|
+*/
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: reposaplus-e2e-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: reposaplus_e2e
+    ports:
+      - "3307:3306"
+    volumes:
+      - e2e_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - e2e_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: reposaplus-e2e-redis
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - e2e_network
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: reposaplus-e2e-mailhog
+    ports:
+      - "8025:8025"  # Web UI
+      - "1025:1025"  # SMTP
+    networks:
+      - e2e_network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: reposaplus-e2e-app
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
+    environment:
+      APP_ENV: testing
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8080
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: reposaplus_e2e
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      SESSION_DRIVER: redis
+      CACHE_STORE: redis
+      QUEUE_CONNECTION: redis
+      REDIS_HOST: redis
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+      MAIL_USERNAME: ""
+      MAIL_PASSWORD: ""
+      MAIL_ENCRYPTION: ""
+      MAILHOG_URL: http://mailhog:8025
+      STRIPE_SECRET: ${STRIPE_SECRET:-sk_test_placeholder}
+      STRIPE_KEY: ${STRIPE_KEY:-pk_test_placeholder}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-whsec_test_placeholder}
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/var/www/html
+    networks:
+      - e2e_network
+    command: >
+      sh -c "
+        php artisan key:generate --force &&
+        php artisan migrate:fresh --force &&
+        php artisan db:seed --force &&
+        php artisan serve --host=0.0.0.0 --port=8080
+      "
+
+volumes:
+  e2e_mysql_data:
+
+networks:
+  e2e_network:
+    driver: bridge
