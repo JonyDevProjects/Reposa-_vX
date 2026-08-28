@@ -1,21 +1,16 @@
-/*
-|--------------------------------------------------------------------------
-| Docker Compose — E2E Testing Stack
-|--------------------------------------------------------------------------
-|
-| Stack completo para ejecutar tests E2E de forma aislada:
-| - MySQL 8.0 (base de datos de pruebas)
-| - Redis (caché y sesiones)
-| - MailHog (captura de correos)
-| - Laravel App (servidor de aplicación)
-|
-| Uso:
-|   docker compose -f docker-compose.e2e.yml up -d
-|   docker compose -f docker-compose.e2e.yml exec app php artisan migrate:fresh --seed
-|   docker compose -f docker-compose.e2e.yml exec app php artisan test --testsuite=Browser
-|   docker compose -f docker-compose.e2e.yml down -v
-|
-*/
+# Docker Compose — E2E Testing Stack
+#
+# Stack completo para ejecutar tests E2E de forma aislada:
+# - MySQL 8.0 (base de datos de pruebas)
+# - Redis (caché y sesiones)
+# - MailHog (captura de correos)
+# - Laravel App (servidor de aplicación)
+#
+# Uso:
+#   docker compose -f docker-compose.e2e.yml up -d
+#   docker compose -f docker-compose.e2e.yml exec app php artisan migrate:fresh --seed
+#   docker compose -f docker-compose.e2e.yml exec app php artisan test --testsuite=Browser
+#   docker compose -f docker-compose.e2e.yml down -v
 
 services:
   mysql:
@@ -95,7 +90,7 @@ services:
       STRIPE_KEY: ${STRIPE_KEY:-pk_test_placeholder}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-whsec_test_placeholder}
     ports:
-      - "8080:8080"
+      - "8081:8080"
     volumes:
       - .:/var/www/html
     networks:
