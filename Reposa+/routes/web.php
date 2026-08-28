@@ -42,6 +42,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/checkout/stripe/cancel', [CartController::class, 'stripeCancel'])->name('stripe.cancel');
 });
 
+// Stripe Webhook (fuera de auth — Stripe envía sin sesión)
+Route::post('/stripe/webhook', [\App\Http\Controllers\StripeWebhookController::class, 'handleWebhook'])->name('cashier.webhook');
+
 // Rutas de Administración
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');

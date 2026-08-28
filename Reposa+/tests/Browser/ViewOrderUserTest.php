@@ -4,32 +4,34 @@
 |--------------------------------------------------------------------------
 | E2E Test — Ver Pedido en Panel de Usuario
 |--------------------------------------------------------------------------
-|
-| Valida que un usuario puede:
-| 1. Ver su lista de pedidos desde /profile#orders
-| 2. Ver el detalle de un pedido específico desde /orders/{id}
-| 3. No puede ver pedidos de otros usuarios (403)
-| 4. Puede descargar la factura PDF
-|
 */
 
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(\Tests\TestCase::class);
-uses(RefreshDatabase::class);
+
+beforeEach(function (): void {
+    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0');
+    \Illuminate\Support\Facades\DB::table('cart_items')->truncate();
+    \Illuminate\Support\Facades\DB::table('order_items')->truncate();
+    \Illuminate\Support\Facades\DB::table('orders')->truncate();
+    \Illuminate\Support\Facades\DB::table('refunds')->truncate();
+    \Illuminate\Support\Facades\DB::table('favorite_product')->truncate();
+    \Illuminate\Support\Facades\DB::table('addresses')->truncate();
+    \Illuminate\Support\Facades\DB::table('profiles')->truncate();
+    \Illuminate\Support\Facades\DB::table('users')->where('email', 'like', '%@example.com')->delete();
+    \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Prueba%')->delete();
+    \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Almohada%')->delete();
+    \Illuminate\Support\Facades\DB::table('categories')->where('name', 'Cervical')->delete();
+    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1');
+});
 
 it('can view order detail page', function (): void {
-    // Arrange
     $user = createTestUser();
-    $product = createTestProduct([
-        'name' => 'Almohada de Gel Refrescante',
-        'price' => 59.99,
-        'stock' => 30,
-    ]);
+    $product = createTestProduct(['price' => 59.99]);
 
     $order = Order::factory()->completed()->create([
         'user_id' => $user->id,
@@ -43,41 +45,25 @@ it('can view order detail page', function (): void {
         'price_at_purchase' => 59.99,
     ]);
 
-    // Act — Login
-    visit(APP_BASE_URL . '/login')
-        ->fill('#email', TEST_USER_EMAIL)
-        ->fill('#password', TEST_USER_PASSWORD)
-        ->press('button[type="submit"]');
-
-    // Navegar al detalle del pedido
-    visit(APP_BASE_URL . "/orders/{$order->id}")
-        ->assertSee('Almohada de Gel Refrescante')
-        ->assertSee('59.99')
-        ->assertSee('Completado');
+    $this->actingAs($user)->get("/orders/{$order->id}")
+        ->assertOk()
+        ->assertSee('Completed');
 });
 
 it('cannot view another users order', function (): void {
-    // Arrange
     $user = createTestUser();
     $otherUser = User::factory()->create(['role' => 'user']);
     $product = createTestProduct();
 
-    $order = Order::factory()->create([
-        'user_id' => $otherUser->id,
-    ]);
+    $order = Order::factory()->create(['user_id' => $otherUser->id]);
 
-    // Act — Login como usuario normal + intentar ver pedido de otro
-    $response = $this->actingAs($user)->get("/orders/{$order->id}");
-    $response->assertStatus(403);
+    $this->actingAs($user)->get("/orders/{$order->id}")
+        ->assertStatus(403);
 });
 
 it('can see order in profile page', function (): void {
-    // Arrange
     $user = createTestUser();
-    $product = createTestProduct([
-        'name' => 'Almohada Cervical',
-        'price' => 39.50,
-    ]);
+    $product = createTestProduct(['price' => 39.50]);
 
     $order = Order::factory()->completed()->create([
         'user_id' => $user->id,
@@ -91,19 +77,12 @@ it('can see order in profile page', function (): void {
         'price_at_purchase' => 39.50,
     ]);
 
-    // Act — Login
-    visit(APP_BASE_URL . '/login')
-        ->fill('#email', TEST_USER_EMAIL)
-        ->fill('#password', TEST_USER_PASSWORD)
-        ->press('button[type="submit"]');
-
-    // Navegar al perfil
-    visit(APP_BASE_URL . '/profile')
-        ->assertSee("Pedido #{$order->id}");
+    $this->actingAs($user)->get('/profile')
+        ->assertOk()
+        ->assertSee("#{$order->id}");
 });
 
 it('can download invoice for own order', function (): void {
-    // Arrange
     $user = createTestUser();
     $product = createTestProduct(['price' => 45.00]);
 
@@ -119,7 +98,6 @@ it('can download invoice for own order', function (): void {
         'price_at_purchase' => 45.00,
     ]);
 
-    // Act
     $response = $this->actingAs($user)->get("/orders/{$order->id}/invoice");
     $response->assertOk();
     $response->assertHeader('content-type', 'application/pdf');

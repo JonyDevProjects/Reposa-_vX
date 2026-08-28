@@ -422,6 +422,12 @@ class CartController extends Controller
 
         $filename = 'Factura_Reposa+' . '_' . str_pad($order->id, 6, '0', STR_PAD_LEFT) . '.pdf';
 
-        return $dompdf->stream($filename, ['Attachment' => true]);
+        $pdf = $dompdf->output();
+
+        return response($pdf, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Length' => strlen($pdf),
+        ]);
     }
 }

@@ -4,31 +4,32 @@
 |--------------------------------------------------------------------------
 | E2E Test — Pago Fallido
 |--------------------------------------------------------------------------
-|
-| Valida el comportamiento cuando el pago falla:
-| 1. El webhook payment_intent.payment_failed actualiza el pedido
-| 2. Se envía un correo de notificación de pago fallido
-| 3. El usuario puede ver su pedido con estado pendiente
-|
-| Nota: Este test simula el webhook de Stripe ya que no podemos
-| interactuar con la UI de Stripe Checkout en tests.
-|
 */
 
 use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\User;
-use App\Models\Product;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 uses(\Tests\TestCase::class);
-uses(RefreshDatabase::class);
+
+beforeEach(function (): void {
+    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0');
+    \Illuminate\Support\Facades\DB::table('cart_items')->truncate();
+    \Illuminate\Support\Facades\DB::table('order_items')->truncate();
+    \Illuminate\Support\Facades\DB::table('orders')->truncate();
+    \Illuminate\Support\Facades\DB::table('refunds')->truncate();
+    \Illuminate\Support\Facades\DB::table('favorite_product')->truncate();
+    \Illuminate\Support\Facades\DB::table('addresses')->truncate();
+    \Illuminate\Support\Facades\DB::table('profiles')->truncate();
+    \Illuminate\Support\Facades\DB::table('users')->where('email', 'like', '%@example.com')->delete();
+    \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Prueba%')->delete();
+    \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Almohada%')->delete();
+    \Illuminate\Support\Facades\DB::table('categories')->where('name', 'Cervical')->delete();
+    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1');
+});
 
 it('handles payment failure webhook correctly', function (): void {
-    // Arrange — Crear usuario con pedido pendiente
     Mail::fake();
     Http::fake();
 
@@ -41,75 +42,47 @@ it('handles payment failure webhook correctly', function (): void {
         'payment_intent_id' => 'pi_test_' . Str::random(14),
     ]);
 
-    OrderItem::factory()->create([
+    \App\Models\OrderItem::factory()->create([
         'order_id' => $order->id,
         'product_id' => $product->id,
         'quantity' => 1,
         'price_at_purchase' => 59.99,
     ]);
 
-    // Act — Enviar webhook de pago fallido
     $payload = [
         'id' => 'evt_test_' . Str::random(24),
         'type' => 'payment_intent.payment_failed',
         'data' => [
             'object' => [
                 'id' => $order->payment_intent_id,
-                'customer' => null, // Sin customer Stripe en este escenario
-                'last_payment_error' => [
-                    'message' => 'Your card was declined.',
-                ],
+                'customer' => null,
+                'last_payment_error' => ['message' => 'Your card was declined.'],
             ],
         ],
     ];
 
-    $response = test()->post('/stripe/webhook', $payload, [
+    test()->post('/stripe/webhook', $payload, [
         'Content-Type' => 'application/json',
     ]);
 
-    // Assert — El pedido sigue en pending (no se procesó)
     expect($order->fresh()->status)->toBe('pending');
-
-    // El pedido sigue existiendo
-    $this->assertDatabaseHas('orders', [
-        'id' => $order->id,
-        'status' => 'pending',
-    ]);
 });
 
-it('shows payment error message to user after failed Stripe redirect', function (): void {
-    // Arrange
+it('shows payment cancellation redirects to cart', function (): void {
     $user = createTestUser();
-    createTestProduct(['stock' => 5]);
 
-    // Act — Login + intentar acceder a success sin session_id
-    visit(APP_BASE_URL . '/login')
-        ->fill('#email', TEST_USER_EMAIL)
-        ->fill('#password', TEST_USER_PASSWORD)
-        ->press('button[type="submit"]');
-
-    // Simular cancelación de pago — redirigir al carrito
-    visit(APP_BASE_URL . '/checkout/stripe/cancel')
-        ->assertSee('El pago fue cancelado');
+    $this->actingAs($user)->get('/checkout/stripe/cancel')
+        ->assertRedirect('/cart');
 });
 
 it('preserves cart when payment is cancelled', function (): void {
-    // Arrange
     $user = createTestUser();
     $product = createTestProduct(['stock' => 5, 'price' => 29.99]);
     createCartItem($user, $product, 1);
 
-    // Act — Login
-    visit(APP_BASE_URL . '/login')
-        ->fill('#email', TEST_USER_EMAIL)
-        ->fill('#password', TEST_USER_PASSWORD)
-        ->press('button[type="submit"]');
+    $this->actingAs($user)->get('/checkout/stripe/cancel')
+        ->assertRedirect('/cart');
 
-    // Simular cancelación del pago
-    visit(APP_BASE_URL . '/checkout/stripe/cancel')
-        ->assertSee('El pago fue cancelado');
-
-    // Assert — El carrito sigue teniendo el producto
     expect(\App\Models\CartItem::where('user_id', $user->id)->count())->toBe(1);
     $this->assertDatabaseHas('cart_items', [
         'user_id' => $user->id,

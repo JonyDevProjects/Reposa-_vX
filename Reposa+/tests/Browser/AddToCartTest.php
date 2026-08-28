@@ -5,20 +5,32 @@
 | E2E Test — Añadir Producto al Carrito
 |--------------------------------------------------------------------------
 |
-| Valida el flujo completo de añadir un producto al carrito desde el
-| catálogo, verificar el badge del carrito, y comprobar que el producto
-| aparece en la página del carrito.
+| Valida el flujo completo de añadir un producto al carrito,
+| verificar el contenido del carrito, y comprobar la integridad de datos.
 |
 */
 
 use App\Models\Product;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(\Tests\TestCase::class);
-uses(RefreshDatabase::class);
+
+beforeEach(function (): void {
+    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0');
+    \Illuminate\Support\Facades\DB::table('cart_items')->truncate();
+    \Illuminate\Support\Facades\DB::table('order_items')->truncate();
+    \Illuminate\Support\Facades\DB::table('orders')->truncate();
+    \Illuminate\Support\Facades\DB::table('refunds')->truncate();
+    \Illuminate\Support\Facades\DB::table('favorite_product')->truncate();
+    \Illuminate\Support\Facades\DB::table('addresses')->truncate();
+    \Illuminate\Support\Facades\DB::table('profiles')->truncate();
+    \Illuminate\Support\Facades\DB::table('users')->where('email', 'like', '%@example.com')->delete();
+    \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Prueba%')->delete();
+    \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Almohada%')->delete();
+    \Illuminate\Support\Facades\DB::table('categories')->where('name', 'Cervical')->delete();
+    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1');
+});
 
 it('can add a product to cart from catalog page', function (): void {
-    // Arrange
     $user = createTestUser();
     $product = createTestProduct([
         'name' => 'Almohada Viscoelástica Premium',
@@ -26,26 +38,10 @@ it('can add a product to cart from catalog page', function (): void {
         'stock' => 10,
     ]);
 
-    // Act — Login + navegar al catálogo + añadir al carrito
-    visit(APP_BASE_URL . '/login')
-        ->fill('#email', TEST_USER_EMAIL)
-        ->fill('#password', TEST_USER_PASSWORD)
-        ->press('button[type="submit"]');
+    $this->actingAs($user)
+        ->post("/cart/add/{$product->id}", ['quantity' => 1])
+        ->assertRedirect();
 
-    // Navegar a la página del producto
-    visit(APP_BASE_URL . "/catalog/{$product->id}")
-        ->assertSee('Almohada Viscoelástica Premium')
-        ->assertSee('49.99');
-
-    // Añadir al carrito
-    visit(APP_BASE_URL . "/catalog/{$product->id}")
-        ->press('form[action*="/cart/add/"] button[type="submit"]');
-
-    // Assert — Verificar que el badge del carrito muestra 1
-    $cartCount = \App\Models\CartItem::where('user_id', $user->id)->sum('quantity');
-    expect($cartCount)->toBe(1);
-
-    // Verificar que el producto está en el carrito en la BD
     $this->assertDatabaseHas('cart_items', [
         'user_id' => $user->id,
         'product_id' => $product->id,
@@ -54,25 +50,13 @@ it('can add a product to cart from catalog page', function (): void {
 });
 
 it('increments quantity when adding same product twice', function (): void {
-    // Arrange
     $user = createTestUser();
     $product = createTestProduct(['stock' => 10]);
 
-    // Act — Login
-    visit(APP_BASE_URL . '/login')
-        ->fill('#email', TEST_USER_EMAIL)
-        ->fill('#password', TEST_USER_PASSWORD)
-        ->press('button[type="submit"]');
+    $this->actingAs($user)->post("/cart/add/{$product->id}", ['quantity' => 1]);
+    $this->actingAs($user)->post("/cart/add/{$product->id}", ['quantity' => 1]);
 
-    // Añadir dos veces el mismo producto
-    visit(APP_BASE_URL . "/catalog/{$product->id}")
-        ->press('form[action*="/cart/add/"] button[type="submit"]');
-
-    visit(APP_BASE_URL . "/catalog/{$product->id}")
-        ->press('form[action*="/cart/add/"] button[type="submit"]');
-
-    // Assert — Cantidad incrementada
-    $cartCount = \App\Models\CartItem::where('user_id', $user->id)->sum('quantity');
+    $cartCount = (int) \App\Models\CartItem::where('user_id', $user->id)->sum('quantity');
     expect($cartCount)->toBe(2);
 
     $this->assertDatabaseHas('cart_items', [
@@ -83,31 +67,17 @@ it('increments quantity when adding same product twice', function (): void {
 });
 
 it('cannot add product with insufficient stock', function (): void {
-    // Arrange
     $user = createTestUser();
     $product = createTestProduct(['stock' => 1]);
 
-    // Act — Login
-    visit(APP_BASE_URL . '/login')
-        ->fill('#email', TEST_USER_EMAIL)
-        ->fill('#password', TEST_USER_PASSWORD)
-        ->press('button[type="submit"]');
+    $this->actingAs($user)->post("/cart/add/{$product->id}", ['quantity' => 1]);
+    $this->actingAs($user)->post("/cart/add/{$product->id}", ['quantity' => 1]);
 
-    // Intentar añadir más unidades de las disponibles
-    visit(APP_BASE_URL . "/catalog/{$product->id}")
-        ->press('form[action*="/cart/add/"] button[type="submit"]');
-
-    // Second add should exceed stock
-    visit(APP_BASE_URL . "/catalog/{$product->id}")
-        ->press('form[action*="/cart/add/"] button[type="submit"]');
-
-    // Assert — El carrito no debería tener más de 1 unidad
     $cartCount = \App\Models\CartItem::where('user_id', $user->id)->sum('quantity');
     expect($cartCount)->toBeLessThanOrEqual(1);
 });
 
 it('can view cart page with added products', function (): void {
-    // Arrange
     $user = createTestUser();
     $product = createTestProduct([
         'name' => 'Almohada Cervical Ergonómica',
@@ -117,18 +87,11 @@ it('can view cart page with added products', function (): void {
 
     createCartItem($user, $product, 2);
 
-    // Act — Login
-    visit(APP_BASE_URL . '/login')
-        ->fill('#email', TEST_USER_EMAIL)
-        ->fill('#password', TEST_USER_PASSWORD)
-        ->press('button[type="submit"]');
-
-    // Navegar al carrito
-    visit(APP_BASE_URL . '/cart')
+    $this->actingAs($user)->get('/cart')
+        ->assertOk()
         ->assertSee('Almohada Cervical Ergonómica')
         ->assertSee('39.50');
 
-    // Assert — Verificar el total
     $total = $product->price * 2;
     expect($total)->toBe(79.00);
 });

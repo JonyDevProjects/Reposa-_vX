@@ -34,6 +34,14 @@ use Illuminate\Support\Facades\Mail;
 
 /*
 |--------------------------------------------------------------------------
+| URL Base para tests E2E
+|--------------------------------------------------------------------------
+*/
+
+define('APP_BASE_URL', env('E2E_BASE_URL', 'http://localhost:8080'));
+
+/*
+|--------------------------------------------------------------------------
 | Datos de Test Constantes
 |--------------------------------------------------------------------------
 */
@@ -59,12 +67,22 @@ define('TEST_ADMIN_NAME', 'Test Admin');
  */
 function createTestUser(array $overrides = []): User
 {
-    return User::factory()->create(array_merge([
+    $defaults = [
         'name' => TEST_USER_NAME,
         'email' => TEST_USER_EMAIL,
         'password' => Hash::make(TEST_USER_PASSWORD),
         'role' => 'user',
-    ], $overrides));
+    ];
+
+    $data = array_merge($defaults, $overrides);
+    $existing = User::where('email', $data['email'])->first();
+
+    if ($existing) {
+        $existing->update($data);
+        return $existing->fresh();
+    }
+
+    return User::factory()->create($data);
 }
 
 /**
@@ -72,12 +90,22 @@ function createTestUser(array $overrides = []): User
  */
 function createTestAdmin(array $overrides = []): User
 {
-    return User::factory()->create(array_merge([
+    $defaults = [
         'name' => TEST_ADMIN_NAME,
         'email' => TEST_ADMIN_EMAIL,
         'password' => Hash::make(TEST_ADMIN_PASSWORD),
         'role' => 'admin',
-    ], $overrides));
+    ];
+
+    $data = array_merge($defaults, $overrides);
+    $existing = User::where('email', $data['email'])->first();
+
+    if ($existing) {
+        $existing->update($data);
+        return $existing->fresh();
+    }
+
+    return User::factory()->create($data);
 }
 
 /**
@@ -98,10 +126,20 @@ function createTestProduct(array $overrides = []): Product
  */
 function createTestCategory(array $overrides = []): Category
 {
-    return Category::factory()->create(array_merge([
+    $defaults = [
         'name' => 'Cervical',
         'slug' => 'cervical',
-    ], $overrides));
+    ];
+
+    $data = array_merge($defaults, $overrides);
+    $existing = Category::where('slug', $data['slug'])->first();
+
+    if ($existing) {
+        $existing->update($data);
+        return $existing->fresh();
+    }
+
+    return Category::factory()->create($data);
 }
 
 /**

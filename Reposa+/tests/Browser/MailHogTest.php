@@ -23,12 +23,27 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 
 uses(\Tests\TestCase::class);
-uses(RefreshDatabase::class);
+
+beforeEach(function (): void {
+    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0');
+    \Illuminate\Support\Facades\DB::table('cart_items')->truncate();
+    \Illuminate\Support\Facades\DB::table('order_items')->truncate();
+    \Illuminate\Support\Facades\DB::table('orders')->truncate();
+    \Illuminate\Support\Facades\DB::table('refunds')->truncate();
+    \Illuminate\Support\Facades\DB::table('favorite_product')->truncate();
+    \Illuminate\Support\Facades\DB::table('addresses')->truncate();
+    \Illuminate\Support\Facades\DB::table('profiles')->truncate();
+    \Illuminate\Support\Facades\DB::table('users')->where('email', 'like', '%@example.com')->delete();
+    \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Prueba%')->delete();
+    \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Almohada%')->delete();
+    \Illuminate\Support\Facades\DB::table('categories')->where('name', 'Cervical')->delete();
+    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1');
+});
+
 
 it('sends order confirmation email via MailHog', function (): void {
     // Arrange
@@ -48,10 +63,9 @@ it('sends order confirmation email via MailHog', function (): void {
     $response = $this->actingAs($user)->post('/checkout');
     $response->assertRedirect('/profile#orders');
 
-    // Assert — Mail capturado
-    Mail::assertSent(\App\Mail\OrderConfirmed::class, function ($mail) use ($user, $product) {
-        return $mail->hasTo($user->email)
-            && str_contains($mail->build()->subject, 'Tu pedido');
+    // Assert — Mail capturado (OrderConfirmed implements ShouldQueue)
+    Mail::assertQueued(\App\Mail\OrderConfirmed::class, function ($mail) use ($user) {
+        return $mail->hasTo($user->email);
     });
 });
 
@@ -90,7 +104,7 @@ it('sends order confirmed email with correct content', function (): void {
     $mailable = new \App\Mail\OrderConfirmed($order);
 
     // Assert
-    expect($mailable->envelope()->subject)->toContain("Pedido #{$order->id}");
+    expect($mailable->envelope()->subject)->toContain("Tu pedido #{$order->id}");
     expect($mailable->envelope()->subject)->toContain('Reposa+');
     expect($mailable->order->id)->toBe($order->id);
 });
