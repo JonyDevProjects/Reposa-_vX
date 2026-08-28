@@ -1,6 +1,13 @@
 #!/bin/sh
 set -e
 
+# Forzar SQLite para Docker (sobreescribe .env)
+export DB_CONNECTION=sqlite
+export DB_DATABASE=/var/www/html/database/database.sqlite
+export SESSION_DRIVER=file
+export CACHE_STORE=file
+export QUEUE_CONNECTION=sync
+
 # Asegura que el fichero SQLite existe (vive en el volumen persistente)
 touch /var/www/html/database/database.sqlite
 

@@ -13,7 +13,8 @@ FROM php:8.4-fpm AS app
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libsqlite3-dev libzip-dev libicu-dev \
         zip unzip git nginx supervisor \
-    && docker-php-ext-install pdo_sqlite bcmath intl zip \
+    && docker-php-ext-install pdo_sqlite bcmath intl zip sockets \
+    && pecl install redis && docker-php-ext-enable redis \
     && docker-php-ext-enable opcache \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -23,7 +24,7 @@ WORKDIR /var/www/html
 
 # Capa cacheable: solo dependencias PHP
 COPY composer.json composer.lock ./
-RUN composer install --no-scripts --no-autoloader --prefer-dist
+RUN composer install --no-scripts --no-autoloader --prefer-dist --no-dev
 
 # Resto del código de la aplicación
 COPY . .
@@ -32,7 +33,8 @@ RUN rm -f public/hot
 # Assets ya compilados en la etapa "frontend"
 COPY --from=frontend /app/public/build ./public/build
 
-RUN composer dump-autoload --optimize \
+RUN composer dump-autoload --optimize --no-dev --no-scripts \
+    && rm -f bootstrap/cache/services.php bootstrap/cache/packages.php \
     && mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache \
        storage/logs bootstrap/cache database \
     && touch database/database.sqlite \
