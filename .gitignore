@@ -28,3 +28,9 @@ Homestead.json
 .env.production
 .phpactor.json
 auth.json
+
+# Agentes IA y herramientas
+.commandcode/
+-e 
+# Testing environment
+.env.testing
