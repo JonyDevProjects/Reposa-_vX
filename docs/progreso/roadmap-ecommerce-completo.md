@@ -35,6 +35,7 @@ Este documento define las fases restantes para llevar Reposa+ al nivel de un e-c
 | 18 | Facturas PDF con dompdf | ✅ |
 | 19 | Email de confirmación mejorado (Stripe + factura) | ✅ |
 | 20 | Búsqueda, paginación y filtros del catálogo | ✅ |
+| 21 | Estados de pedido expandidos + dashboard admin con Chart.js | ✅ |
 
 ---
 
@@ -283,7 +284,7 @@ composer require dompdf/dompdf
 | 7 — Facturas PDF | ✅ Completada |
 | 8 — Email post-pago | ✅ Completada |
 | 9 — Búsqueda y paginación | ✅ Completada |
-| 10 — Estados de pedido | ⬜ Pendiente |
+| 10 — Estados de pedido | ✅ Completada |
 | 11 — Reembolsos | ⬜ Pendiente |
 | 12 — Tests PHPUnit | ⬜ Pendiente |
 | 13 — CI/CD | ⬜ Pendiente |
@@ -307,7 +308,7 @@ Registro de cambios respecto al plan original. Se actualiza al final de cada ses
 
 ## Notas para la Siguiente Sesión
 
-1. **Siguiente:** Fase 10 (Estados de pedido y gestión admin) o Fase 12 (Tests PHPUnit)
+1. **Siguiente:** Fase 11 (Reembolsos), Fase 12 (Tests PHPUnit) o Fase 13 (CI/CD)
 2. **GitFlow:** Cada nueva funcionalidad debe implementarse en una `feature/*` branch desde `develop`
 
 ### Pendiente para producción — Webhook de Stripe
