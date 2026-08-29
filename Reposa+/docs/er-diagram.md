@@ -1,6 +1,6 @@
 # Diagrama Entidad-Relación — Reposa+
 
-> **Asignatura:** Tecnologías Avanzadas de Desarrollo (EPD3)  
+> **Asignatura:** Tecnologías Avanzadas de Desarrollo (TFG)  
 > **Proyecto:** Reposa+ — Tienda online de colchones y descanso  
 > **Última actualización:** 30 de mayo de 2026
 

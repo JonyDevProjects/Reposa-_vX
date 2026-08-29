@@ -1,6 +1,6 @@
 # Reposa+ - Mockups y Wireframes
 
-Este documento contiene los bocetos y esquemas de diseño estructural (wireframes) de la aplicación web Reposa+ para cumplir con los requisitos de la EPD3 (Problema 0).
+Este documento contiene los bocetos y esquemas de diseño estructural (wireframes) de la aplicación web Reposa+ para cumplir con los requisitos de la TFG (Problema 0).
 
 Debido a que el proyecto ya se encuentra en fase de desarrollo, presentamos los wireframes arquitectónicos principales.
 

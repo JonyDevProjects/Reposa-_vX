@@ -1,6 +1,6 @@
 # Reposa+ (Tienda de Almohadas y Descanso)
 
-Este proyecto es la solución a la **EPD3 de Tecnologías Avanzadas de Desarrollo**. Consiste en un e-commerce completamente funcional desarrollado en **Laravel 10** y **Bootstrap 5**, con un diseño personalizado, sistema de carrito, wishlist y panel de administración.
+Este proyecto es la solución a la **TFG de Tecnologías Avanzadas de Desarrollo**. Consiste en un e-commerce completamente funcional desarrollado en **Laravel 10** y **Bootstrap 5**, con un diseño personalizado, sistema de carrito, wishlist y panel de administración.
 
 ## Características Principales
 
