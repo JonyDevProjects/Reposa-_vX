@@ -21,13 +21,22 @@ class ProfileController extends Controller
 
         if ($user->favorites()->where('product_id', $product->id)->exists()) {
             $user->favorites()->detach($product->id);
-
-            return back()->with('success', 'Producto eliminado de tus favoritos.');
+            $isFavorite = false;
+        } else {
+            $user->favorites()->attach($product->id);
+            $isFavorite = true;
         }
 
-        $user->favorites()->attach($product->id);
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'is_favorite' => $isFavorite,
+            ]);
+        }
 
-        return back()->with('success', 'Producto añadido a tus favoritos.');
+        return back()->with('success', $isFavorite
+            ? 'Producto añadido a tus favoritos.'
+            : 'Producto eliminado de tus favoritos.');
     }
 
     public function removeFavorite(Product $product)
