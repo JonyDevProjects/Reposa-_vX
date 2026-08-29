@@ -5,7 +5,7 @@
 Este documento define las fases restantes para llevar Reposa+ al nivel de un e-commerce real. Se incluye el trabajo ya realizado (pasarela de pagos con Stripe) como parte integral del roadmap, y se detallan las funcionalidades pendientes organizadas por prioridad y dependencias.
 
 **Fecha de creación:** 28 de agosto de 2026
-**Última sesión:** Implementación de Stripe Checkout + GitFlow reorganization
+**Última sesión:** 29/08/2026 — Stack Docker completo, Escalabilidad, Internacionalización
 
 ---
 
@@ -39,7 +39,12 @@ Este documento define las fases restantes para llevar Reposa+ al nivel de un e-c
 | 22 | **Sistema de reembolsos con Stripe** | ✅ |
 | 23 | **Suite de PHPUnit (46 tests, 107 assertions)** | ✅ |
 | 24 | **CI/CD con GitHub Actions (lint + tests + build)** | ✅ |
-| 25 | **Suite E2E con Pest + Playwright (8 archivos de test, 38 tests)** | ✅ |
+| 25 | **Suite E2E con Pest + Playwright (39 tests, 112 assertions)** | ✅ |
+| 26 | **Stack Docker completo (7 servicios) — MySQL, Redis, MailHog, MinIO, nginx-lb** | ✅ |
+| 27 | **Escalabilidad horizontal — Redis persistente, MinIO (S3), Load Balancer** | ✅ |
+| 28 | **Fix favoritos duplicados + toggle funcional con JSON** | ✅ |
+| 29 | **Internacionalización de productos con spatie/laravel-translatable** | ✅ |
+| 30 | **Documentación — Autor, TFG, limpieza de archivos** | ✅ |
 
 ---
 
@@ -319,15 +324,28 @@ Registro de cambios respecto al plan original. Se actualiza al final de cada ses
 | 28/08/2026 | Fase 25 (E2E) | Tests reescritos de Playwright a HTTP (actingAs) | pest-plugin-browser: visit() crea contextos separados, sesión login no persiste. HTTP tests son más rápidos y confiables |
 | 28/08/2026 | Fase 25 (E2E) | Registrada ruta POST /stripe/webhook en web.php | Faltaba: Cashier no auto-registra la ruta, el webhook endpoint no existía |
 | 28/08/2026 | Fase 25 (E2E) | Eliminados overrides DB de phpunit.xml | phpunit.xml forzaba SQLite para todos los tests; .env.testing ya configura MySQL para browser tests |
+| 29/08/2026 | Fase 26 (Docker) | Stack Docker restaurado con 7 servicios completos | El docker-compose.yml original solo tenía app+queue con SQLite. Se restauró MySQL, Redis, MailHog, MinIO, nginx-lb |
+| 29/08/2026 | Fase 26 (Docker) | Dockerfile: extensiones pdo_mysql, mysqli, sockets, Redis | Faltaban para soporte MySQL y colas en Docker |
+| 29/08/2026 | Fase 26 (Docker) | entrypoint.sh: soporte condicional SQLite/MySQL | El entrypoint forzaba SQLite; ahora respeta .env |
+| 29/08/2026 | Fase 27 (Escalabilidad) | Redis persistente con volumen redis_data | Sesiones/cache/queue se perdían al reiniciar contenedor |
+| 29/08/2026 | Fase 27 (Escalabilidad) | MinIO (S3-compatible) para almacenamiento de archivos | Preparado para uploads futuros y escalabilidad horizontal |
+| 29/08/2026 | Fase 27 (Escalabilidad) | nginx-lb como load balancer reverse proxy | App expuesta en puerto 80 vía LB, no directamente |
+| 29/08/2026 | Fase 28 (Favoritos) | Eliminada sección duplicada de favoritos en perfil | profile/index.blade.php tenía DOS secciones completas |
+| 29/08/2026 | Fase 28 (Favoritos) | toggleFavorite devuelva JSON para AJAX | Controlador devolvía redirect; JavaScript esperaba JSON |
+| 29/08/2026 | Fase 29 (i18n) | spatie/laravel-translatable para productos y categorías | Columnas convertidas de string a JSON; 8 productos traducidos es/en |
+| 29/08/2026 | Fase 29 (i18n) | ProductController adaptado con JSON_EXTRACT | Búsqueda y filtros funcionan con columnas JSON por locale |
+| 29/08/2026 | Fase 29 (i18n) | APP_LOCALE=es como idioma por defecto | Locale default cambiado de en a es |
+| 29/08/2026 | Fase 30 (Docs) | Autor = Jonathan Javier Quishpe Maldonado | Actualizado en README.md |
+| 29/08/2026 | Fase 30 (Docs) | Todas las referencias EPD3 cambiadas a TFG | 4 archivos de documentación actualizados |
 
 ---
 
 ## Notas para la Siguiente Sesión
 
-1. **Todas las fases del roadmap completadas (1-25)**
-2. **Siguiente paso:** Merge `feature/e2e-tests` a `develop` con `--no-ff`
-3. **Estado de tests:** 39 E2E tests pasan (112 assertions), 58 Feature tests pasan
-4. **Branch:** `feature/e2e-tests` en origin, commit `e9a271e`
+1. **Todas las fases del roadmap completadas (1-30)**
+2. **Estado de tests:** 39 E2E tests pasan (112 assertions), 58 Feature tests pasan
+3. **Branch:** `develop` en origin, commit `e1ee0d9`
+4. **Stack Docker:** 7 servicios corriendo (app, queue, mysql, redis, mailhog, minio, nginx-lb)
 
 ### Pendiente para producción — Webhook de Stripe
 
