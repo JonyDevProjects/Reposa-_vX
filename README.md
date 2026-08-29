@@ -12,7 +12,7 @@ Toda la documentación relacionada con el diseño, los requisitos, la base de da
 
 A continuación, puedes acceder a todos los documentos clave del proyecto:
 
-- 📄 [**Guía de la Práctica (EPD3)**](./docs/EPD3%20-%202526.md): Requisitos técnicos y funcionales del proyecto académico.
+- 📄 [**Requisitos Técnicos del TFG**](./docs/EPD3%20-%202526.md): Requisitos técnicos y funcionales implementados en el Trabajo de Fin de Grado.
 - 🛒 [**Informe de E-Commerce**](./docs/Inf-E-Comerce.md): Estrategia de producto (almohadas de descanso), marca, colores y planificación del negocio.
 - 🗄️ [**Esquema de la Base de Datos**](./docs/EsquemaBBDD.md): Arquitectura, tablas y relaciones de la base de datos del sistema.
 - 🎯 [**Informe de Objetivos y Fases**](./docs/Informe_Objetivos_Fases.md): Detalle de las fases de desarrollo del proyecto, hitos alcanzados (como v1.0-alpha) y próximos pasos (carrito de compras).
