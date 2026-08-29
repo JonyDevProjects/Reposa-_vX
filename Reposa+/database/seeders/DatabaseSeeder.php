@@ -56,93 +56,104 @@ class DatabaseSeeder extends Seeder
             'is_main' => true
         ]);
 
-        // Crear productos específicos (Almohadas)
-        $products = [
+        // Crear productos específicos (Almohadas) con traducciones
+        $productsData = [
             [
-                'name' => 'Almohada Viscoelástica Premium',
-                'description' => 'Espuma de memoria de alta densidad que se adapta perfectamente a tu cuello.',
+                'name' => ['es' => 'Almohada Viscoelástica Premium', 'en' => 'Premium Viscoelastic Pillow'],
+                'description' => ['es' => 'Espuma de memoria de alta densidad que se adapta perfectamente a tu cuello.', 'en' => 'High-density memory foam that perfectly adapts to your neck.'],
                 'price' => 45.99,
                 'stock' => 50,
-                'material' => 'Viscoelástica',
-                'firmness' => 'Media-Alta',
-                'dimensions' => '70x40 cm',
+                'material' => ['es' => 'Viscoelástica', 'en' => 'Viscoelastic'],
+                'firmness' => ['es' => 'Media-Alta', 'en' => 'Medium-High'],
+                'dimensions' => ['es' => '70x40 cm', 'en' => '70x40 cm'],
                 'image_url' => '/images/products/pillow_viscoelastica.png'
             ],
             [
-                'name' => 'Almohada de Gel Refrescante',
-                'description' => 'Capa de gel térmico para mantener la frescura durante toda la noche.',
+                'name' => ['es' => 'Almohada de Gel Refrescante', 'en' => 'Cooling Gel Pillow'],
+                'description' => ['es' => 'Capa de gel térmico para mantener la frescura durante toda la noche.', 'en' => 'Thermal gel layer to keep you cool all night long.'],
                 'price' => 59.99,
                 'stock' => 30,
-                'material' => 'Gel y Espuma',
-                'firmness' => 'Media',
-                'dimensions' => '70x40 cm',
+                'material' => ['es' => 'Gel y Espuma', 'en' => 'Gel and Foam'],
+                'firmness' => ['es' => 'Media', 'en' => 'Medium'],
+                'dimensions' => ['es' => '70x40 cm', 'en' => '70x40 cm'],
                 'image_url' => '/images/products/pillow_gel.png'
             ],
             [
-                'name' => 'Almohada Cervical Ergonómica',
-                'description' => 'Diseño contorneado para aliviar la presión en la columna vertebral.',
+                'name' => ['es' => 'Almohada Cervical Ergonómica', 'en' => 'Ergonomic Cervical Pillow'],
+                'description' => ['es' => 'Diseño contorneado para aliviar la presión en la columna vertebral.', 'en' => 'Contoured design to relieve pressure on the spine.'],
                 'price' => 39.50,
                 'stock' => 100,
-                'material' => 'Látex',
-                'firmness' => 'Alta',
-                'dimensions' => '60x35 cm',
+                'material' => ['es' => 'Látex', 'en' => 'Latex'],
+                'firmness' => ['es' => 'Alta', 'en' => 'High'],
+                'dimensions' => ['es' => '60x35 cm', 'en' => '60x35 cm'],
                 'image_url' => '/images/products/pillow_cervical.png'
             ],
             [
-                'name' => 'Almohada de Plumas Naturales',
-                'description' => 'Relleno de plumón natural para una suavidad extrema y confort tradicional.',
+                'name' => ['es' => 'Almohada de Plumas Naturales', 'en' => 'Natural Feathers Pillow'],
+                'description' => ['es' => 'Relleno de plumón natural para una suavidad extrema y confort tradicional.', 'en' => 'Natural down filling for extreme softness and traditional comfort.'],
                 'price' => 75.00,
                 'stock' => 20,
-                'material' => 'Plumón de Oca',
-                'firmness' => 'Suave',
-                'dimensions' => '80x40 cm',
+                'material' => ['es' => 'Plumón de Oca', 'en' => 'Goose Down'],
+                'firmness' => ['es' => 'Suave', 'en' => 'Soft'],
+                'dimensions' => ['es' => '80x40 cm', 'en' => '80x40 cm'],
                 'image_url' => '/images/products/pillow_plumas.png'
             ],
             [
-                'name' => 'Almohada Antiácaros Hipoalergénica',
-                'description' => 'Tratamiento especial para prevenir alergias y garantizar un entorno limpio.',
+                'name' => ['es' => 'Almohada Antiácaros Hipoalergénica', 'en' => 'Hypoallergenic Anti-Dust Mite Pillow'],
+                'description' => ['es' => 'Tratamiento especial para prevenir alergias y garantizar un entorno limpio.', 'en' => 'Special treatment to prevent allergies and ensure a clean environment.'],
                 'price' => 29.99,
                 'stock' => 150,
-                'material' => 'Microfibra',
-                'firmness' => 'Media',
-                'dimensions' => '75x40 cm',
+                'material' => ['es' => 'Microfibra', 'en' => 'Microfiber'],
+                'firmness' => ['es' => 'Media', 'en' => 'Medium'],
+                'dimensions' => ['es' => '75x40 cm', 'en' => '75x40 cm'],
                 'image_url' => '/images/products/pillow_antiacaros.png'
             ],
             [
-                'name' => 'Almohada Viaje Cuello 360',
-                'description' => 'Soporte completo para el cuello durante viajes largos en avión o coche.',
+                'name' => ['es' => 'Almohada Viaje Cuello 360', 'en' => '360 Neck Travel Pillow'],
+                'description' => ['es' => 'Soporte completo para el cuello durante viajes largos en avión o coche.', 'en' => 'Complete neck support for long flights or car rides.'],
                 'price' => 19.99,
                 'stock' => 200,
-                'material' => 'Espuma',
-                'firmness' => 'Alta',
-                'dimensions' => '30x30 cm',
+                'material' => ['es' => 'Espuma', 'en' => 'Foam'],
+                'firmness' => ['es' => 'Alta', 'en' => 'High'],
+                'dimensions' => ['es' => '30x30 cm', 'en' => '30x30 cm'],
                 'image_url' => '/images/products/pillow_viaje.png'
             ],
             [
-                'name' => 'Almohada de Bambú Ecológica',
-                'description' => 'Funda de bambú transpirable y relleno sostenible.',
+                'name' => ['es' => 'Almohada de Bambú Ecológica', 'en' => 'Eco-Friendly Bamboo Pillow'],
+                'description' => ['es' => 'Funda de bambú transpirable y relleno sostenible.', 'en' => 'Breathable bamboo cover and sustainable filling.'],
                 'price' => 49.99,
                 'stock' => 40,
-                'material' => 'Bambú y Fibras Recicladas',
-                'firmness' => 'Media-Suave',
-                'dimensions' => '70x40 cm',
+                'material' => ['es' => 'Bambú y Fibras Recicladas', 'en' => 'Bamboo and Recycled Fibers'],
+                'firmness' => ['es' => 'Media-Suave', 'en' => 'Medium-Soft'],
+                'dimensions' => ['es' => '70x40 cm', 'en' => '70x40 cm'],
                 'image_url' => '/images/products/pillow_bambu.png'
             ],
             [
-                'name' => 'Almohada Terapéutica con Aloe Vera',
-                'description' => 'Tejido impregnado con extractos de Aloe Vera para el cuidado de la piel.',
+                'name' => ['es' => 'Almohada Terapéutica con Aloe Vera', 'en' => 'Aloe Vera Therapeutic Pillow'],
+                'description' => ['es' => 'Tejido impregnado con extractos de Aloe Vera para el cuidado de la piel.', 'en' => 'Fabric infused with Aloe Vera extracts for skin care.'],
                 'price' => 35.50,
                 'stock' => 80,
-                'material' => 'Algodón y Aloe Vera',
-                'firmness' => 'Media',
-                'dimensions' => '70x40 cm',
+                'material' => ['es' => 'Algodón y Aloe Vera', 'en' => 'Cotton and Aloe Vera'],
+                'firmness' => ['es' => 'Media', 'en' => 'Medium'],
+                'dimensions' => ['es' => '70x40 cm', 'en' => '70x40 cm'],
                 'image_url' => '/images/products/pillow_aloevera.png'
             ]
         ];
 
         $createdProducts = [];
-        foreach ($products as $p) {
-            $product = Product::create($p);
+        foreach ($productsData as $pData) {
+            $product = new Product();
+            foreach (['name', 'description', 'material', 'firmness', 'dimensions'] as $field) {
+                if (isset($pData[$field]) && is_array($pData[$field])) {
+                    foreach ($pData[$field] as $locale => $value) {
+                        $product->setTranslation($field, $locale, $value);
+                    }
+                    unset($pData[$field]);
+                }
+            }
+            $product->fill($pData);
+            $product->save();
+
             $product->categories()->attach(
                 $categories->random(rand(1, 2))->pluck('id')->toArray()
             );
