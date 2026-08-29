@@ -1,4 +1,7 @@
 services:
+  # ------------------------------------------------------------------
+  # Laravel App (Nginx + PHP-FPM via Supervisor)
+  # ------------------------------------------------------------------
   app:
     build:
       context: .
@@ -8,16 +11,22 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - sqlite_data:/var/www/html/database
       - storage_data:/var/www/html/storage
     env_file:
       - .env
-    environment:
-      - DB_CONNECTION=sqlite
-      - DB_DATABASE=/var/www/html/database/database.sqlite
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
     networks:
       - reposaplus
 
+  # ------------------------------------------------------------------
+  # Laravel Queue Worker
+  # ------------------------------------------------------------------
   queue:
     build:
       context: .
@@ -26,20 +35,66 @@ services:
     restart: unless-stopped
     command: php artisan queue:work --tries=3 --sleep=3
     volumes:
-      - sqlite_data:/var/www/html/database
       - storage_data:/var/www/html/storage
     env_file:
       - .env
-    environment:
-      - DB_CONNECTION=sqlite
-      - DB_DATABASE=/var/www/html/database/database.sqlite
     depends_on:
-      - app
+      app:
+        condition: service_started
+    networks:
+      - reposaplus
+
+  # ------------------------------------------------------------------
+  # MySQL Database
+  # ------------------------------------------------------------------
+  mysql:
+    image: mysql:8.0
+    container_name: reposaplus_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: reposaplus
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - reposaplus
+
+  # ------------------------------------------------------------------
+  # Redis (Sessions, Cache, Queue)
+  # ------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: reposaplus_redis
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - reposaplus
+
+  # ------------------------------------------------------------------
+  # MailHog (SMTP + Web UI for email testing)
+  # ------------------------------------------------------------------
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: reposaplus_mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
     networks:
       - reposaplus
 
 volumes:
-  sqlite_data:
+  mysql_data:
   storage_data:
 
 networks:
