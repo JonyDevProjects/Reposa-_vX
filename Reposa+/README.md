@@ -65,4 +65,4 @@ Se han creado vistas a nivel de base de datos para optimizar reportes en el pane
 
 ## Integrantes del Grupo
 
-*(Rellenar aquí los nombres de los integrantes según se especifica en la EPD3)*
+*   **Jonathan Javier Quishpe Maldonado**
