@@ -526,4 +526,3 @@ Reposa+ cuenta con una arquitectura base sólidamente cimentada. Sin embargo, pa
 *   **Bootstrap 5:** Componentes y documentación. https://getbootstrap.com/
 *   **MDN Web Docs:** AJAX y Fetch API. https://developer.mozilla.org/es/
 *   **Mailtrap:** Testing de Emails en Desarrollo. https://mailtrap.io/
-*   **Apuntes Asignatura TAD:** Diapositivas teóricas y guiones prácticos (EPD3). Universidad Pablo de Olavide (2026).
