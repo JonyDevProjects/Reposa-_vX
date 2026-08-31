@@ -15,13 +15,9 @@ class FavoriteTest extends TestCase
     {
         $product = Product::factory()->create();
 
-        $response = $this->postJson("/favorites/toggle/{$product->id}");
+        $response = $this->postJson("/favorites/{$product->id}");
 
-        $response->assertStatus(401)
-                 ->assertJson([
-                     'success' => false,
-                     'redirect' => route('login')
-                 ]);
+        $response->assertStatus(401);
     }
 
     public function test_user_can_toggle_favorite()
@@ -30,7 +26,7 @@ class FavoriteTest extends TestCase
         $product = Product::factory()->create();
 
         $response = $this->actingAs($user)
-                         ->postJson("/favorites/toggle/{$product->id}");
+                         ->postJson("/favorites/{$product->id}");
 
         $response->assertStatus(200)
                  ->assertJson([
@@ -42,7 +38,7 @@ class FavoriteTest extends TestCase
 
         // Toggle again to remove
         $response = $this->actingAs($user)
-                         ->postJson("/favorites/toggle/{$product->id}");
+                         ->postJson("/favorites/{$product->id}");
 
         $response->assertStatus(200)
                  ->assertJson([

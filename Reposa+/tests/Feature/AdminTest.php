@@ -150,7 +150,9 @@ class AdminTest extends TestCase
         ]);
 
         $response->assertRedirect('/admin/products');
-        $this->assertDatabaseHas('products', ['name' => 'Almohada Test', 'price' => 49.99]);
+        $created = Product::latest()->first();
+        $this->assertEquals('Almohada Test', $created->getTranslation('name', 'es'));
+        $this->assertEquals(49.99, (float) $created->price);
     }
 
     public function test_admin_can_update_product(): void
@@ -165,7 +167,8 @@ class AdminTest extends TestCase
         ]);
 
         $response->assertRedirect('/admin/products');
-        $this->assertDatabaseHas('products', ['id' => $product->id, 'name' => 'Actualizado']);
+        $updated = Product::find($product->id);
+        $this->assertEquals('Actualizado', $updated->getTranslation('name', 'es'));
     }
 
     public function test_admin_can_delete_product(): void
@@ -185,7 +188,8 @@ class AdminTest extends TestCase
         ]);
 
         $response->assertRedirect('/admin/categories');
-        $this->assertDatabaseHas('categories', ['name' => 'Nueva Categoría']);
+        $created = Category::latest()->first();
+        $this->assertEquals('Nueva Categoría', $created->getTranslation('name', 'es'));
     }
 
     public function test_admin_can_update_category(): void
@@ -197,7 +201,8 @@ class AdminTest extends TestCase
         ]);
 
         $response->assertRedirect('/admin/categories');
-        $this->assertDatabaseHas('categories', ['id' => $category->id, 'name' => 'Actualizada']);
+        $updated = Category::find($category->id);
+        $this->assertEquals('Actualizada', $updated->getTranslation('name', 'es'));
     }
 
     public function test_admin_can_delete_category(): void
