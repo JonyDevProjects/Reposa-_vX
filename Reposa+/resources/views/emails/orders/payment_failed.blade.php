@@ -1,20 +1,20 @@
 <x-mail::message>
-# Pago no procesado
+# {{ __('messages.email.payment_failed.title') }}
 
-Hola {{ $order->user->name }},
+{{ __('messages.email.payment_failed.hello', ['name' => $order->user->name]) }}
 
-Lamentablemente, el pago de tu pedido #{{ $order->id }} no pudo ser procesado.
+{{ __('messages.email.payment_failed.message', ['id' => $order->id]) }}
 
-**Motivo:** {{ $errorMessage }}
+**{{ __('messages.email.payment_failed.reason') }}** {{ $errorMessage }}
 
-Tu pedido se mantiene en estado pendiente. Puedes intentar realizar el pago de nuevo desde tu carrito de compra.
+{{ __('messages.email.payment_failed.pending_msg') }}
 
 <x-mail::button :url="config('app.url') . '/cart'">
-Reintentar pago
+{{ __('messages.email.payment_failed.retry') }}
 </x-mail::button>
 
-Si el problema persiste, no dudes en contactarnos.
+{{ __('messages.email.payment_failed.persist') }}
 
-Gracias,<br>
-El equipo de {{ config('app.name') }}
+{{ __('messages.email.payment_failed.thanks') }}<br>
+{{ __('messages.email.payment_failed.team', ['name' => config('app.name')]) }}
 </x-mail::message>

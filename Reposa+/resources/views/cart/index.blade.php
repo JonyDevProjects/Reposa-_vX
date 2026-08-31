@@ -100,7 +100,7 @@
 
                         @auth
                         <a href="{{ route('stripe.checkout') }}" class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow-sm text-decoration-none">
-                            <i class="bi bi-credit-card me-2"></i>Pagar
+                            <i class="bi bi-credit-card me-2"></i>{{ __('messages.cart.pay') }}
                         </a>
                         @endauth
                     @endif

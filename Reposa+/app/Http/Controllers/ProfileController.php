@@ -35,8 +35,8 @@ class ProfileController extends Controller
         }
 
         return back()->with('success', $isFavorite
-            ? 'Producto añadido a tus favoritos.'
-            : 'Producto eliminado de tus favoritos.');
+            ? __('messages.profile.favorite_added')
+            : __('messages.profile.favorite_removed'));
     }
 
     public function removeFavorite(Product $product)
@@ -44,7 +44,7 @@ class ProfileController extends Controller
         $user = auth()->user();
         $user->favorites()->detach($product->id);
 
-        return redirect('/profile#favorites')->with('success', 'Producto eliminado de tus favoritos.');
+        return redirect('/profile#favorites')->with('success', __('messages.profile.favorite_removed'));
     }
 
     public function storeAddress(Request $request)
@@ -58,7 +58,7 @@ class ProfileController extends Controller
 
         auth()->user()->addresses()->create($validated);
 
-        return back()->with('success', 'Dirección añadida correctamente.');
+        return back()->with('success', __('messages.profile.address_added'));
     }
 
     public function destroyAddress(\App\Models\Address $address)
@@ -69,7 +69,7 @@ class ProfileController extends Controller
 
         $address->delete();
 
-        return back()->with('success', 'Dirección eliminada.');
+        return back()->with('success', __('messages.profile.address_deleted'));
     }
 
     public function updateAddress(Request $request, \App\Models\Address $address)
@@ -87,6 +87,6 @@ class ProfileController extends Controller
 
         $address->update($validated);
 
-        return back()->with('success', 'Dirección actualizada correctamente.');
+        return back()->with('success', __('messages.profile.address_updated'));
     }
 }

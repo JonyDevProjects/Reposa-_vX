@@ -21,20 +21,20 @@
                 <div class="d-flex gap-2 align-items-center">
                     @if(request('q') || request('category') || request('material') || request('firmness') || request('min_price') || request('max_price'))
                         <a href="/catalog" class="btn btn-outline-secondary btn-sm">
-                            <i class="bi bi-x-circle me-1"></i>Limpiar filtros
+                            <i class="bi bi-x-circle me-1"></i>{{ __('messages.catalog.clear_filters') }}
                         </a>
                     @endif
                     <div class="dropdown">
                         <button class="btn btn-outline-primary dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-arrow-down-up me-1"></i>Ordenar
+                            <i class="bi bi-arrow-down-up me-1"></i>{{ __('messages.catalog.sort') }}
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
                             @php $currentSort = request('sort', 'newest'); @endphp
-                            <li><a class="dropdown-item {{ $currentSort === 'newest' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'newest']) }}">Más recientes</a></li>
-                            <li><a class="dropdown-item {{ $currentSort === 'price_asc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'price_asc']) }}">Precio: menor a mayor</a></li>
-                            <li><a class="dropdown-item {{ $currentSort === 'price_desc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'price_desc']) }}">Precio: mayor a menor</a></li>
-                            <li><a class="dropdown-item {{ $currentSort === 'name_asc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'name_asc']) }}">Nombre: A-Z</a></li>
-                            <li><a class="dropdown-item {{ $currentSort === 'name_desc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'name_desc']) }}">Nombre: Z-A</a></li>
+                            <li><a class="dropdown-item {{ $currentSort === 'newest' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'newest']) }}">{{ __('messages.catalog.sort.newest') }}</a></li>
+                            <li><a class="dropdown-item {{ $currentSort === 'price_asc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'price_asc']) }}">{{ __('messages.catalog.sort.price_asc') }}</a></li>
+                            <li><a class="dropdown-item {{ $currentSort === 'price_desc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'price_desc']) }}">{{ __('messages.catalog.sort.price_desc') }}</a></li>
+                            <li><a class="dropdown-item {{ $currentSort === 'name_asc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'name_asc']) }}">{{ __('messages.catalog.sort.name_asc') }}</a></li>
+                            <li><a class="dropdown-item {{ $currentSort === 'name_desc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'name_desc']) }}">{{ __('messages.catalog.sort.name_desc') }}</a></li>
                         </ul>
                     </div>
                 </div>
@@ -52,20 +52,20 @@
                         @if(request('q'))<input type="hidden" name="q" value="{{ request('q') }}">@endif
                         @if(request('sort'))<input type="hidden" name="sort" value="{{ request('sort') }}">@endif
 
-                        <h5 class="fw-bold mb-4"><i class="bi bi-funnel me-2"></i>Filtros</h5>
+                        <h5 class="fw-bold mb-4"><i class="bi bi-funnel me-2"></i>{{ __('messages.catalog.filters') }}</h5>
 
                         {{-- Search --}}
                         <div class="mb-4">
-                            <label class="form-label fw-semibold small text-muted">Buscar</label>
+                            <label class="form-label fw-semibold small text-muted">{{ __('messages.catalog.search') }}</label>
                             <div class="input-group input-group-sm">
                                 <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
-                                <input type="text" name="q" class="form-control border-start-0 bg-light" placeholder="Nombre o descripción..." value="{{ request('q') }}">
+                                <input type="text" name="q" class="form-control border-start-0 bg-light" placeholder="{{ __('messages.catalog.search_placeholder') }}" value="{{ request('q') }}">
                             </div>
                         </div>
 
                         {{-- Categories --}}
                         <div class="mb-4">
-                            <label class="form-label fw-semibold small text-muted">Categoría</label>
+                            <label class="form-label fw-semibold small text-muted">{{ __('messages.catalog.category') }}</label>
                             <div class="list-group list-group-flush">
                                 <a href="/catalog?{{ http_build_query(request()->except('category', 'page')) }}" class="list-group-item list-group-item-action border-0 px-0 {{ !request('category') ? 'text-primary fw-bold' : '' }}">
                                     {{ __('messages.catalog.filter.all') }}
@@ -83,9 +83,9 @@
 
                         {{-- Material --}}
                         <div class="mb-4">
-                            <label class="form-label fw-semibold small text-muted">Material</label>
+                            <label class="form-label fw-semibold small text-muted">{{ __('messages.catalog.material') }}</label>
                             <select name="material" class="form-select form-select-sm" onchange="this.form.submit()">
-                                <option value="">Todos</option>
+                                <option value="">{{ __('messages.catalog.all') }}</option>
                                 @foreach($materials as $material)
                                     <option value="{{ $material }}" {{ request('material') == $material ? 'selected' : '' }}>{{ $material }}</option>
                                 @endforeach
@@ -94,9 +94,9 @@
 
                         {{-- Firmness --}}
                         <div class="mb-4">
-                            <label class="form-label fw-semibold small text-muted">Firmeza</label>
+                            <label class="form-label fw-semibold small text-muted">{{ __('messages.catalog.firmness') }}</label>
                             <select name="firmness" class="form-select form-select-sm" onchange="this.form.submit()">
-                                <option value="">Todas</option>
+                                <option value="">{{ __('messages.catalog.all_firmness') }}</option>
                                 @foreach($firmnesses as $firmness)
                                     <option value="{{ $firmness }}" {{ request('firmness') == $firmness ? 'selected' : '' }}>{{ $firmness }}</option>
                                 @endforeach
@@ -105,7 +105,7 @@
 
                         {{-- Price Range --}}
                         <div class="mb-4">
-                            <label class="form-label fw-semibold small text-muted">Rango de precio (€)</label>
+                            <label class="form-label fw-semibold small text-muted">{{ __('messages.catalog.price_range') }}</label>
                             <div class="d-flex gap-2 align-items-center">
                                 <input type="number" name="min_price" class="form-control form-control-sm" placeholder="Mín" value="{{ request('min_price') }}" min="0" step="0.01" style="width: 80px;">
                                 <span class="text-muted">—</span>
@@ -114,7 +114,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100 btn-sm">
-                            <i class="bi bi-funnel me-1"></i>Aplicar filtros
+                            <i class="bi bi-funnel me-1"></i>{{ __('messages.catalog.apply_filters') }}
                         </button>
                     </form>
                 </div>
@@ -127,32 +127,32 @@
                     <div class="d-flex flex-wrap gap-2 mb-3">
                         @if(request('q'))
                             <span class="badge bg-primary">
-                                Buscar: «{{ request('q') }}»
+                                {{ __('messages.catalog.results_search') }} «{{ request('q') }}»
                                 <a href="{{ request()->fullUrlWithQuery(['q' => null, 'page' => null]) }}" class="text-white ms-1 text-decoration-none">&times;</a>
                             </span>
                         @endif
                         @if(request('category'))
                             @php $cat = $categories->firstWhere('slug', request('category')); @endphp
                             <span class="badge bg-primary">
-                                Categoría: {{ $cat?->name ?? request('category') }}
+                                {{ __('messages.catalog.results_category') }} {{ $cat?->name ?? request('category') }}
                                 <a href="{{ request()->fullUrlWithQuery(['category' => null, 'page' => null]) }}" class="text-white ms-1 text-decoration-none">&times;</a>
                             </span>
                         @endif
                         @if(request('material'))
                             <span class="badge bg-primary">
-                                Material: {{ request('material') }}
+                                {{ __('messages.catalog.results_material') }} {{ request('material') }}
                                 <a href="{{ request()->fullUrlWithQuery(['material' => null, 'page' => null]) }}" class="text-white ms-1 text-decoration-none">&times;</a>
                             </span>
                         @endif
                         @if(request('firmness'))
                             <span class="badge bg-primary">
-                                Firmeza: {{ request('firmness') }}
+                                {{ __('messages.catalog.results_firmness') }} {{ request('firmness') }}
                                 <a href="{{ request()->fullUrlWithQuery(['firmness' => null, 'page' => null]) }}" class="text-white ms-1 text-decoration-none">&times;</a>
                             </span>
                         @endif
                         @if(request('min_price') || request('max_price'))
                             <span class="badge bg-primary">
-                                Precio: {{ request('min_price', '0') }}€ — {{ request('max_price', '∞') }}€
+                                {{ __('messages.catalog.results_price') }} {{ request('min_price', '0') }}€ — {{ request('max_price', '∞') }}€
                                 <a href="{{ request()->fullUrlWithQuery(['min_price' => null, 'max_price' => null, 'page' => null]) }}" class="text-white ms-1 text-decoration-none">&times;</a>
                             </span>
                         @endif
@@ -160,7 +160,7 @@
                 @endif
 
                 {{-- Results count --}}
-                <p class="text-muted mb-3">{{ $products->total() }} producto{{ $products->total() !== 1 ? 's' : '' }} encontrado{{ $products->total() !== 1 ? 's' : '' }}</p>
+                <p class="text-muted mb-3">{{ __('messages.catalog.results_count', ['count' => $products->total()]) }}</p>
 
                 @if($products->isEmpty())
                     <div class="text-center py-5">
@@ -199,7 +199,7 @@
                                             @endif
                                         </p>
                                         @if($product->stock > 0 && $product->stock <= 5)
-                                            <small class="text-warning fw-semibold"><i class="bi bi-box-seam me-1"></i>¡Quedan {{ $product->stock }}!</small>
+                                            <small class="text-warning fw-semibold"><i class="bi bi-box-seam me-1"></i>{{ __('messages.catalog.low_stock', ['count' => $product->stock]) }}</small>
                                         @endif
                                         <div class="d-flex justify-content-between align-items-center gap-2 mt-2">
                                             <span class="fs-4 fw-bold text-primary">{{ number_format($product->price, 2) }}€</span>
@@ -215,12 +215,12 @@
                                                 @auth
                                                     <form action="{{ route('favorites.toggle', $product) }}" method="POST" class="m-0">
                                                         @csrf
-                                                        <button type="submit" class="btn btn-sm rounded-circle {{ in_array($product->id, $favoriteIds) ? 'btn-danger text-white' : 'btn-outline-danger' }}" title="{{ in_array($product->id, $favoriteIds) ? 'Eliminar de favoritos' : 'Añadir a favoritos' }}">
+                                                        <button type="submit" class="btn btn-sm rounded-circle {{ in_array($product->id, $favoriteIds) ? 'btn-danger text-white' : 'btn-outline-danger' }}" title="{{ in_array($product->id, $favoriteIds) ? __('messages.catalog.remove_favorite') : __('messages.catalog.add_favorite') }}">
                                                             <i class="bi {{ in_array($product->id, $favoriteIds) ? 'bi-heart-fill' : 'bi-heart' }}"></i>
                                                         </button>
                                                     </form>
                                                 @else
-                                                    <a href="{{ route('login') }}" class="btn btn-sm btn-outline-danger rounded-circle" title="Inicia sesión para añadir a favoritos">
+                                                    <a href="{{ route('login') }}" class="btn btn-sm btn-outline-danger rounded-circle" title="{{ __('messages.catalog.login_favorite') }}">
                                                         <i class="bi bi-heart"></i>
                                                     </a>
                                                 @endauth

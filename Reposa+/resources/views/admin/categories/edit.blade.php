@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Editar Categoría')
+@section('title', __('messages.admin.categories.edit_title'))
 
 @section('content')
 <div class="row">
@@ -31,7 +31,7 @@
                     @method('PUT')
                     
                     <div class="mb-3">
-                        <label for="name" class="form-label">Nombre de la Categoría</label>
+                        <label for="name" class="form-label">{{ __('messages.admin.categories.name_label') }}</label>
                         <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $category->name) }}" required>
                         @error('name')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -40,7 +40,7 @@
 
                     <div class="d-flex justify-content-end gap-2">
                         <a href="{{ route('admin.categories') }}" class="btn btn-light">Cancelar</a>
-                        <button type="submit" class="btn btn-primary px-4">Actualizar Categoría</button>
+                        <button type="submit" class="btn btn-primary px-4">{{ __('messages.admin.categories.update') }}</button>
                     </div>
                 </form>
             </div>

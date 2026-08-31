@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Editar Producto')
+@section('title', __('messages.admin.products.edit_title'))
 
 @section('content')
 <div class="row justify-content-center">
@@ -15,7 +15,7 @@
                     @method('PUT')
                     
                     <div class="mb-3">
-                        <label for="name" class="form-label">Nombre de la Almohada</label>
+                        <label for="name" class="form-label">{{ __('messages.admin.products.name_label') }}</label>
                         <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $product->name) }}" required>
                         @error('name')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -23,7 +23,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="description" class="form-label">Descripción / Beneficios Ergonómicos</label>
+                        <label for="description" class="form-label">{{ __('messages.admin.products.description_label') }}</label>
                         <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="4" required>{{ old('description', $product->description) }}</textarea>
                         @error('description')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -47,14 +47,14 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="price" class="form-label">Precio (€)</label>
+                            <label for="price" class="form-label">{{ __('messages.admin.products.price_label') }}</label>
                             <input type="number" step="0.01" class="form-control @error('price') is-invalid @enderror" id="price" name="price" value="{{ old('price', $product->price) }}" required>
                             @error('price')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="stock" class="form-label">Stock Actual</label>
+                            <label for="stock" class="form-label">{{ __('messages.admin.products.stock_current') }}</label>
                             <input type="number" class="form-control @error('stock') is-invalid @enderror" id="stock" name="stock" value="{{ old('stock', $product->stock) }}" required>
                             @error('stock')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -72,7 +72,7 @@
 
                     <div class="d-flex justify-content-end gap-2">
                         <a href="{{ route('admin.products') }}" class="btn btn-light">Cancelar</a>
-                        <button type="submit" class="btn btn-primary px-4">Actualizar Producto</button>
+                        <button type="submit" class="btn btn-primary px-4">{{ __('messages.admin.products.update') }}</button>
                     </div>
                 </form>
             </div>

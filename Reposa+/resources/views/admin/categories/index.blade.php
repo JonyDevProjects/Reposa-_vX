@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Gestión de Categorías')
+@section('title', __('messages.admin.categories.title'))
 
 @section('content')
 <div class="row">
@@ -22,9 +22,9 @@
     </div>
     <div class="col-md-9">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold mb-0">Categorías</h2>
+            <h2 class="fw-bold mb-0">{{ __('messages.admin.categories.title') }}</h2>
             <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg me-2"></i> Nueva Categoría
+                <i class="bi bi-plus-lg me-2"></i> {{ __('messages.admin.categories.new') }}
             </a>
         </div>
 
@@ -35,10 +35,10 @@
                         <thead class="table-light">
                             <tr>
                                 <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Slug</th>
-                                <th>Productos</th>
-                                <th class="text-end">Acciones</th>
+                                <th>{{ __('messages.admin.categories.name') }}</th>
+                                <th>{{ __('messages.admin.categories.slug') }}</th>
+                                <th>{{ __('messages.admin.categories.products_count') }}</th>
+                                <th class="text-end">{{ __('messages.admin.categories.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -57,7 +57,7 @@
                                         <a href="{{ route('admin.categories.edit', $category) }}" class="btn btn-sm btn-outline-secondary">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        <form action="{{ route('admin.categories.delete', $category) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar esta categoría?')">
+                                        <form action="{{ route('admin.categories.delete', $category) }}" method="POST" onsubmit="return confirm('{{ __('messages.admin.categories.confirm_delete') }}')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-danger">
@@ -71,7 +71,7 @@
                             @if($categories->isEmpty())
                             <tr>
                                 <td colspan="5" class="text-center py-4 text-muted">
-                                    No hay categorías registradas.
+                                    {{ __('messages.admin.categories.no_categories') }}
                                 </td>
                             </tr>
                             @endif

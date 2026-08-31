@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Gestión de Productos')
+@section('title', __('messages.admin.products.title'))
 
 @section('content')
 <div class="row">
@@ -9,9 +9,9 @@
     </div>
     <div class="col-md-9">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold mb-0">Productos</h2>
+            <h2 class="fw-bold mb-0">{{ __('messages.admin.products.title') }}</h2>
             <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg me-2"></i> Nuevo Producto
+                <i class="bi bi-plus-lg me-2"></i> {{ __('messages.admin.products.new') }}
             </a>
         </div>
 
@@ -22,10 +22,10 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Imagen</th>
-                                <th>Nombre</th>
-                                <th>Precio</th>
-                                <th>Stock</th>
-                                <th class="text-end">Acciones</th>
+                                <th>{{ __('messages.admin.products.name') }}</th>
+                                <th>{{ __('messages.admin.products.price') }}</th>
+                                <th>{{ __('messages.admin.products.stock') }}</th>
+                                <th class="text-end">{{ __('messages.admin.products.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -46,7 +46,7 @@
                                         <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-sm btn-outline-secondary">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        <form action="{{ route('admin.products.delete', $product) }}" method="POST" onsubmit="return confirm('¿Estás seguro?')">
+                                        <form action="{{ route('admin.products.delete', $product) }}" method="POST" onsubmit="return confirm('{{ __('messages.admin.products.confirm_delete') }}')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-danger">

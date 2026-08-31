@@ -48,9 +48,9 @@ class CartController extends Controller
 
         if ($product->stock <= 0) {
             if (request()->wantsJson()) {
-                return response()->json(['success' => false, 'message' => 'Producto sin stock disponible'], 422);
+                return response()->json(['success' => false, 'message' => __('messages.cart.stock_unavailable')], 422);
             }
-            return back()->with('error', 'Producto sin stock disponible');
+            return back()->with('error', __('messages.cart.stock_unavailable'));
         }
 
         if (Auth::check()) {
@@ -60,7 +60,7 @@ class CartController extends Controller
 
             $currentQty = $cartItem ? $cartItem->quantity : 0;
             if ($currentQty + $quantity > $product->stock) {
-                $msg = "No hay suficiente stock. Disponible: {$product->stock}, en carrito: {$currentQty}.";
+                $msg = __('messages.cart.insufficient_stock', ['available' => $product->stock, 'cart_qty' => $currentQty]);
                 if (request()->wantsJson()) {
                     return response()->json(['success' => false, 'message' => $msg], 422);
                 }
@@ -80,7 +80,7 @@ class CartController extends Controller
             $cart = session()->get('cart', []);
             $currentQty = isset($cart[$product->id]) ? $cart[$product->id]['quantity'] : 0;
             if ($currentQty + $quantity > $product->stock) {
-                $msg = "No hay suficiente stock. Disponible: {$product->stock}, en carrito: {$currentQty}.";
+                $msg = __('messages.cart.insufficient_stock', ['available' => $product->stock, 'cart_qty' => $currentQty]);
                 return back()->with('error', $msg);
             }
             if (isset($cart[$product->id])) {
@@ -100,12 +100,12 @@ class CartController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Producto añadido al carrito',
+                'message' => __('messages.cart.added'),
                 'cartCount' => $cartCount
             ]);
         }
 
-        return back()->with('success', 'Producto añadido al carrito');
+        return back()->with('success', __('messages.cart.added'));
     }
 
     public function update(Request $request, $id)
@@ -117,7 +117,7 @@ class CartController extends Controller
             $product = Product::find($cartItem->product_id);
 
             if ($product && $request->quantity > $product->stock) {
-                return back()->with('error', "Solo quedan {$product->stock} unidades disponibles de \"{$product->name}\".");
+                return back()->with('error', __('messages.cart.only_left', ['count' => $product->stock, 'name' => $product->name]));
             }
 
             $cartItem->update(['quantity' => $request->quantity]);
@@ -126,14 +126,14 @@ class CartController extends Controller
             if (isset($cart[$id])) {
                 $product = Product::find($id);
                 if ($product && $request->quantity > $product->stock) {
-                    return back()->with('error', "Solo quedan {$product->stock} unidades disponibles de \"{$product->name}\".");
+                    return back()->with('error', __('messages.cart.only_left', ['count' => $product->stock, 'name' => $product->name]));
                 }
                 $cart[$id]['quantity'] = $request->quantity;
                 session()->put('cart', $cart);
             }
         }
 
-        return back()->with('success', 'Carrito actualizado');
+        return back()->with('success', __('messages.cart.updated'));
     }
 
     public function remove($id)
@@ -148,7 +148,7 @@ class CartController extends Controller
                 session()->put('cart', $cart);
             }
         }
-        return back()->with('success', 'Producto eliminado del carrito');
+        return back()->with('success', __('messages.cart.removed'));
     }
 
     public function checkout()
@@ -178,7 +178,7 @@ class CartController extends Controller
         $cartItems = CartItem::where('user_id', $user->id)->with('product')->get();
 
         if ($cartItems->isEmpty()) {
-            return back()->with('error', 'El carrito está vacío');
+            return back()->with('error', __('messages.cart.empty'));
         }
 
         $total = $cartItems->sum(function($item) {
@@ -199,7 +199,7 @@ class CartController extends Controller
                     $product = Product::lockForUpdate()->find($item->product_id);
 
                     if ($product->stock < $item->quantity) {
-                        throw new \Exception("Stock insuficiente para \"{$product->name}\". Disponible: {$product->stock}, solicitado: {$item->quantity}.");
+                        throw new \Exception(__('messages.cart.stock_insufficient', ['name' => $product->name, 'available' => $product->stock, 'requested' => $item->quantity]));
                     }
 
                     $product->decrement('stock', $item->quantity);
@@ -224,10 +224,10 @@ class CartController extends Controller
             Mail::to($user->email)->send(new OrderConfirmed($order));
         } catch (\Exception $e) {
             // Si falla el envío del correo, el pedido sigue siendo válido
-            return redirect('/profile#orders')->with('success', '¡Pedido realizado con éxito! No se pudo enviar el correo de confirmación, pero tu pedido ha sido procesado.');
+            return redirect('/profile#orders')->with('success', __('messages.cart.order_success_no_email'));
         }
 
-        return redirect('/profile#orders')->with('success', '¡Pedido realizado con éxito! Se ha enviado un ticket a tu correo.');
+        return redirect('/profile#orders')->with('success', __('messages.cart.order_success'));
     }
 
     public function orders()
@@ -279,7 +279,7 @@ class CartController extends Controller
         $cartItems = CartItem::where('user_id', $user->id)->with('product')->get();
 
         if ($cartItems->isEmpty()) {
-            return back()->with('error', 'El carrito está vacío');
+            return back()->with('error', __('messages.cart.empty'));
         }
 
         // Verify stock availability before creating the order
@@ -289,10 +289,10 @@ class CartController extends Controller
                     $product = Product::lockForUpdate()->find($item->product_id);
 
                     if (! $product || $product->stock < $item->quantity) {
-                        $name = $product?->name ?? 'Producto #' . $item->product_id;
+                        $name = $product?->name ?? __('messages.admin.products.name') . ' #' . $item->product_id;
                         $available = $product?->stock ?? 0;
                         throw new \Exception(
-                            "Stock insuficiente para \"{$name}\". Disponible: {$available}, solicitado: {$item->quantity}."
+                            __('messages.cart.stock_insufficient', ['name' => $name, 'available' => $available, 'requested' => $item->quantity])
                         );
                     }
                 }
@@ -317,9 +317,6 @@ class CartController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
-
-        // Vaciar carrito
-        CartItem::where('user_id', $user->id)->delete();
 
         // Construir line items para Stripe Checkout
         $lineItems = $order->orderItems->map(function ($item) {
@@ -362,13 +359,13 @@ class CartController extends Controller
         $sessionId = $request->get('session_id');
 
         if ($sessionId === null) {
-            return redirect('/')->with('error', 'No se encontró la sesión de pago.');
+            return redirect('/')->with('error', __('messages.cart.session_not_found'));
         }
 
         $session = Cashier::stripe()->checkout->sessions->retrieve($sessionId);
 
         if ($session->payment_status !== 'paid') {
-            return redirect('/profile#orders')->with('error', 'El pago no fue completado.');
+            return redirect('/profile#orders')->with('error', __('messages.cart.payment_not_completed'));
         }
 
         $orderId = $session->metadata['order_id'] ?? null;
@@ -387,6 +384,9 @@ class CartController extends Controller
                 $order->update(['status' => 'completed']);
             });
 
+            // Vaciar carrito solo después de confirmar el pago
+            CartItem::where('user_id', auth()->id())->delete();
+
             // Enviar correo de confirmación
             try {
                 Mail::to($order->user->email)->send(new OrderConfirmed($order));
@@ -395,12 +395,23 @@ class CartController extends Controller
             }
         }
 
-        return redirect('/profile#orders')->with('success', '¡Pago realizado con éxito! Tu pedido ha sido confirmado.');
+        return redirect('/profile#orders')->with('success', __('messages.cart.payment_success'));
     }
 
     public function stripeCancel()
     {
-        return redirect('/cart')->with('error', 'El pago fue cancelado. Tu carrito se mantiene intacto.');
+        // Cancelar la orden pending más reciente del usuario
+        $order = Order::where('user_id', auth()->id())
+            ->where('status', 'pending')
+            ->whereNotNull('stripe_session_id')
+            ->latest()
+            ->first();
+
+        if ($order) {
+            $order->update(['status' => 'cancelled']);
+        }
+
+        return redirect('/cart')->with('error', __('messages.cart.payment_cancelled'));
     }
 
     public function downloadInvoice(Order $order)
@@ -420,7 +431,7 @@ class CartController extends Controller
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
-        $filename = 'Factura_Reposa+' . '_' . str_pad($order->id, 6, '0', STR_PAD_LEFT) . '.pdf';
+        $filename = __('messages.invoice.title') . '_Reposa+' . '_' . str_pad($order->id, 6, '0', STR_PAD_LEFT) . '.pdf';
 
         $pdf = $dompdf->output();
 

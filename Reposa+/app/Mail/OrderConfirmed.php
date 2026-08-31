@@ -27,7 +27,7 @@ class OrderConfirmed extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Tu pedido #' . $this->order->id . ' — Reposa+',
+            subject: __('messages.mail.order_confirmed_subject', ['id' => $this->order->id]),
         );
     }
 

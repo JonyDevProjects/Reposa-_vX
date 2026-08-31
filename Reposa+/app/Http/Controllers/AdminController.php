@@ -103,7 +103,7 @@ class AdminController extends Controller
             $product->categories()->attach($request->categories);
         }
 
-        return redirect()->route('admin.products')->with('success', 'Producto creado correctamente.');
+        return redirect()->route('admin.products')->with('success', __('messages.admin.product_created'));
     }
 
     public function editProduct(Product $product)
@@ -132,13 +132,13 @@ class AdminController extends Controller
             $product->categories()->detach();
         }
 
-        return redirect()->route('admin.products')->with('success', 'Producto actualizado correctamente.');
+        return redirect()->route('admin.products')->with('success', __('messages.admin.product_updated'));
     }
 
     public function deleteProduct(Product $product)
     {
         $product->delete();
-        return back()->with('success', 'Producto eliminado.');
+        return back()->with('success', __('messages.admin.product_deleted'));
     }
 
     public function orders()
@@ -170,7 +170,7 @@ class AdminController extends Controller
             'slug' => Str::slug($request->name),
         ]);
 
-        return redirect()->route('admin.categories')->with('success', 'Categoría creada correctamente.');
+        return redirect()->route('admin.categories')->with('success', __('messages.admin.category_created'));
     }
 
     public function editCategory(Category $category)
@@ -189,13 +189,13 @@ class AdminController extends Controller
             'slug' => Str::slug($request->name),
         ]);
 
-        return redirect()->route('admin.categories')->with('success', 'Categoría actualizada correctamente.');
+        return redirect()->route('admin.categories')->with('success', __('messages.admin.category_updated'));
     }
 
     public function deleteCategory(Category $category)
     {
         $category->delete();
-        return back()->with('success', 'Categoría eliminada.');
+        return back()->with('success', __('messages.admin.category_deleted'));
     }
 
     public function updateOrderStatus(Request $request, Order $order)
@@ -209,26 +209,26 @@ class AdminController extends Controller
         if (! Order::canTransition($order->status, $newStatus)) {
             $current = Order::getStatusLabel($order->status);
             $target = Order::getStatusLabel($newStatus);
-            return back()->with('error', "No se puede cambiar de \"{$current}\" a \"{$target}\".");
+            return back()->with('error', __('messages.admin.status_invalid_transition', ['current' => $current, 'target' => $target]));
         }
 
         $order->update(['status' => $newStatus]);
 
-        return back()->with('success', 'Estado del pedido actualizado a "' . Order::getStatusLabel($newStatus) . '".');
+        return back()->with('success', __('messages.admin.status_updated', ['status' => Order::getStatusLabel($newStatus)]));
     }
 
     public function refundOrder(Request $request, Order $order)
     {
         if (! in_array($order->status, [Order::STATUS_COMPLETED, Order::STATUS_DELIVERED])) {
-            return back()->with('error', 'Solo se pueden reembolsar pedidos completados o entregados.');
+            return back()->with('error', __('messages.admin.refund_only_completed'));
         }
 
         if (! $order->payment_intent_id) {
-            return back()->with('error', 'Este pedido no tiene un pago de Stripe asociado para reembolsar.');
+            return back()->with('error', __('messages.admin.refund_no_stripe'));
         }
 
         if ($order->refunds()->where('status', 'succeeded')->exists()) {
-            return back()->with('error', 'Este pedido ya ha sido reembolsado.');
+            return back()->with('error', __('messages.admin.refund_already_done'));
         }
 
         $request->validate([
@@ -244,7 +244,7 @@ class AdminController extends Controller
             $refund = Refund::create([
                 'order_id' => $order->id,
                 'amount' => $order->total_amount,
-                'reason' => $request->input('reason', 'Reembolso solicitado por administrador'),
+                'reason' => $request->input('reason', __('messages.admin.refund_admin_reason')),
                 'stripe_refund_id' => $stripeRefund->id,
                 'status' => $stripeRefund->status,
             ]);
@@ -266,12 +266,12 @@ class AdminController extends Controller
                 ]);
             }
 
-            return back()->with('success', 'Reembolso procesado correctamente. Importe: ' . number_format($order->total_amount, 2) . '€');
+            return back()->with('success', __('messages.admin.refund_success', ['amount' => number_format($order->total_amount, 2)]));
         } catch (\Exception $e) {
             Log::error("Refund failed for order {$order->id}", [
                 'error' => $e->getMessage(),
             ]);
-            return back()->with('error', 'Error al procesar el reembolso: ' . $e->getMessage());
+            return back()->with('error', __('messages.admin.refund_error', ['error' => $e->getMessage()]));
         }
     }
 }

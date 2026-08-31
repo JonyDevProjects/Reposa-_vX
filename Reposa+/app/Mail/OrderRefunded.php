@@ -27,7 +27,7 @@ class OrderRefunded extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Reembolso procesado — Pedido #' . $this->order->id . ' — Reposa+',
+            subject: __('messages.mail.order_refunded_subject', ['id' => $this->order->id]),
         );
     }
 

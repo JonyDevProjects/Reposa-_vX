@@ -26,7 +26,7 @@ class PaymentFailed extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Pago no procesado — Reposa+',
+            subject: __('messages.mail.payment_failed_subject'),
         );
     }
 

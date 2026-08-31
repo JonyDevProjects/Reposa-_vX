@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\OrderConfirmed;
 use App\Mail\OrderRefunded;
+use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Refund;
@@ -61,6 +62,9 @@ class StripeWebhookController extends CashierController
             $order->update(['status' => 'completed']);
         });
 
+        // Vaciar carrito del usuario (safety net — por si stripeSuccess no lo hizo)
+        CartItem::where('user_id', $order->user_id)->delete();
+
         // Send confirmation email if not already sent
         try {
             Mail::to($order->user->email)->send(new OrderConfirmed($order));
@@ -100,9 +104,12 @@ class StripeWebhookController extends CashierController
                     ->first();
 
                 if ($order) {
+                    // Cancelar la orden ya que el pago falló
+                    $order->update(['status' => 'cancelled']);
+
                     try {
                         Mail::to($user->email)->send(
-                            new \App\Mail\PaymentFailed($order, $paymentIntent['last_payment_error']['message'] ?? 'El pago no pudo ser procesado')
+                            new \App\Mail\PaymentFailed($order, $paymentIntent['last_payment_error']['message'] ?? __('messages.cart.payment_not_completed'))
                         );
                     } catch (\Exception $e) {
                         Log::error("Stripe webhook: failed to send payment failure email for order {$order->id}", [
@@ -149,7 +156,7 @@ class StripeWebhookController extends CashierController
             Refund::create([
                 'order_id' => $order->id,
                 'amount' => ($charge['amount_refunded'] ?? $order->total_amount) / 100,
-                'reason' => 'Reembolsado vía Stripe dashboard',
+                'reason' => __('messages.webhook.stripe_dashboard_refund'),
                 'stripe_refund_id' => $refundId,
                 'status' => 'succeeded',
             ]);

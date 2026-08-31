@@ -69,7 +69,10 @@ class Order extends Model
 
     public static function getStatusLabel(string $status): string
     {
-        return self::STATUSES[$status] ?? ucfirst($status);
+        $key = 'messages.order.status.' . $status;
+        $translated = __($key);
+
+        return $translated !== $key ? $translated : ucfirst($status);
     }
 
     public static function getStatusColor(string $status): string

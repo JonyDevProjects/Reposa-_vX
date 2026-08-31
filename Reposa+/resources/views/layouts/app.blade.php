@@ -35,7 +35,7 @@
                 <form action="/catalog" method="GET" class="d-none d-lg-flex me-3" style="max-width: 300px; width: 100%;">
                     <div class="input-group input-group-sm">
                         <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
-                        <input type="text" name="q" class="form-control border-start-0" placeholder="Buscar almohadas..." value="{{ request('q') }}">
+                        <input type="text" name="q" class="form-control border-start-0" placeholder="{{ __('messages.layout.search_placeholder') }}" value="{{ request('q') }}">
                     </div>
                 </form>
                 <ul class="navbar-nav ms-auto">
@@ -63,7 +63,7 @@
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="/profile">{{ __('messages.nav.profile') }}</a></li>
                                 @if(Auth::user()->role === 'admin')
-                                    <li><a class="dropdown-item text-danger" href="{{ route('admin.dashboard') }}">Panel de administración</a></li>
+                                    <li><a class="dropdown-item text-danger" href="{{ route('admin.dashboard') }}">{{ __('messages.layout.admin_panel') }}</a></li>
                                 @endif
                                 <li><hr class="dropdown-divider"></li>
                                 <li>

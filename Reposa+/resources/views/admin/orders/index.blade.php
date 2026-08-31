@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Historial Global de Pedidos')
+@section('title', __('messages.admin.orders.title'))
 
 @section('content')
 <div class="row">
@@ -8,7 +8,7 @@
         @include('admin.partials.sidebar')
     </div>
     <div class="col-md-9">
-        <h2 class="fw-bold mb-4">Historial Global de Transacciones</h2>
+        <h2 class="fw-bold mb-4">{{ __('messages.admin.orders.history') }}</h2>
 
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -30,12 +30,12 @@
                         <thead class="table-light">
                             <tr>
                                 <th>ID</th>
-                                <th>Cliente</th>
-                                <th>Productos</th>
+                                <th>{{ __('messages.admin.orders.customer') }}</th>
+                                <th>{{ __('messages.admin.orders.products') }}</th>
                                 <th>Total</th>
                                 <th>Fecha</th>
                                 <th>Estado</th>
-                                <th>Acciones</th>
+                                <th>{{ __('messages.admin.orders.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -82,7 +82,7 @@
                                     @if(in_array($order->status, ['completed', 'delivered']) && $order->payment_intent_id && !$order->refunds()->where('status', 'succeeded')->exists())
                                         <button class="btn btn-sm btn-outline-danger" type="button"
                                                 data-bs-toggle="modal" data-bs-target="#refundModal{{ $order->id }}">
-                                            <i class="bi bi-arrow-counterclockwise"></i> Reembolsar
+                                            <i class="bi bi-arrow-counterclockwise"></i> {{ __('messages.admin.orders.refund') }}
                                         </button>
 
                                         <div class="modal fade" id="refundModal{{ $order->id }}" tabindex="-1">
@@ -91,21 +91,21 @@
                                                     <form action="{{ route('admin.orders.refund', $order) }}" method="POST">
                                                         @csrf
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title">Reembolsar Pedido #{{ $order->id }}</h5>
+                                                            <h5 class="modal-title">{{ __('messages.admin.orders.refund_title') }}{{ $order->id }}</h5>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <p>Se reembolsará <strong>{{ number_format($order->total_amount, 2) }}€</strong> al cliente <strong>{{ $order->user->name }}</strong>.</p>
-                                                            <p class="text-muted small">El stock se restaurará automáticamente.</p>
+                                                            <p>{{ __('messages.admin.orders.refund_desc') }} <strong>{{ number_format($order->total_amount, 2) }}€</strong> {{ __('messages.admin.orders.refund_to_client') }} <strong>{{ $order->user->name }}</strong>.</p>
+                                                            <p class="text-muted small">{{ __('messages.admin.orders.stock_restore') }}</p>
                                                             <div class="mb-3">
-                                                                <label for="reason{{ $order->id }}" class="form-label">Motivo (opcional)</label>
+                                                                <label for="reason{{ $order->id }}" class="form-label">{{ __('messages.admin.orders.reason_optional') }}</label>
                                                                 <input type="text" class="form-control" id="reason{{ $order->id }}" name="reason" maxlength="500" placeholder="Ej: Producto defectuoso, solicitud del cliente...">
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.admin.orders.cancel') }}</button>
                                                             <button type="submit" class="btn btn-danger" onclick="return confirm('¿Confirmar reembolso de {{ number_format($order->total_amount, 2) }}€?')">
-                                                                Confirmar Reembolso
+                                                                {{ __('messages.admin.orders.confirm_refund') }}
                                                             </button>
                                                         </div>
                                                     </form>
@@ -113,7 +113,7 @@
                                             </div>
                                         </div>
                                     @elseif($order->status === 'refunded')
-                                        <span class="badge bg-secondary">Reembolsado</span>
+                                        <span class="badge bg-secondary">{{ __('messages.admin.orders.refunded') }}</span>
                                     @else
                                         <span class="text-muted small">—</span>
                                     @endif

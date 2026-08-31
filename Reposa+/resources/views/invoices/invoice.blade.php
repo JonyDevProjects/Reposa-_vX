@@ -40,14 +40,14 @@
     <div class="header">
         <div class="brand">
             <h1>Reposa+</h1>
-            <p>Almohadas Ergonómicas</p>
+            <p>{{ __('messages.invoice.company') }}</p>
         </div>
         <div class="invoice-meta">
-            <h2>Factura</h2>
-            <p><strong>Nº:</strong> #{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</p>
-            <p><strong>Fecha:</strong> {{ $order->created_at->format('d/m/Y') }}</p>
+            <h2>{{ __('messages.invoice.title') }}</h2>
+            <p><strong>{{ __('messages.invoice.number') }}</strong> #{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</p>
+            <p><strong>{{ __('messages.invoice.date') }}</strong> {{ $order->created_at->format('d/m/Y') }}</p>
             @if($order->stripe_session_id)
-                <p><strong>Sesión:</strong> {{ substr($order->stripe_session_id, 0, 20) }}…</p>
+                <p><strong>{{ __('messages.invoice.session') }}</strong> {{ substr($order->stripe_session_id, 0, 20) }}…</p>
             @endif
         </div>
     </div>
@@ -55,7 +55,7 @@
     <div class="body">
         <div class="parties">
             <div class="party">
-                <h3>Facturado a</h3>
+                <h3>{{ __('messages.invoice.billed_to') }}</h3>
                 <p><strong>{{ $order->user->name }}</strong></p>
                 <p>{{ $order->user->email }}</p>
                 @if($order->user->addresses && $order->user->addresses->isNotEmpty())
@@ -65,22 +65,22 @@
                 @endif
             </div>
             <div class="party">
-                <h3>Método de pago</h3>
+                <h3>{{ __('messages.invoice.payment_method') }}</h3>
                 <p><strong>Stripe Checkout</strong></p>
                 @if($order->user->pm_last_four)
-                    <p>Tarjeta **** {{ $order->user->pm_last_four }}</p>
+                    <p>{{ __('messages.invoice.card_ending') }} {{ $order->user->pm_last_four }}</p>
                 @endif
-                <p>Estado: <strong style="color: #16a34a;">Pagado</strong></p>
+                <p>{{ __('messages.invoice.status_paid') }}</p>
             </div>
         </div>
 
         <table>
             <thead>
                 <tr>
-                    <th>Producto</th>
-                    <th>Cantidad</th>
-                    <th>Precio Ud.</th>
-                    <th>Subtotal</th>
+                    <th>{{ __('messages.invoice.product') }}</th>
+                    <th>{{ __('messages.invoice.quantity') }}</th>
+                    <th>{{ __('messages.invoice.unit_price') }}</th>
+                    <th>{{ __('messages.invoice.subtotal') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -98,15 +98,15 @@
         <div class="totals">
             <div class="totals-box">
                 <div class="totals-row">
-                    <span>Subtotal</span>
+                    <span>{{ __('messages.invoice.subtotal') }}</span>
                     <span>{{ number_format($order->total_amount, 2) }}€</span>
                 </div>
                 <div class="totals-row">
-                    <span>IVA (21%)</span>
-                    <span>Incluido</span>
+                    <span>{{ __('messages.invoice.vat') }}</span>
+                    <span>{{ __('messages.invoice.included') }}</span>
                 </div>
                 <div class="totals-row total">
-                    <span>Total</span>
+                    <span>{{ __('messages.invoice.total') }}</span>
                     <span>{{ number_format($order->total_amount, 2) }}€</span>
                 </div>
             </div>
@@ -114,8 +114,8 @@
     </div>
 
     <div class="footer">
-        <p><strong>Reposa+</strong> — Almohadas Ergonómicas de Alta Gama</p>
-        <p>Gracias por tu compra. Para consultas, contacta con nosotros.</p>
+        <p><strong>Reposa+</strong> — {{ __('messages.invoice.footer_title') }}</p>
+        <p>{{ __('messages.invoice.footer_thanks') }}</p>
     </div>
 </body>
 </html>

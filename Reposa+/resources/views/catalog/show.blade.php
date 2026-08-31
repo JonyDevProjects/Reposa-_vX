@@ -76,14 +76,14 @@
                         <p class="text-muted mb-4" style="font-size: 0.9rem;">
                             <i class="bi bi-box-seam me-1"></i>
                             @if($product->stock <= 5)
-                                <span class="text-warning fw-semibold">¡Quedan solo {{ $product->stock }} unidades!</span>
+                                <span class="text-warning fw-semibold">{{ __('messages.catalog.show.last_units', ['count' => $product->stock]) }}</span>
                             @else
-                                Quedan {{ $product->stock }} unidades disponibles
+                                {{ __('messages.catalog.show.units_available', ['count' => $product->stock]) }}
                             @endif
                         </p>
                     @else
                         <p class="text-danger mb-4 fw-semibold" style="font-size: 0.9rem;">
-                            <i class="bi bi-exclamation-triangle me-1"></i>Agotado — avísame cuando vuelva a estar disponible
+                            <i class="bi bi-exclamation-triangle me-1"></i>{{ __('messages.catalog.show.out_of_stock_notify') }}
                         </p>
                     @endif
 
@@ -113,7 +113,7 @@
                             </form>
                         @else
                             <button class="btn btn-secondary flex-grow-1 py-3 fw-bold" disabled>
-                                <i class="bi bi-cart-x me-2"></i>Sin stock disponible
+                                <i class="bi bi-cart-x me-2"></i>{{ __('messages.catalog.show.no_stock') }}
                             </button>
                         @endif
 

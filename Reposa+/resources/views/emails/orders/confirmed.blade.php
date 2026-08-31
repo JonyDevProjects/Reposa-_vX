@@ -1,32 +1,32 @@
 <x-mail::message>
-# ¡Gracias por tu pedido en Reposa+!
+# {{ __('messages.email.confirmed.title') }}
 
-Hola {{ $order->user->name }},
+{{ __('messages.email.confirmed.hello', ['name' => $order->user->name]) }}
 
-Tu pedido **#{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}** ha sido confirmado con éxito.
+{{ __('messages.email.confirmed.order_confirmed', ['id' => str_pad($order->id, 6, '0', STR_PAD_LEFT)]) }}
 
-**Resumen del Pedido:**
-| Producto | Cantidad | Precio |
+**{{ __('messages.email.confirmed.order_summary') }}**
+| {{ __('messages.email.confirmed.product') }} | {{ __('messages.email.confirmed.quantity') }} | {{ __('messages.email.confirmed.price') }} |
 | :--- | :---: | :--- |
 @foreach ($order->orderItems as $item)
 | {{ $item->product->name }} | {{ $item->quantity }} | {{ number_format($item->price_at_purchase, 2) }}€ |
 @endforeach
-| **Total** | | **{{ number_format($order->total_amount, 2) }}€** |
+| **{{ __('messages.email.confirmed.total') }}** | | **{{ number_format($order->total_amount, 2) }}€** |
 
 @if($order->stripe_session_id)
-**Pago procesado vía Stripe Checkout**
+**{{ __('messages.email.confirmed.stripe_payment') }}**
 @endif
 
-Nos pondremos en marcha para que recibas tus almohadas lo antes posible.
+{{ __('messages.email.confirmed.shipping_msg') }}
 
 <x-mail::button :url="$invoiceUrl">
-Descargar Factura PDF
+{{ __('messages.email.confirmed.download_invoice') }}
 </x-mail::button>
 
 <x-mail::button :url="config('app.url') . '/orders/' . $order->id">
-Ver mi pedido
+{{ __('messages.email.confirmed.view_order') }}
 </x-mail::button>
 
-Gracias,<br>
-El equipo de {{ config('app.name') }}
+{{ __('messages.email.confirmed.thanks') }}<br>
+{{ __('messages.email.confirmed.team', ['name' => config('app.name')]) }}
 </x-mail::message>
