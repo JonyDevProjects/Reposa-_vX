@@ -5,7 +5,7 @@
 Este documento define las fases restantes para llevar Reposa+ al nivel de un e-commerce real. Se incluye el trabajo ya realizado (pasarela de pagos con Stripe) como parte integral del roadmap, y se detallan las funcionalidades pendientes organizadas por prioridad y dependencias.
 
 **Fecha de creación:** 28 de agosto de 2026
-**Última sesión:** 29/08/2026 — Stack Docker completo, Escalabilidad, Internacionalización
+**Última sesión:** 31/08/2026 — Localización completa, Fix tests, Fix checkout flow
 
 ---
 
@@ -45,6 +45,8 @@ Este documento define las fases restantes para llevar Reposa+ al nivel de un e-c
 | 28 | **Fix favoritos duplicados + toggle funcional con JSON** | ✅ |
 | 29 | **Internacionalización de productos con spatie/laravel-translatable** | ✅ |
 | 30 | **Documentación — Autor, TFG, limpieza de archivos** | ✅ |
+| 31 | **Localización completa de la interfaz (es/en) — ~215 strings** | ✅ |
+| 32 | **Fix checkout flow — cancelar pago preserva carrito** | ✅ |
 
 ---
 
@@ -267,6 +269,155 @@ composer require dompdf/dompdf
 
 ---
 
+## Fase 33: Dev Containers — Entorno de Desarrollo Ligero (PRIORIDAD MEDIA)
+
+**Objetivo:** Configurar un entorno de desarrollo con Dev Containers que sea más ligero que Docker Compose completo, manteniendo Docker para producción.
+
+### Contexto
+
+El stack Docker actual (7 servicios) está diseñado para producción y despliegue. Para desarrollo diario, Dev Containers ofrece:
+- Solo 1-2 contenedores (app + mysql)
+- Código montado desde host (ediciones en tiempo real)
+- IDE integrado (VS Code/Cursor) con IntelliSense, debugging, terminal
+- Arranque rápido (~10s vs ~60s del stack completo)
+- Extensions del IDE funcionando dentro del contenedor
+
+### 33.1 Estructura de archivos
+
+```
+.devcontainer/
+├── devcontainer.json    # Configuración del entorno
+└── Dockerfile           # Imagen ligera de desarrollo
+```
+
+### 33.2 Dockerfile de desarrollo
+
+- Imagen base: `php:8.2-cli` o `mcr.microsoft.com/devcontainers/php:8.2`
+- Extensiones PHP necesarias: pdo_mysql, mbstring, xml, curl, zip, dom, gd, redis, bcmath
+- Composer instalado
+- Node.js 18+ (para Vite)
+- Sin Nginx (usa `php artisan serve` o Herd)
+
+### 33.3 devcontainer.json
+
+```json
+{
+  "name": "Reposa+ Dev",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "forwardPorts": [8000, 3306],
+  "postCreateCommand": "composer install && cp .env.example .env && php artisan key:generate",
+  "postStartCommand": "php artisan migrate:fresh --seed --force",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-docker",
+        "bmewburn.vscode-intelephense-client",
+        "onecentlin.laravel-blade"
+      ]
+    }
+  },
+  "dockerComposeFile": "../docker-compose.dev.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace"
+}
+```
+
+### 33.4 docker-compose.dev.yml (alternativo)
+
+Si se prefiere Docker Compose para el Dev Container:
+
+```yaml
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ..:/workspace
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql-dev
+    environment:
+      - DB_HOST=mysql-dev
+      - DB_DATABASE=reposa
+      - DB_USERNAME=root
+      - DB_PASSWORD=secret
+
+  mysql-dev:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=reposa
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_dev_data:/var/lib/mysql
+
+volumes:
+  mysql_dev_data:
+```
+
+### 33.5 Servicios incluidos vs excluidos
+
+| Servicio | Producción | Dev Container |
+|----------|-----------|---------------|
+| app (PHP) | ✅ | ✅ (ligero, sin Nginx) |
+| mysql | ✅ | ✅ |
+| redis | ✅ | ❌ (no necesario para dev) |
+| queue | ✅ | ❌ (`php artisan queue:work` manual) |
+| mailhog | ✅ | ❌ (usar Mailpit o log) |
+| minio | ✅ | ❌ (usar filesystem local) |
+| nginx-lb | ✅ | ❌ (`php artisan serve`) |
+
+### 33.6 Configuración .env para Dev Container
+
+```env
+APP_ENV=local
+APP_DEBUG=true
+DB_CONNECTION=mysql
+DB_HOST=mysql-dev
+DB_PORT=3306
+DB_DATABASE=reposa
+DB_USERNAME=root
+DB_PASSWORD=secret
+FILESYSTEM_DISK=local
+MAIL_MAILER=log
+QUEUE_CONNECTION=sync
+```
+
+### 33.7 Requisitos previos
+
+- VS Code o Cursor con extensión "Dev Containers"
+- Docker Desktop o OrbStack corriendo
+- El `docker-compose.yml` de producción se mantiene sin cambios
+
+### 33.8 Flujo de uso
+
+1. Abrir el proyecto en VS Code/Cursor
+2. Click en "Reopen in Container" (notificación automática)
+3. VS Code conecta al contenedor, instala extensions
+4. `composer install` + `php artisan migrate:fresh --seed`
+5. Desarrollar con `php artisan serve` en puerto 8000
+6. Para testing con stack completo: `docker compose up -d`
+
+### 33.9 Decisiones a tomar
+
+- [ ] ¿Usar Docker Compose dev o solo Dockerfile?
+- [ ] ¿Incluir Redis en dev (para sesiones/cache) o usar sync?
+- [ ] ¿Usar Mailpit (Homebrew) o log para emails en dev?
+- [ ] ¿VS Code o Cursor como IDE principal?
+
+**Archivos a crear:**
+- `.devcontainer/devcontainer.json`
+- `.devcontainer/Dockerfile`
+- `docker-compose.dev.yml` (si se usa enfoque Compose)
+
+---
+
 ## Resumen de Prioridades
 
 | Fase | Descripción | Prioridad | Dependencias |
@@ -280,6 +431,7 @@ composer require dompdf/dompdf
 | 11 | Reembolsos | 🟢 Baja | Fase 10 |
 | 12 | Tests PHPUnit | 🟡 Media | Fases 5-6 |
 | 13 | CI/CD | 🟢 Baja | Fase 12 |
+| 33 | Dev Containers | 🟡 Media | — |
 
 ---
 
@@ -297,6 +449,9 @@ composer require dompdf/dompdf
 | 11 — Reembolsos | ✅ Completada |
 | 12 — Tests PHPUnit | ✅ Completada |
 | 13 — CI/CD | ✅ Completada |
+| 31 — Localización completa | ✅ Completada |
+| 32 — Fix checkout flow | ✅ Completada |
+| 33 — Dev Containers | ⬜ Pendiente |
 
 ---
 
@@ -337,15 +492,31 @@ Registro de cambios respecto al plan original. Se actualiza al final de cada ses
 | 29/08/2026 | Fase 29 (i18n) | APP_LOCALE=es como idioma por defecto | Locale default cambiado de en a es |
 | 29/08/2026 | Fase 30 (Docs) | Autor = Jonathan Javier Quishpe Maldonado | Actualizado en README.md |
 | 29/08/2026 | Fase 30 (Docs) | Todas las referencias EPD3 cambiadas a TFG | 4 archivos de documentación actualizados |
+| 31/08/2026 | Fase 31 (i18n UI) | Localización completa de la interfaz (~215 strings) | 20 vistas Blade, 4 controladores, 3 Mailables, Order model — todo con __() |
+| 31/08/2026 | Fase 31 (i18n UI) | AdminTest: assertDatabaseHas reemplazado por getTranslation() | spatie/laravel-translatable guarda name como JSON; aserciones raw DB fallaban |
+| 31/08/2026 | Fase 32 (Checkout) | Eliminada eliminación prematura del carrito en stripeCheckout() | Cancelar pago en Stripe eliminaba artículos del carrito y dejaba orden huérfana |
+| 31/08/2026 | Fase 32 (Checkout) | stripeCancel() cancela orden pending + carrito intacto | Antes solo redirigía a /cart vacío sin limpiar la orden |
+| 31/08/2026 | Fase 32 (Checkout) | Webhook failure cancela orden pending | handlePaymentIntentPaymentFailed ahora marca orden como cancelled |
 
 ---
 
 ## Notas para la Siguiente Sesión
 
-1. **Todas las fases del roadmap completadas (1-30)**
-2. **Estado de tests:** 39 E2E tests pasan (112 assertions), 58 Feature tests pasan
-3. **Branch:** `develop` en origin, commit `e1ee0d9`
-4. **Stack Docker:** 7 servicios corriendo (app, queue, mysql, redis, mailhog, minio, nginx-lb)
+1. **Fases completadas:** 32 de 33 (fase 33 — Dev Containers — pendiente)
+2. **Estado de tests:** 60 Feature tests pasan (112 assertions), 0 fallidos
+3. **Branch:** `develop` en origin, commit `e4b0c80`
+4. **Stack Docker:** 7 servicios (app, queue, mysql, redis, mailhog, minio, nginx-lb) — corriendo
+5. **Localización:** Completa — UI funciona en es/en via `/lang/en` y `/lang/es`
+6. **Checkout flow:** Fix aplicado — cancelar pago preserva carrito, orden se cancela
+
+### Siguiente tarea: Fase 33 — Dev Containers
+
+Configurar `.devcontainer/` con Dockerfile ligero y `devcontainer.json` para desarrollo con VS Code/Cursor. El stack Docker completo se mantiene para producción; Dev Containers usa solo app + mysql.
+
+**Decisiones pendientes:**
+- ¿Usar Docker Compose dev o solo Dockerfile?
+- ¿Incluir Redis en dev o usar sync?
+- ¿VS Code o Cursor como IDE principal?
 
 ### Pendiente para producción — Webhook de Stripe
 
