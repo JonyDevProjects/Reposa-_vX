@@ -46,7 +46,7 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 | Fase | Denominación / Enfoque | Comandos Clave | Estado |
 |---|---|---|:---:|
 | **1** | Fundamentos, Autoridad Visual y Componentes Base | `init`, `document`, `extract` | ✅ Completada |
-| **2** | Evaluación Heurística, Accesibilidad y Diagnóstico | `critique`, `audit` | ⏳ Pendiente |
+| **2** | Evaluación Heurística, Accesibilidad y Diagnóstico | `critique`, `audit` | ✅ Completada |
 | **3** | Identidad Cromática, Tipografía y Armonía Espacial | `typeset`, `colorize`, `layout` | ⏳ Pendiente |
 | **4** | Experiencia Persuasiva y Emocional del Storefront | `shape`, `bolder`, `animate`, `delight` | ⏳ Pendiente |
 | **5** | Claridad Transaccional, Estados Vacíos y Resiliencia | `clarify`, `harden`, `onboard`, `distill` | ⏳ Pendiente |
@@ -356,10 +356,10 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 
 | Fase | Hito / Entregable | Estado |
 |---|---|:---:|
-| **Fase 1** | Contexto `PRODUCT.md` y `DESIGN.md` inicializados | ⏳ Pendiente |
-| **Fase 1** | Tokens SCSS y primeros componentes Blade extraídos | ⏳ Pendiente |
-| **Fase 2** | Auditoría heurística y de accesibilidad completada | ⏳ Pendiente |
-| **Fase 2** | Contrastes WCAG AA y accesibilidad por teclado resueltos | ⏳ Pendiente |
+| **Fase 1** | Contexto `PRODUCT.md` y `DESIGN.md` inicializados | ✅ Completada |
+| **Fase 1** | Tokens SCSS y primeros componentes Blade extraídos | ✅ Completada |
+| **Fase 2** | Auditoría heurística y de accesibilidad completada | ✅ Completada |
+| **Fase 2** | Contrastes WCAG AA y accesibilidad por teclado diagnosticados | ✅ Completada |
 | **Fase 3** | Nueva escala tipográfica dual integrada | ⏳ Pendiente |
 | **Fase 3** | Paleta cromática de descanso aplicada en toda la app | ⏳ Pendiente |
 | **Fase 3** | Layouts y espaciados armónicos en catálogo y producto | ⏳ Pendiente |
