@@ -17,15 +17,7 @@
             <div class="col-md-6">
                 <div class="card border-0 shadow-sm overflow-hidden rounded-4 position-relative">
                     <img src="{{ $product->image_url ?? '/images/pillow-detail.png' }}" class="img-fluid product-main-img" alt="{{ $product->name }}">
-                    @if($product->stock > 0)
-                        <span class="badge bg-success position-absolute top-0 end-0 m-3 px-3 py-2 rounded-pill shadow">
-                            <i class="bi bi-check-circle me-1"></i>{{ __('messages.product.in_stock') ?? 'En stock' }}
-                        </span>
-                    @else
-                        <span class="badge bg-danger position-absolute top-0 end-0 m-3 px-3 py-2 rounded-pill shadow">
-                            <i class="bi bi-x-circle me-1"></i>{{ __('messages.product.out_of_stock') ?? 'Agotado' }}
-                        </span>
-                    @endif
+                    <x-badge-stock :stock="$product->stock" class="position-absolute top-0 end-0 m-3 shadow" />
                 </div>
                 <div class="row mt-3 g-2">
                     <div class="col-4">
@@ -70,7 +62,9 @@
                         <span class="text-muted">{{ __('messages.product.reviews_count') }}</span>
                     </div>
 
-                    <h2 class="display-6 fw-bold text-primary mb-2">{{ number_format($product->price, 2) }}€</h2>
+                    <div class="mb-2">
+                        <x-price :amount="$product->price" size="xl" :splitDecimals="true" />
+                    </div>
 
                     @if($product->stock > 0)
                         <p class="text-muted mb-4" style="font-size: 0.9rem;">
