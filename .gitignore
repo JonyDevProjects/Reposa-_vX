@@ -31,6 +31,9 @@ auth.json
 
 # Agentes IA y herramientas
 .commandcode/
--e 
+.agent/
+.gemini/
+.engram/
+
 # Testing environment
 .env.testing
