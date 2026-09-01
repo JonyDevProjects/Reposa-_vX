@@ -5,7 +5,7 @@
 Este documento define las fases restantes para llevar Reposa+ al nivel de un e-commerce real. Se incluye el trabajo ya realizado (pasarela de pagos con Stripe) como parte integral del roadmap, y se detallan las funcionalidades pendientes organizadas por prioridad y dependencias.
 
 **Fecha de creación:** 28 de agosto de 2026
-**Última sesión:** 31/08/2026 — Localización completa, Fix tests, Fix checkout flow
+**Última sesión:** 01/09/2026 — Dev Containers (Fase 33)
 
 ---
 
@@ -47,6 +47,7 @@ Este documento define las fases restantes para llevar Reposa+ al nivel de un e-c
 | 30 | **Documentación — Autor, TFG, limpieza de archivos** | ✅ |
 | 31 | **Localización completa de la interfaz (es/en) — ~215 strings** | ✅ |
 | 32 | **Fix checkout flow — cancelar pago preserva carrito** | ✅ |
+| 33 | **Dev Containers — Entorno de desarrollo ligero (.devcontainer/ + docker-compose.dev.yml)** | ✅ |
 
 ---
 
@@ -451,7 +452,7 @@ QUEUE_CONNECTION=sync
 | 13 — CI/CD | ✅ Completada |
 | 31 — Localización completa | ✅ Completada |
 | 32 — Fix checkout flow | ✅ Completada |
-| 33 — Dev Containers | ⬜ Pendiente |
+| 33 — Dev Containers | ✅ Completada |
 
 ---
 
@@ -497,26 +498,32 @@ Registro de cambios respecto al plan original. Se actualiza al final de cada ses
 | 31/08/2026 | Fase 32 (Checkout) | Eliminada eliminación prematura del carrito en stripeCheckout() | Cancelar pago en Stripe eliminaba artículos del carrito y dejaba orden huérfana |
 | 31/08/2026 | Fase 32 (Checkout) | stripeCancel() cancela orden pending + carrito intacto | Antes solo redirigía a /cart vacío sin limpiar la orden |
 | 31/08/2026 | Fase 32 (Checkout) | Webhook failure cancela orden pending | handlePaymentIntentPaymentFailed ahora marca orden como cancelled |
+| 31/08/2026 | Fase 33 (DevContainers) | Se usó docker-compose.dev.yml en lugar de solo Dockerfile | Más fiable para healthchecks de MySQL; Railway-like pattern |
+| 31/08/2026 | Fase 33 (DevContainers) | QUEUE_CONNECTION=sync, MAIL_MAILER=log en dev | No se necesita Redis ni MailHog para desarrollo diario |
+| 31/08/2026 | Fase 33 (DevContainers) | VS Code como IDE principal (compatible con Cursor) | Extensión Dev Containers funciona en ambos |
+| 01/09/2026 | Fase 33 (DevContainers) | Base image cambiada de PHP 8.3 a PHP 8.4 | composer.lock requiere Symfony 8.x (php >=8.4) |
+| 01/09/2026 | Fase 33 (DevContainers) | Añadidos libonig-dev y libxml2-dev al Dockerfile | mbstring requiere oniguruma; xml/dom requiere libxml2 |
+| 01/09/2026 | Fase 33 (DevContainers) | Eliminado repositorio Yarn del base image | GPG key expirada/ausente en mcr.microsoft.com/devcontainers/php |
+| 01/09/2026 | Fase 33 (DevContainers) | command: sleep infinity en lugar de artisan serve | Container crashaba antes de postCreateCommand (composer install) |
+| 01/09/2026 | Fase 33 (DevContainers) | .env del host montado sobreescribe config dev | Bind mount trae Redis config; solucionado con sed post-create |
 
 ---
 
 ## Notas para la Siguiente Sesión
 
-1. **Fases completadas:** 32 de 33 (fase 33 — Dev Containers — pendiente)
+1. **Fases completadas:** 33 de 33 (roadmap completado)
 2. **Estado de tests:** 60 Feature tests pasan (112 assertions), 0 fallidos
 3. **Branch:** `develop` en origin, commit `e4b0c80`
 4. **Stack Docker:** 7 servicios (app, queue, mysql, redis, mailhog, minio, nginx-lb) — corriendo
-5. **Localización:** Completa — UI funciona en es/en via `/lang/en` y `/lang/es`
-6. **Checkout flow:** Fix aplicado — cancelar pago preserva carrito, orden se cancela
+5. **Dev Containers:** `.devcontainer/` + `docker-compose.dev.yml` — app + mysql ligero para desarrollo
+6. **Localización:** Completa — UI funciona en es/en via `/lang/en` y `/lang/es`
+7. **Checkout flow:** Fix aplicado — cancelar pago preserva carrito, orden se cancela
 
-### Siguiente tarea: Fase 33 — Dev Containers
+### Siguiente tarea: Roadmap completado — pendiente para producción
 
-Configurar `.devcontainer/` con Dockerfile ligero y `devcontainer.json` para desarrollo con VS Code/Cursor. El stack Docker completo se mantiene para producción; Dev Containers usa solo app + mysql.
-
-**Decisiones pendientes:**
-- ¿Usar Docker Compose dev o solo Dockerfile?
-- ¿Incluir Redis en dev o usar sync?
-- ¿VS Code o Cursor como IDE principal?
+Todas las 33 fases del roadmap están completadas. Pendiente para producción:
+- Webhook de Stripe con secreto real (ver sección abajo)
+- Despliegue en servidor con HTTPS
 
 ### Pendiente para producción — Webhook de Stripe
 
