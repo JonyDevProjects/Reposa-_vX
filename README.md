@@ -17,6 +17,7 @@ A continuación, puedes acceder a todos los documentos clave del proyecto:
 - 🗄️ [**Esquema de la Base de Datos**](./docs/EsquemaBBDD.md): Arquitectura, tablas y relaciones de la base de datos del sistema.
 - 🎯 [**Informe de Objetivos y Fases**](./docs/Informe_Objetivos_Fases.md): Detalle de las fases de desarrollo del proyecto, hitos alcanzados (como v1.0-alpha) y próximos pasos (carrito de compras).
 - 🤖 [**Ecosistema de Agentes de IA**](./docs/Documentacion_Ecosistema_Agentes.md): Guía sobre la infraestructura de agentes (`.agents/`), reglas y herramientas automatizadas (Antigravity).
+- 🚀 [**Manual del Desarrollador — CI/CD**](./docs/Manual_Desarrollador_CICD.md): Guía completa de entornos de desarrollo, Docker, Dev Containers, testing y pipeline de CI/CD.
 
 ---
 *Para información específica del framework Laravel, puedes consultar el [README interno de Reposa+](./Reposa+/README.md).*
