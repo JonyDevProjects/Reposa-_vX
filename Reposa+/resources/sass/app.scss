@@ -1,16 +1,13 @@
-// Custom Variables
-$primary: #182447;
-$secondary: #758ef9;
-$info: #42569a;
-$light: #b1cdff;
+// Reposa+ Design System Tokens
+@import "tokens";
 
 // Import Bootstrap
 @import "bootstrap/scss/bootstrap";
 
 // Custom styles for Reposa+
 body {
-    background-color: #f8fafc;
-    color: #182447;
+    background-color: var(--color-canvas);
+    color: var(--color-text-primary);
     font-family: 'Inter', sans-serif;
 }
 

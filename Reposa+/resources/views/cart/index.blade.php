@@ -86,22 +86,22 @@
                         <span class="text-success fw-bold">{{ __('messages.cart.free') }}</span>
                     </div>
                     <hr>
-                    <div class="d-flex justify-content-between mb-4">
-                        <span class="h5 fw-bold">{{ __('messages.cart.total') }}</span>
-                        <span class="h4 fw-bold text-primary">{{ number_format($total, 2) }}€</span>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="h5 fw-bold mb-0">{{ __('messages.cart.total') }}</span>
+                        <x-price :amount="$total" size="lg" />
                     </div>
 
                     @if(!$cartItems->isEmpty())
                         @guest
-                        <a href="{{ route('cart.login') }}" class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow-sm text-decoration-none">
-                            {{ __('messages.cart.checkout') }} <i class="bi bi-chevron-right ms-2"></i>
-                        </a>
+                        <x-button href="{{ route('cart.login') }}" size="lg" :pill="true" class="w-100 shadow-sm text-decoration-none" icon="bi-chevron-right" iconPosition="right">
+                            {{ __('messages.cart.checkout') }}
+                        </x-button>
                         @endguest
 
                         @auth
-                        <a href="{{ route('stripe.checkout') }}" class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow-sm text-decoration-none">
-                            <i class="bi bi-credit-card me-2"></i>{{ __('messages.cart.pay') }}
-                        </a>
+                        <x-button href="{{ route('stripe.checkout') }}" size="lg" :pill="true" class="w-100 shadow-sm text-decoration-none" icon="bi-credit-card">
+                            {{ __('messages.cart.pay') }}
+                        </x-button>
                         @endauth
                     @endif
                     

@@ -173,61 +173,7 @@
                     <div class="row g-4">
                         @foreach($products as $product)
                             <div class="col-md-4">
-                                <div class="card card-product h-100 shadow-sm border-0">
-                                    <a href="{{ route('products.show', $product) }}" class="text-decoration-none text-dark">
-                                        <img src="{{ $product->image_url ?? 'https://placehold.co/400x300/182447/ffffff?text=' . urlencode($product->name) }}" class="card-img-top" alt="{{ $product->name }}">
-                                    </a>
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <span class="badge bg-light text-primary border">{{ $product->material }}</span>
-                                            <span class="text-muted small"><i class="bi bi-star-fill text-warning"></i> 4.8</span>
-                                        </div>
-                                        <h5 class="card-title fw-bold mb-1">
-                                            <a href="{{ route('products.show', $product) }}" class="text-decoration-none text-dark">
-                                                @if(request('q'))
-                                                    {!! str_ireplace(request('q'), '<mark>' . e(request('q')) . '</mark>', e($product->name)) !!}
-                                                @else
-                                                    {{ $product->name }}
-                                                @endif
-                                            </a>
-                                        </h5>
-                                        <p class="card-text text-muted small mb-3">
-                                            @if(request('q'))
-                                                {!! str_ireplace(request('q'), '<mark>' . e(request('q')) . '</mark>', e(Str::limit($product->description, 60))) !!}
-                                            @else
-                                                {{ Str::limit($product->description, 60) }}
-                                            @endif
-                                        </p>
-                                        @if($product->stock > 0 && $product->stock <= 5)
-                                            <small class="text-warning fw-semibold"><i class="bi bi-box-seam me-1"></i>{{ __('messages.catalog.low_stock', ['count' => $product->stock]) }}</small>
-                                        @endif
-                                        <div class="d-flex justify-content-between align-items-center gap-2 mt-2">
-                                            <span class="fs-4 fw-bold text-primary">{{ number_format($product->price, 2) }}€</span>
-                                            <div class="d-flex gap-2">
-                                                @if($product->stock > 0)
-                                                    <form action="{{ route('cart.add', $product) }}" method="POST" class="m-0">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-outline-primary btn-sm rounded-circle"><i class="bi bi-cart-plus"></i></button>
-                                                    </form>
-                                                @else
-                                                    <button class="btn btn-secondary btn-sm rounded-circle" disabled><i class="bi bi-cart-x"></i></button>
-                                                @endif
-                                                @auth
-                                                    <form action="{{ route('favorites.toggle', $product) }}" method="POST" class="m-0">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-sm rounded-circle {{ in_array($product->id, $favoriteIds) ? 'btn-danger text-white' : 'btn-outline-danger' }}" title="{{ in_array($product->id, $favoriteIds) ? __('messages.catalog.remove_favorite') : __('messages.catalog.add_favorite') }}">
-                                                            <i class="bi {{ in_array($product->id, $favoriteIds) ? 'bi-heart-fill' : 'bi-heart' }}"></i>
-                                                        </button>
-                                                    </form>
-                                                @else
-                                                    <a href="{{ route('login') }}" class="btn btn-sm btn-outline-danger rounded-circle" title="{{ __('messages.catalog.login_favorite') }}">
-                                                        <i class="bi bi-heart"></i>
-                                                    </a>
-                                                @endauth
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <x-product-card :product="$product" :favoriteIds="$favoriteIds" :searchQuery="request('q')" />
                             </div>
                         @endforeach
                     </div>

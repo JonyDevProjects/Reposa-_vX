@@ -1,0 +1,88 @@
+// =============================================================================
+// Reposa+ Design System Tokens (The Midnight Sanctuary)
+// Derived from DESIGN.md and normative token schema
+// =============================================================================
+
+// --- Color Primitives ---
+$color-deep-sanctuary-navy: #182447;
+$color-twilight-indigo:      #42569a;
+$color-dream-periwinkle:     #758ef9;
+$color-celestial-mist:       #b1cdff;
+$color-slate-mist:           #f8fafc;
+$color-pure-linen:           #ffffff;
+$color-restored-green:       #198754;
+$color-amber-caution:        #ffc107;
+$color-exhausted-red:        #dc3545;
+$color-muted-grey:           #6c757d;
+
+// --- Bootstrap Palette Mapping ---
+$primary:   $color-deep-sanctuary-navy;
+$secondary: $color-dream-periwinkle;
+$info:      $color-twilight-indigo;
+$light:     $color-celestial-mist;
+$success:   $color-restored-green;
+$warning:   $color-amber-caution;
+$danger:    $color-exhausted-red;
+
+// --- Radius Tokens ---
+$radius-xs:   2px;
+$radius-sm:   4px;
+$radius-md:   8px;
+$radius-card: 15px;
+$radius-xl:   24px;
+$radius-pill: 50rem;
+
+// --- Shadows & Elevation ---
+$shadow-ambient:        0 1px 3px rgba(0, 0, 0, 0.08);
+$shadow-card:           0 2px 8px rgba(24, 36, 71, 0.06);
+$shadow-lifted:         0 10px 20px rgba(24, 36, 71, 0.10);
+$shadow-floating-badge: 0 4px 12px rgba(24, 36, 71, 0.15);
+
+// --- Motion & Transitions ---
+$ease-gentle:      cubic-bezier(0.4, 0, 0.2, 1);
+$transition-fast:  all 0.15s $ease-gentle;
+$transition-base:  all 0.25s $ease-gentle;
+$transition-lift:  transform 0.3s $ease-gentle, box-shadow 0.3s $ease-gentle;
+
+// --- CSS Custom Properties (:root) ---
+:root {
+    // Brand Colors
+    --color-primary: #{$color-deep-sanctuary-navy};
+    --color-primary-navy: #{$color-deep-sanctuary-navy};
+    --color-secondary: #{$color-dream-periwinkle};
+    --color-twilight: #{$color-twilight-indigo};
+    --color-light-tint: #{$color-celestial-mist};
+    
+    // Canvas & Surface
+    --color-canvas: #{$color-slate-mist};
+    --color-surface: #{$color-pure-linen};
+    --color-text-primary: #{$color-deep-sanctuary-navy};
+    --color-text-muted: #{$color-muted-grey};
+    
+    // Status Colors
+    --color-success: #{$color-restored-green};
+    --color-warning: #{$color-amber-caution};
+    --color-danger: #{$color-exhausted-red};
+
+    // Radius Tokens
+    --radius-xs: #{$radius-xs};
+    --radius-sm: #{$radius-sm};
+    --radius-md: #{$radius-md};
+    --radius-card: #{$radius-card};
+    --radius-xl: #{$radius-xl};
+    --radius-pill: #{$radius-pill};
+
+    // Shadows
+    --shadow-soft: #{$shadow-ambient};
+    --shadow-card: #{$shadow-card};
+    --shadow-lifted: #{$shadow-lifted};
+    --shadow-floating: #{$shadow-floating-badge};
+
+    // Transitions
+    --transition-lift: #{$transition-lift};
+    --transition-base: #{$transition-base};
+
+    // Focus ring
+    --focus-ring: 0 0 0 0.25rem rgba(117, 142, 249, 0.25);
+    --focus-outline: 2px solid #{$color-dream-periwinkle};
+}
