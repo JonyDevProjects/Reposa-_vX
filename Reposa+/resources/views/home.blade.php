@@ -6,8 +6,8 @@
     <!-- Hero Section -->
     <section class="hero-section text-center position-relative overflow-hidden">
         <div class="container position-relative z-1">
-            <h1 class="display-3 fw-bold mb-3">{{ __('messages.home.hero.title') }}</h1>
-            <p class="lead mb-5 opacity-75">{{ __('messages.home.hero.subtitle') }}</p>
+            <h1 class="display-3 fw-bold mb-3 text-white">{{ __('messages.home.hero.title') }}</h1>
+            <p class="lead mb-5 text-white opacity-90">{{ __('messages.home.hero.subtitle') }}</p>
             <div class="d-flex justify-content-center gap-3">
                 <a href="/catalog" class="btn btn-secondary btn-lg px-5">{{ __('messages.home.hero.btn_catalog') }}</a>
                 <a href="#featured" class="btn btn-outline-light btn-lg px-5">{{ __('messages.home.hero.btn_featured') }}</a>

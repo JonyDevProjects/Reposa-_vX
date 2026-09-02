@@ -26,12 +26,27 @@ body {
 // --- Headings & Display Hierarchy ---
 h1, h2, h3, h4, h5, h6,
 .display-1, .display-2, .display-3, .display-4, .display-5, .display-6,
-.h1, .h2, .h3, .h4, .h5, .h6,
-.navbar-brand {
+.h1, .h2, .h3, .h4, .h5, .h6 {
     font-family: var(--font-display);
-    color: var(--color-text-primary);
     letter-spacing: -0.02em;
     font-weight: 700;
+    color: inherit;
+}
+
+.navbar-brand {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    font-weight: 700;
+    color: #ffffff !important;
+
+    i {
+        color: #ffffff !important;
+    }
+
+    &:hover,
+    &:focus {
+        color: rgba(255, 255, 255, 0.9) !important;
+    }
 }
 
 // Display Hero Scale

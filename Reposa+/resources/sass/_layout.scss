@@ -140,8 +140,14 @@ body {
     background-image: linear-gradient(rgba(24, 36, 71, 0.85), rgba(24, 36, 71, 0.85)), url('/images/hero.png');
     background-size: cover;
     background-position: center;
-    color: #ffffff;
+    color: #ffffff !important;
     padding: var(--space-8) 0;
+
+    h1, h2, h3, h4, h5, h6,
+    .display-1, .display-2, .display-3, .display-hero,
+    .lead, p {
+        color: #ffffff !important;
+    }
 
     @media (min-width: 992px) {
         padding: var(--space-9) 0;

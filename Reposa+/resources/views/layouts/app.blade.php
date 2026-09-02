@@ -20,8 +20,8 @@
     </a>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="/">
-                <i class="bi bi-moon-stars-fill me-2"></i>Reposa+
+            <a class="navbar-brand fw-bold text-white d-inline-flex align-items-center" href="/">
+                <i class="bi bi-moon-stars-fill me-2 text-white"></i>Reposa+
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Abrir navegación">
                 <span class="navbar-toggler-icon"></span>
