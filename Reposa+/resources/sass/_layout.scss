@@ -187,50 +187,50 @@ body {
     }
 }
 
-// Hover & Focus States (Maximum Contrast 14.8:1)
-.category-card-link:focus-visible {
-    outline: var(--focus-outline);
-    outline-offset: 4px;
-    border-radius: var(--radius-card);
-}
+// Hover & Focus States (Luminous Elevation & Serene Indigo Accent - NEVER disappears into dark void!)
+.category-card-link {
+    display: block;
+    height: 100%;
+    text-decoration: none;
 
-.category-card-link:hover .category-card,
-.category-card-link:focus-visible .category-card,
-.category-card:hover {
-    transform: translateY(-6px);
-    background-color: var(--color-midnight-sanctuary) !important;
-    border-color: var(--color-midnight-sanctuary) !important;
-    box-shadow: 0 16px 32px -4px rgba(24, 36, 71, 0.25), 0 4px 12px rgba(24, 36, 71, 0.1) !important;
+    &:focus-visible {
+        outline: 2px solid var(--color-serene-indigo);
+        outline-offset: 4px;
+        border-radius: var(--radius-card);
+    }
 
-    .category-icon-wrapper {
-        background-color: rgba(255, 255, 255, 0.15) !important;
-        color: #ffffff !important;
-        transform: scale(1.08);
+    &:hover .category-card,
+    &:focus-visible .category-card {
+        transform: translateY(-8px);
+        background-color: #ffffff !important;
+        border-color: var(--color-serene-indigo) !important;
+        box-shadow: 0 20px 36px -8px rgba(79, 70, 229, 0.22), 0 8px 16px -4px rgba(24, 36, 71, 0.08) !important;
 
-        i {
-            color: #ffffff !important;
+        .category-icon-wrapper {
+            background-color: var(--color-serene-indigo) !important;
+            box-shadow: 0 8px 16px rgba(79, 70, 229, 0.35);
+            transform: scale(1.1);
+
+            i {
+                color: #ffffff !important;
+                transform: scale(1.05);
+            }
+        }
+
+        .category-title,
+        h3, h5 {
+            color: var(--color-serene-indigo) !important;
         }
     }
-
-    .category-title,
-    h3, h5 {
-        color: #ffffff !important;
-    }
 }
 
-// Backward-compatibility for hover-lift
+// Backward-compatibility for hover-lift (Elevation only, no color blackout)
 .hover-lift {
     transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-                box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-                background-color 0.25s ease;
+                box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 
     &:hover {
         transform: translateY(-6px);
-        background-color: var(--color-midnight-sanctuary) !important;
         box-shadow: var(--shadow-hover);
-
-        h3, h5, i, p, span {
-            color: #ffffff !important;
-        }
     }
 }
