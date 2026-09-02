@@ -154,7 +154,46 @@ body {
     }
 }
 
-// --- Category Cards & Micro-Interactions ---
+// Hero CTAs (Calm, Elegant, Balanced Contrast)
+.btn-hero-primary {
+    background-color: #ffffff !important;
+    color: var(--color-midnight-sanctuary) !important;
+    border: 1px solid #ffffff !important;
+    font-weight: 700;
+    font-family: var(--font-display);
+    border-radius: var(--radius-sm, 8px);
+    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+
+    &:hover,
+    &:focus {
+        background-color: #f8fafc !important;
+        color: var(--color-midnight-sanctuary) !important;
+        border-color: #f8fafc !important;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    }
+}
+
+.btn-hero-secondary {
+    background-color: transparent !important;
+    color: #ffffff !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.65) !important;
+    font-weight: 600;
+    font-family: var(--font-display);
+    border-radius: var(--radius-sm, 8px);
+    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+
+    &:hover,
+    &:focus {
+        background-color: rgba(255, 255, 255, 0.12) !important;
+        color: #ffffff !important;
+        border-color: #ffffff !important;
+        transform: translateY(-2px);
+    }
+}
+
+// --- Category Cards & Micro-Interactions (Refined, Subtle, Tactile) ---
 .category-card {
     background-color: var(--color-surface);
     border: 1px solid var(--color-border-subtle);
@@ -165,29 +204,31 @@ body {
                 border-color 0.25s ease;
 
     .category-icon-wrapper {
-        width: 64px;
-        height: 64px;
+        width: 60px;
+        height: 60px;
         display: flex;
         align-items: center;
         justify-content: center;
         border-radius: 50%;
-        background-color: var(--color-periwinkle-subtle);
-        color: var(--color-serene-indigo);
+        background-color: #f1f5f9;
+        color: #334155;
         transition: background-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
 
         i {
             color: inherit;
             line-height: 1;
+            font-size: 1.5rem;
         }
     }
 
     .category-title {
         color: var(--color-text-primary);
+        font-weight: 600;
         transition: color 0.25s ease;
     }
 }
 
-// Hover & Focus States (Luminous Elevation & Serene Indigo Accent - NEVER disappears into dark void!)
+// Hover & Focus States: Subtle, calm elevation without visual noise
 .category-card-link {
     display: block;
     height: 100%;
@@ -201,36 +242,35 @@ body {
 
     &:hover .category-card,
     &:focus-visible .category-card {
-        transform: translateY(-8px);
+        transform: translateY(-4px);
         background-color: #ffffff !important;
-        border-color: var(--color-serene-indigo) !important;
-        box-shadow: 0 20px 36px -8px rgba(79, 70, 229, 0.22), 0 8px 16px -4px rgba(24, 36, 71, 0.08) !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 12px 24px -4px rgba(24, 36, 71, 0.08), 0 4px 8px -2px rgba(24, 36, 71, 0.04) !important;
 
         .category-icon-wrapper {
-            background-color: var(--color-serene-indigo) !important;
-            box-shadow: 0 8px 16px rgba(79, 70, 229, 0.35);
-            transform: scale(1.1);
+            background-color: var(--color-periwinkle-subtle) !important;
+            color: var(--color-serene-indigo) !important;
+            transform: scale(1.06);
 
             i {
-                color: #ffffff !important;
-                transform: scale(1.05);
+                color: var(--color-serene-indigo) !important;
             }
         }
 
         .category-title,
         h3, h5 {
-            color: var(--color-serene-indigo) !important;
+            color: var(--color-text-primary) !important;
         }
     }
 }
 
-// Backward-compatibility for hover-lift (Elevation only, no color blackout)
+// Backward-compatibility for hover-lift (Elevation only, natural shadow)
 .hover-lift {
     transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
                 box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 
     &:hover {
-        transform: translateY(-6px);
-        box-shadow: var(--shadow-hover);
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px -4px rgba(24, 36, 71, 0.08);
     }
 }
