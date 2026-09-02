@@ -26,12 +26,12 @@
             <div class="row g-4 justify-content-center">
                 @foreach($categories as $category)
                     <div class="col-6 col-md-3">
-                        <a href="/catalog?category={{ $category->slug }}" class="text-decoration-none">
-                            <div class="card h-100 border-0 shadow-sm text-center p-4 hover-lift">
-                                <div class="mb-3 text-primary">
-                                    <i class="bi bi-moon-stars fs-1"></i>
+                        <a href="/catalog?category={{ $category->slug }}" class="text-decoration-none category-card-link d-block h-100">
+                            <div class="card category-card h-100 shadow-sm text-center p-4">
+                                <div class="category-icon-wrapper mb-3 mx-auto">
+                                    <i class="bi bi-moon-stars fs-2"></i>
                                 </div>
-                                <h3 class="h5 fw-bold text-dark mb-0">{{ $category->name }}</h3>
+                                <h3 class="h5 fw-bold mb-0 category-title">{{ $category->name }}</h3>
                             </div>
                         </a>
                     </div>
