@@ -46,7 +46,7 @@
         <div class="row g-4">
             <!-- Sidebar / Filters -->
             <div class="col-md-3">
-                <div class="card border-0 shadow-sm p-4 sticky-top" style="top: 100px;">
+                <div class="filter-card sticky-sidebar">
                     <form action="/catalog" method="GET" id="filter-form">
                         {{-- Preserve current search and sort --}}
                         @if(request('q'))<input type="hidden" name="q" value="{{ request('q') }}">@endif
@@ -55,16 +55,16 @@
                         <h2 class="h5 fw-bold mb-4"><i class="bi bi-funnel me-2"></i>{{ __('messages.catalog.filters') }}</h2>
 
                         {{-- Search --}}
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold small text-muted">{{ __('messages.catalog.search') }}</label>
+                        <div class="filter-group mb-4">
+                            <label for="catalog-search-input" class="form-label fw-semibold small text-muted">{{ __('messages.catalog.search') }}</label>
                             <div class="input-group input-group-sm">
                                 <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
-                                <input type="text" name="q" class="form-control border-start-0 bg-light" placeholder="{{ __('messages.catalog.search_placeholder') }}" value="{{ request('q') }}">
+                                <input type="text" name="q" id="catalog-search-input" class="form-control border-start-0 bg-light" placeholder="{{ __('messages.catalog.search_placeholder') }}" value="{{ request('q') }}">
                             </div>
                         </div>
 
                         {{-- Categories --}}
-                        <div class="mb-4">
+                        <div class="filter-group mb-4">
                             <label class="form-label fw-semibold small text-muted">{{ __('messages.catalog.category') }}</label>
                             <div class="list-group list-group-flush">
                                 <a href="/catalog?{{ http_build_query(request()->except('category', 'page')) }}" class="list-group-item list-group-item-action border-0 px-0 {{ !request('category') ? 'text-primary fw-bold' : '' }}">
@@ -82,9 +82,9 @@
                         <hr>
 
                         {{-- Material --}}
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold small text-muted">{{ __('messages.catalog.material') }}</label>
-                            <select name="material" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <div class="filter-group mb-4">
+                            <label for="catalog-material-select" class="form-label fw-semibold small text-muted">{{ __('messages.catalog.material') }}</label>
+                            <select name="material" id="catalog-material-select" class="form-select form-select-sm">
                                 <option value="">{{ __('messages.catalog.all') }}</option>
                                 @foreach($materials as $material)
                                     <option value="{{ $material }}" {{ request('material') == $material ? 'selected' : '' }}>{{ $material }}</option>
@@ -93,9 +93,9 @@
                         </div>
 
                         {{-- Firmness --}}
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold small text-muted">{{ __('messages.catalog.firmness') }}</label>
-                            <select name="firmness" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <div class="filter-group mb-4">
+                            <label for="catalog-firmness-select" class="form-label fw-semibold small text-muted">{{ __('messages.catalog.firmness') }}</label>
+                            <select name="firmness" id="catalog-firmness-select" class="form-select form-select-sm">
                                 <option value="">{{ __('messages.catalog.all_firmness') }}</option>
                                 @foreach($firmnesses as $firmness)
                                     <option value="{{ $firmness }}" {{ request('firmness') == $firmness ? 'selected' : '' }}>{{ $firmness }}</option>
@@ -104,18 +104,25 @@
                         </div>
 
                         {{-- Price Range --}}
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold small text-muted">{{ __('messages.catalog.price_range') }}</label>
-                            <div class="d-flex gap-2 align-items-center">
-                                <input type="number" name="min_price" class="form-control form-control-sm" placeholder="Mín" value="{{ request('min_price') }}" min="0" step="0.01" style="width: 80px;">
-                                <span class="text-muted">—</span>
-                                <input type="number" name="max_price" class="form-control form-control-sm" placeholder="Máx" value="{{ request('max_price') }}" min="0" step="0.01" style="width: 80px;">
+                        <div class="filter-group mb-4">
+                            <label id="catalog-price-label" class="form-label fw-semibold small text-muted">{{ __('messages.catalog.price_range') }}</label>
+                            <div class="d-flex gap-2 align-items-center" aria-labelledby="catalog-price-label">
+                                <input type="number" name="min_price" id="catalog-min-price" aria-label="Precio mínimo" class="form-control form-control-sm tabular-nums" placeholder="Mín" value="{{ request('min_price') }}" min="0" step="0.01" style="width: 80px;">
+                                <span class="text-muted" aria-hidden="true">—</span>
+                                <input type="number" name="max_price" id="catalog-max-price" aria-label="Precio máximo" class="form-control form-control-sm tabular-nums" placeholder="Máx" value="{{ request('max_price') }}" min="0" step="0.01" style="width: 80px;">
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100 btn-sm">
-                            <i class="bi bi-funnel me-1"></i>{{ __('messages.catalog.apply_filters') }}
-                        </button>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-sm fw-semibold">
+                                <i class="bi bi-funnel me-1"></i>{{ __('messages.catalog.apply_filters') }}
+                            </button>
+                            @if(request('q') || request('category') || request('material') || request('firmness') || request('min_price') || request('max_price'))
+                                <a href="/catalog" class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-x-circle me-1"></i>{{ __('messages.catalog.clear_filters') }}
+                                </a>
+                            @endif
+                        </div>
                     </form>
                 </div>
             </div>
@@ -128,32 +135,32 @@
                         @if(request('q'))
                             <span class="badge bg-primary">
                                 {{ __('messages.catalog.results_search') }} «{{ request('q') }}»
-                                <a href="{{ request()->fullUrlWithQuery(['q' => null, 'page' => null]) }}" class="text-white ms-1 text-decoration-none">&times;</a>
+                                <a href="{{ request()->fullUrlWithQuery(['q' => null, 'page' => null]) }}" class="text-white ms-1 text-decoration-none" aria-label="Eliminar filtro de búsqueda">&times;</a>
                             </span>
                         @endif
                         @if(request('category'))
                             @php $cat = $categories->firstWhere('slug', request('category')); @endphp
                             <span class="badge bg-primary">
                                 {{ __('messages.catalog.results_category') }} {{ $cat?->name ?? request('category') }}
-                                <a href="{{ request()->fullUrlWithQuery(['category' => null, 'page' => null]) }}" class="text-white ms-1 text-decoration-none">&times;</a>
+                                <a href="{{ request()->fullUrlWithQuery(['category' => null, 'page' => null]) }}" class="text-white ms-1 text-decoration-none" aria-label="Eliminar filtro de categoría">&times;</a>
                             </span>
                         @endif
                         @if(request('material'))
                             <span class="badge bg-primary">
                                 {{ __('messages.catalog.results_material') }} {{ request('material') }}
-                                <a href="{{ request()->fullUrlWithQuery(['material' => null, 'page' => null]) }}" class="text-white ms-1 text-decoration-none">&times;</a>
+                                <a href="{{ request()->fullUrlWithQuery(['material' => null, 'page' => null]) }}" class="text-white ms-1 text-decoration-none" aria-label="Eliminar filtro de material">&times;</a>
                             </span>
                         @endif
                         @if(request('firmness'))
                             <span class="badge bg-primary">
                                 {{ __('messages.catalog.results_firmness') }} {{ request('firmness') }}
-                                <a href="{{ request()->fullUrlWithQuery(['firmness' => null, 'page' => null]) }}" class="text-white ms-1 text-decoration-none">&times;</a>
+                                <a href="{{ request()->fullUrlWithQuery(['firmness' => null, 'page' => null]) }}" class="text-white ms-1 text-decoration-none" aria-label="Eliminar filtro de firmeza">&times;</a>
                             </span>
                         @endif
                         @if(request('min_price') || request('max_price'))
                             <span class="badge bg-primary">
                                 {{ __('messages.catalog.results_price') }} {{ request('min_price', '0') }}€ — {{ request('max_price', '∞') }}€
-                                <a href="{{ request()->fullUrlWithQuery(['min_price' => null, 'max_price' => null, 'page' => null]) }}" class="text-white ms-1 text-decoration-none">&times;</a>
+                                <a href="{{ request()->fullUrlWithQuery(['min_price' => null, 'max_price' => null, 'page' => null]) }}" class="text-white ms-1 text-decoration-none" aria-label="Eliminar filtro de precio">&times;</a>
                             </span>
                         @endif
                     </div>

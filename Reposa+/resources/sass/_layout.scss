@@ -1,0 +1,164 @@
+// =============================================================================
+// Reposa+ Spatial Rhythm & Layout System (8px Grid Hierarchy)
+// Phase 3: Layout - Decoupled Containers & Harmonious Spacing
+// =============================================================================
+
+// --- Base Body & App Shell ---
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-canvas);
+    color: var(--color-text-primary);
+}
+
+.main-content {
+    flex: 1 0 auto;
+    width: 100%;
+}
+
+// --- Skip Navigation Link (A11y Floor) ---
+.skip-link {
+    position: absolute;
+    top: -100px;
+    left: var(--space-4);
+    z-index: 1050;
+    transition: top 0.2s ease;
+
+    &:focus,
+    &:focus-visible {
+        top: var(--space-4);
+        outline: var(--focus-outline);
+        outline-offset: 2px;
+    }
+}
+
+// --- Section Rhythm & Vertical Cadence (8px Scale) ---
+.section-spacing {
+    padding-top: var(--space-7);    // 48px
+    padding-bottom: var(--space-7); // 48px
+
+    @media (min-width: 992px) {
+        padding-top: var(--space-8);    // 64px
+        padding-bottom: var(--space-8); // 64px
+    }
+}
+
+.section-spacing-compact {
+    padding-top: var(--space-5);    // 24px
+    padding-bottom: var(--space-5); // 24px
+
+    @media (min-width: 992px) {
+        padding-top: var(--space-6);    // 32px
+        padding-bottom: var(--space-6); // 32px
+    }
+}
+
+// --- Containers & Fluid Scaffolding ---
+.container-tight {
+    width: 100%;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+}
+
+.container-standard {
+    width: 100%;
+    max-width: 1140px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+}
+
+// --- Sticky Sidebar Architecture ---
+.sticky-sidebar {
+    position: sticky;
+    top: 96px;
+    z-index: 10;
+}
+
+// --- Filter Sidebar Styling (Catalog) ---
+.filter-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-card);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-card);
+}
+
+.filter-group {
+    margin-bottom: var(--space-5);
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 0.8125rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--color-text-muted);
+        margin-bottom: var(--space-2);
+        display: block;
+    }
+}
+
+// --- Product Grid (Card Layout) ---
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--space-5);
+
+    @media (min-width: 1200px) {
+        gap: var(--space-6);
+    }
+}
+
+// --- Asymmetric Product Detail Grid (60/40) ---
+.product-gallery-block {
+    @media (min-width: 992px) {
+        position: sticky;
+        top: 96px;
+    }
+}
+
+// --- Cart Summary Layout ---
+.cart-summary-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-card);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-card);
+}
+
+// --- Hero Section Layout (Full-Bleed Fluid Header) ---
+.hero-section {
+    background-image: linear-gradient(rgba(24, 36, 71, 0.85), rgba(24, 36, 71, 0.85)), url('/images/hero.png');
+    background-size: cover;
+    background-position: center;
+    color: #ffffff;
+    padding: var(--space-8) 0;
+
+    @media (min-width: 992px) {
+        padding: var(--space-9) 0;
+    }
+}
+
+// --- Micro-Interactions (Hover Lift) ---
+.hover-lift {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease;
+
+    &:hover {
+        transform: translateY(-8px);
+        background-color: var(--color-midnight-sanctuary) !important;
+        box-shadow: var(--shadow-hover);
+
+        h3, h5, i {
+            color: #ffffff !important;
+        }
+    }
+}

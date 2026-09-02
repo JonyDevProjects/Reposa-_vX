@@ -7,17 +7,8 @@
 // Reposa+ Typography System
 @import "typography";
 
-// Custom styles for Reposa+
-body {
-    background-color: var(--color-canvas);
-    color: var(--color-text-primary);
-}
-
-.hero-section {
-    background: linear-gradient(135deg, #182447 0%, #42569a 100%);
-    color: white;
-    padding: 100px 0;
-}
+// Reposa+ Spatial Rhythm & Layout
+@import "layout";
 
 .card-product {
     border: none;
