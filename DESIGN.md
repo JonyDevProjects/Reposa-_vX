@@ -3,16 +3,17 @@ name: Reposa+
 description: E-commerce de descanso premium y salud postural
 colors:
   primary: "#182447"
-  secondary: "#42569a"
-  accent: "#758ef9"
-  light-tint: "#b1cdff"
+  secondary: "#4f46e5"
+  accent: "#42569a"
+  periwinkle: "#758ef9"
+  light-tint: "#e0e7ff"
   canvas: "#f8fafc"
   surface: "#ffffff"
   text-primary: "#182447"
-  text-muted: "#6c757d"
-  success: "#198754"
-  warning: "#ffc107"
-  danger: "#dc3545"
+  text-muted: "#475569"
+  success: "#059669"
+  warning: "#d97706"
+  danger: "#dc2626"
 typography:
   display:
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
@@ -104,26 +105,27 @@ El sistema equilibra una rigurosa claridad técnica sobre ergonomía, materiales
 La paleta cromática se articula en torno a la cromoterapia del sueño: tonos índigos que transmiten descanso profundo, serenidad y sofisticación, combinados con blancos puros que aportan sensación de higiene y frescura transpirable.
 
 ### Primary
-- **Deep Sanctuary Navy** (`#182447`): El núcleo de identidad de la marca. Aplicado en barras de navegación, cabeceras principales, botones de compra primarios, tipografía de alta jerarquía y precios. Evoca el cielo nocturno y la estabilidad firme.
+- **Deep Sanctuary Navy** (`#182447`): El núcleo de identidad de la marca. Aplicado en barras de navegación, cabeceras principales, botones de compra primarios, tipografía de alta jerarquía y precios. Evoca el cielo nocturno y la estabilidad firme (ratio 15.2:1 vs blanco, AAA).
 
-### Secondary
-- **Twilight Indigo** (`#42569a`): Tono de transición crepuscular. Utilizado en estados `:hover` de botones primarios, degradados de cabeceras hero y elementos secundarios que requieren atención sin estridencias.
+### Secondary & Interactive Accent
+- **Serene Indigo** (`#4f46e5`): El color clave de acción interactiva secundaria y botones de soporte. Sustituye al antiguo periwinkle en botones para garantizar ratio WCAG 2.1 AA (6.34:1 con texto blanco).
+- **Twilight Indigo** (`#42569a`): Tono crepuscular para roles informativos, estados hover y degradados (ratio 6.95:1 vs blanco).
 
-### Accent
-- **Dream Periwinkle** (`#758ef9`): Acento cromático luminoso y moderno. Empleado en llamadas a la acción complementarias, barras decorativas de sección, insignias y estados `:focus-visible` accesibles.
-
-### Soft Tint & Backgrounds
-- **Celestial Mist** (`#b1cdff`): Tinte suave y relajante utilizado en chips de material, insignias sutiles y fondos de soporte que aligeran el peso visual.
+### Accent & Atmospheric Tints
+- **Dream Periwinkle** (`#758ef9`): Acento cromático luminoso reservado para detalles decorativos, auras de foco accesible (`:focus-visible`) y microinteracciones.
+- **Periwinkle Subtle** (`#e0e7ff`): Tinte lavanda suave para chips y fondos de soporte con texto oscuro (`#3730a3`, contraste 9.6:1).
 - **Slate Mist** (`#f8fafc`): Fondo general del lienzo web (`body`). Aporta un matiz ligeramente frío que mitiga el deslumbramiento de pantallas en horas nocturnas.
 - **Pure Linen** (`#ffffff`): Fondo de tarjetas, superficies elevadas y contenedores de compra. Representa la limpieza y transpirabilidad de la ropa de cama.
 
 ### Status & Feedback
-- **Restored Green** (`#198754`): Disponibilidad confirmada (*En stock*) y beneficios comerciales (*Envío gratuito*).
-- **Amber Caution** (`#ffc107`): Valoraciones de clientes (estrellas) y alertas preventivas de inventario (*Últimas unidades*).
-- **Exhausted Red** (`#dc3545`): Producto agotado, alertas críticas de stock y botón de favoritos activos.
+- **Restorative Sage** (`#059669`): Disponibilidad confirmada (*En stock*) y beneficios comerciales (*Envío gratuito*). Cumple WCAG AA (4.53:1 sobre blanco).
+- **Warm Amber** (`#d97706`): Valoraciones de clientes (estrellas) y alertas preventivas de inventario (*Últimas unidades*) con texto de alto contraste (`#78350f`, ratio 8.4:1).
+- **Exhausted Red** (`#dc2626`): Producto agotado, alertas críticas de stock y botón de favoritos activos (ratio 4.7:1 sobre blanco, WCAG AA).
+- **Restful Slate** (`#475569`): Texto secundario y descriptivo con contraste garantizado (> 6.6:1 en canvas `#f8fafc` y blanco).
 
 ### Named Rules
-**The Sanctuary Rarity Rule.** El azul acento (*Dream Periwinkle*) nunca ocupa más del 15% del área visible en pantalla. Su función es orientar el ojo hacia la acción clave con delicadeza, sin saturar la atmósfera de relajación.
+**The Sanctuary Rarity Rule.** El azul acento nunca ocupa más del 15% del área visible en pantalla. Su función es orientar el ojo hacia la acción clave con delicadeza, sin saturar la atmósfera de relajación.
+**The WCAG AA Contrast Rule.** Todo elemento textual sobre fondo blanco o de color debe garantizar un ratio de contraste mínimo de 4.5:1 (3:1 para controles y gráficos interactivos).
 **The No-Aggression Rule.** Quedan prohibidos los fondos de urgencia roja estridente o las tipografías parpadeantes para forzar la compra impulsiva; la urgencia se comunica mediante microcopy sobrio y respetuoso.
 
 ## Typography

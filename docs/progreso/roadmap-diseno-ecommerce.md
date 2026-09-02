@@ -47,7 +47,7 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 |---|---|---|:---:|
 | **1** | Fundamentos, Autoridad Visual y Componentes Base | `init`, `document`, `extract` | ✅ Completada |
 | **2** | Evaluación Heurística, Accesibilidad y Diagnóstico | `critique`, `audit` | ✅ Completada |
-| **3** | Identidad Cromática, Tipografía y Armonía Espacial | `typeset`, `colorize`, `layout` | ⏳ Pendiente |
+| **3** | Identidad Cromática, Tipografía y Armonía Espacial | `typeset`, `colorize`, `layout` | ✅ Completada |
 | **4** | Experiencia Persuasiva y Emocional del Storefront | `shape`, `bolder`, `animate`, `delight` | ⏳ Pendiente |
 | **5** | Claridad Transaccional, Estados Vacíos y Resiliencia | `clarify`, `harden`, `onboard`, `distill` | ⏳ Pendiente |
 | **6** | Densidad Operativa (Admin, Facturas) y Feature Estrella | `quieter`, `overdrive` | ⏳ Pendiente |
@@ -171,6 +171,13 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 **Criterios de Aceptación:**
 - Cero saltos visuales en el ancho del contenedor entre páginas.
 - Tipografía y paleta coherentes en todo el recorrido de compra.
+
+**Resultados Entregados y Defectos Subsanados:**
+- **DEF-01 (Contraste WCAG 2.1 AA):** Resuelto. Sustituido el acento secundario deficiente (`#758ef9`, 3.01:1) por **Serene Indigo** (`#4F46E5`, ratio 6.34:1) y ajustado el gris secundario a Restful Slate 600 (`#475569`, ratio 6.68:1 sobre canvas y 7.0:1 sobre blanco). Sincronizado en `_tokens.scss`, `DESIGN.md` y `.impeccable/design.json`.
+- **DEF-04 (Recarga Síncrona en Selects):** Resuelto. Eliminado `onchange="this.form.submit()"` de los selectores de material y firmeza en `catalog/index.blade.php`. Implementados selectores estables con etiquetas `<label for="...">` y enlaces semánticos con IDs, manteniendo el envío controlado mediante el botón "Aplicar filtros".
+- **DEF-09 (Jerarquía Semántica de Encabezados):** Resuelto. Incorporado `<h1>` semántico principal en el carrito (`cart/index.blade.php`), corregido el salto de nivel `<h6>` a `<h2 class="h5">` en especificaciones de ficha (`catalog/show.blade.php`), título de producto en tarjeta normalizado a `<h3>` en `components/product-card.blade.php` y títulos de secciones en home normalizados.
+- **DEF-10 (Fuentes Inline Fuera de Escala):** Resuelto. Creado `Reposa+/resources/sass/_typography.scss` con escala armónica (`display`, `h1`-`h6`, `body`, `caption`), clases utilitarias (`.fs-caption`, `.fs-body-sm`), ancho máximo de lectura ergonómica (`65ch`) y cifras tabulares (`font-feature-settings: 'tnum'`) para precios y cantidades. Eliminados todos los estilos inline `0.7rem` y `0.9rem`.
+- **DEF-11 (Contenedor Anidado y Fondos Fluidos):** Resuelto. Desacoplado el `<main class="container mt-4">` rígido de `layouts/app.blade.php` a `<main id="main-content" class="main-content flex-grow-1">` permitiendo fondos fluidos de ancho completo (*full-bleed*) en cabeceras y hero sections. Añadido enlace de salto accesible (*skip-link*) al inicio del DOM y creado `Reposa+/resources/sass/_layout.scss` con rejilla espacial de múltiplos de 8px.
 
 ---
 

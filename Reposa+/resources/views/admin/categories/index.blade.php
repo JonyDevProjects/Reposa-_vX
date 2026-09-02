@@ -3,6 +3,7 @@
 @section('title', __('messages.admin.categories.title'))
 
 @section('content')
+<div class="container py-4">
 <div class="row">
     <div class="col-md-3">
         <div class="list-group shadow-sm mb-4">
@@ -81,5 +82,6 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 @endsection

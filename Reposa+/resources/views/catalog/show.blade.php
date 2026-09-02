@@ -23,19 +23,19 @@
                     <div class="col-4">
                         <div class="card border-0 bg-light rounded-3 p-3 text-center h-100">
                             <i class="bi bi-truck text-primary fs-4"></i>
-                            <small class="d-block mt-1 fw-semibold text-dark" style="font-size: 0.7rem;">{{ __('messages.product.free_shipping') }}</small>
+                            <span class="d-block mt-1 fw-semibold text-dark fs-caption">{{ __('messages.product.free_shipping') }}</span>
                         </div>
                     </div>
                     <div class="col-4">
                         <div class="card border-0 bg-light rounded-3 p-3 text-center h-100">
                             <i class="bi bi-shield-check text-primary fs-4"></i>
-                            <small class="d-block mt-1 fw-semibold text-dark" style="font-size: 0.7rem;">{{ __('messages.product.trial_days') }}</small>
+                            <span class="d-block mt-1 fw-semibold text-dark fs-caption">{{ __('messages.product.trial_days') }}</span>
                         </div>
                     </div>
                     <div class="col-4">
                         <div class="card border-0 bg-light rounded-3 p-3 text-center h-100">
                             <i class="bi bi-award text-primary fs-4"></i>
-                            <small class="d-block mt-1 fw-semibold text-dark" style="font-size: 0.7rem;">{{ __('messages.product.certified') ?? 'Calidad certificada' }}</small>
+                            <span class="d-block mt-1 fw-semibold text-dark fs-caption">{{ __('messages.product.certified') ?? 'Calidad certificada' }}</span>
                         </div>
                     </div>
                 </div>
@@ -59,7 +59,7 @@
                             <i class="bi bi-star-fill"></i>
                             <i class="bi bi-star-half"></i>
                         </div>
-                        <span class="text-muted">{{ __('messages.product.reviews_count') }}</span>
+                        <span class="text-muted small">{{ __('messages.product.reviews_count') }}</span>
                     </div>
 
                     <div class="mb-2">
@@ -67,22 +67,22 @@
                     </div>
 
                     @if($product->stock > 0)
-                        <p class="text-muted mb-4" style="font-size: 0.9rem;">
+                        <p class="text-muted mb-4 small">
                             <i class="bi bi-box-seam me-1"></i>
                             @if($product->stock <= 5)
                                 <span class="text-warning fw-semibold">{{ __('messages.catalog.show.last_units', ['count' => $product->stock]) }}</span>
                             @else
-                                {{ __('messages.catalog.show.units_available', ['count' => $product->stock]) }}
+                                <span class="tabular-nums">{{ __('messages.catalog.show.units_available', ['count' => $product->stock]) }}</span>
                             @endif
                         </p>
                     @else
-                        <p class="text-danger mb-4 fw-semibold" style="font-size: 0.9rem;">
+                        <p class="text-danger mb-4 fw-semibold small">
                             <i class="bi bi-exclamation-triangle me-1"></i>{{ __('messages.catalog.show.out_of_stock_notify') }}
                         </p>
                     @endif
 
                     <div class="mb-4">
-                        <h6 class="fw-bold">{{ __('messages.product.specs_title') }}</h6>
+                        <h2 class="h5 fw-bold mb-3">{{ __('messages.product.specs_title') }}</h2>
                         <ul class="list-unstyled">
                             <li><i class="bi bi-check2-circle text-success me-2"></i><strong>{{ __('messages.product.material') }}</strong> {{ $product->material }}</li>
                             <li><i class="bi bi-check2-circle text-success me-2"></i><strong>{{ __('messages.product.firmness') }}</strong> {{ $product->firmness }}</li>
@@ -90,16 +90,16 @@
                         </ul>
                     </div>
 
-                    <p class="text-muted mb-5 lead">{{ $product->description }}</p>
+                    <p class="text-muted mb-5 lead prose-reading">{{ $product->description }}</p>
 
                     <div class="d-flex flex-column flex-md-row gap-3 mb-5">
                         @if($product->stock > 0)
                             <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-flex gap-3 w-100">
                                 @csrf
                                 <div class="input-group" style="width: 130px;">
-                                    <button class="btn btn-outline-secondary" type="button" onclick="this.nextElementSibling.stepDown()">-</button>
-                                    <input type="number" name="quantity" class="form-control text-center" value="1" min="1" max="{{ $product->stock }}">
-                                    <button class="btn btn-outline-secondary" type="button" onclick="this.previousElementSibling.stepUp()">+</button>
+                                    <button class="btn btn-outline-secondary" type="button" onclick="this.nextElementSibling.stepDown()" aria-label="Disminuir cantidad">-</button>
+                                    <input type="number" name="quantity" class="form-control text-center tabular-nums" value="1" min="1" max="{{ $product->stock }}" aria-label="Cantidad">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="this.previousElementSibling.stepUp()" aria-label="Aumentar cantidad">+</button>
                                 </div>
                                 <button type="submit" class="btn btn-primary flex-grow-1 py-3 fw-bold">
                                     <i class="bi bi-cart-plus me-2"></i>{{ __('messages.product.add_to_cart') }}
@@ -114,7 +114,7 @@
                         @auth
                             <form action="{{ route('favorites.toggle', $product) }}" method="POST" class="m-0">
                                 @csrf
-                                <button type="submit" class="btn {{ $isFavorite ? 'btn-danger' : 'btn-outline-danger' }} py-3 px-4" title="{{ __('messages.footer.favorites') }}">
+                                <button type="submit" class="btn {{ $isFavorite ? 'btn-danger' : 'btn-outline-danger' }} py-3 px-4" title="{{ __('messages.footer.favorites') }}" aria-label="{{ __('messages.footer.favorites') }}">
                                     <i class="bi {{ $isFavorite ? 'bi-heart-fill' : 'bi-heart' }}"></i>
                                 </button>
                             </form>

@@ -31,7 +31,7 @@
                                 <div class="mb-3 text-primary">
                                     <i class="bi bi-moon-stars fs-1"></i>
                                 </div>
-                                <h5 class="fw-bold text-dark mb-0">{{ $category->name }}</h5>
+                                <h3 class="h5 fw-bold text-dark mb-0">{{ $category->name }}</h3>
                             </div>
                         </a>
                     </div>
@@ -66,38 +66,20 @@
             <div class="row g-4 text-center">
                 <div class="col-md-4">
                     <i class="bi bi-truck fs-1 mb-3"></i>
-                    <h5 class="fw-bold">{{ __('messages.home.features.express.title') }}</h5>
+                    <h3 class="h5 fw-bold">{{ __('messages.home.features.express.title') }}</h3>
                     <p class="opacity-75 small">{{ __('messages.home.features.express.desc') }}</p>
                 </div>
                 <div class="col-md-4">
                     <i class="bi bi-shield-check fs-1 mb-3"></i>
-                    <h5 class="fw-bold">{{ __('messages.home.features.guarantee.title') }}</h5>
+                    <h3 class="h5 fw-bold">{{ __('messages.home.features.guarantee.title') }}</h3>
                     <p class="opacity-75 small">{{ __('messages.home.features.guarantee.desc') }}</p>
                 </div>
                 <div class="col-md-4">
                     <i class="bi bi-heart-pulse fs-1 mb-3"></i>
-                    <h5 class="fw-bold">{{ __('messages.home.features.health.title') }}</h5>
+                    <h3 class="h5 fw-bold">{{ __('messages.home.features.health.title') }}</h3>
                     <p class="opacity-75 small">{{ __('messages.home.features.health.desc') }}</p>
                 </div>
             </div>
         </div>
     </section>
-
-    <style>
-        .hover-lift {
-            transition: transform 0.2s ease;
-        }
-        .hover-lift:hover {
-            transform: translateY(-10px);
-            background-color: #182447 !important;
-        }
-        .hover-lift:hover h5, .hover-lift:hover i {
-            color: white !important;
-        }
-        .hero-section {
-            background-image: linear-gradient(rgba(24, 36, 71, 0.8), rgba(24, 36, 71, 0.8)), url('/images/hero.png');
-            background-size: cover;
-            background-position: center;
-        }
-    </style>
 @endsection

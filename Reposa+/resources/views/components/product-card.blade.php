@@ -32,7 +32,7 @@
             </span>
         </div>
 
-        <h5 class="card-title fw-bold mb-1 fs-5">
+        <h3 class="card-title fw-bold mb-1 fs-5">
             <a href="{{ $productRoute }}" class="text-decoration-none text-dark stretched-link">
                 @if($searchQuery)
                     {!! str_ireplace($searchQuery, '<mark class="bg-warning-subtle text-dark p-0 rounded-1">' . e($searchQuery) . '</mark>', e($product->name)) !!}
@@ -40,7 +40,7 @@
                     {{ $product->name }}
                 @endif
             </a>
-        </h5>
+        </h3>
 
         <p class="card-text text-muted small mb-3 flex-grow-1">
             @php $descLimit = Str::limit($product->description, 60); @endphp

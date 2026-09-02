@@ -3,6 +3,7 @@
 @section('title', __('messages.admin.dashboard.title'))
 
 @section('content')
+<div class="container py-4">
 <div class="row">
     <div class="col-md-3">
         @include('admin.partials.sidebar')
@@ -216,6 +217,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 
 @push('scripts')

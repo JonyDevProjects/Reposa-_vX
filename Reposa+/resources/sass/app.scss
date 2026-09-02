@@ -4,18 +4,11 @@
 // Import Bootstrap
 @import "bootstrap/scss/bootstrap";
 
-// Custom styles for Reposa+
-body {
-    background-color: var(--color-canvas);
-    color: var(--color-text-primary);
-    font-family: 'Inter', sans-serif;
-}
+// Reposa+ Typography System
+@import "typography";
 
-.hero-section {
-    background: linear-gradient(135deg, #182447 0%, #42569a 100%);
-    color: white;
-    padding: 100px 0;
-}
+// Reposa+ Spatial Rhythm & Layout
+@import "layout";
 
 .card-product {
     border: none;

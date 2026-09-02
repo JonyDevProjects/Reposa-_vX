@@ -9,18 +9,21 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
 
     <!-- Scripts and Styles -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
+    <a href="#main-content" class="skip-link btn btn-primary">
+        {{ __('messages.layout.skip_to_content') ?? 'Saltar al contenido principal' }}
+    </a>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm">
         <div class="container">
             <a class="navbar-brand fw-bold" href="/">
                 <i class="bi bi-moon-stars-fill me-2"></i>Reposa+
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Abrir navegación">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -35,7 +38,7 @@
                 <form action="/catalog" method="GET" class="d-none d-lg-flex me-3" style="max-width: 300px; width: 100%;">
                     <div class="input-group input-group-sm">
                         <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
-                        <input type="text" name="q" class="form-control border-start-0" placeholder="{{ __('messages.layout.search_placeholder') }}" value="{{ request('q') }}">
+                        <input type="text" name="q" class="form-control border-start-0" placeholder="{{ __('messages.layout.search_placeholder') }}" value="{{ request('q') }}" aria-label="{{ __('messages.layout.search_placeholder') }}">
                     </div>
                 </form>
                 <ul class="navbar-nav ms-auto">
@@ -93,12 +96,11 @@
         </div>
     </nav>
 
-    <main class="container mt-4">
-
+    <main id="main-content" class="main-content flex-grow-1">
         @yield('content')
     </main>
 
-    <footer class="bg-primary text-white py-5 mt-5">
+    <footer class="bg-primary text-white py-5 mt-auto">
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-4">

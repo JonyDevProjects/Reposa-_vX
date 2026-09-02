@@ -11,18 +11,23 @@
       },
       "secondary": {
         "role": "secondary",
+        "displayName": "Serene Indigo",
+        "canonical": "#4f46e5"
+      },
+      "accent": {
+        "role": "accent",
         "displayName": "Twilight Indigo",
         "canonical": "#42569a"
       },
-      "accent": {
+      "periwinkle": {
         "role": "accent",
         "displayName": "Dream Periwinkle",
         "canonical": "#758ef9"
       },
       "light-tint": {
         "role": "tertiary",
-        "displayName": "Celestial Mist",
-        "canonical": "#b1cdff"
+        "displayName": "Periwinkle Subtle",
+        "canonical": "#e0e7ff"
       },
       "canvas": {
         "role": "neutral",
@@ -41,23 +46,23 @@
       },
       "text-muted": {
         "role": "neutral",
-        "displayName": "Restful Grey",
-        "canonical": "#6c757d"
+        "displayName": "Restful Slate",
+        "canonical": "#475569"
       },
       "success": {
         "role": "status",
-        "displayName": "Restored Green",
-        "canonical": "#198754"
+        "displayName": "Restorative Sage",
+        "canonical": "#059669"
       },
       "warning": {
         "role": "status",
-        "displayName": "Amber Caution",
-        "canonical": "#ffc107"
+        "displayName": "Warm Amber",
+        "canonical": "#d97706"
       },
       "danger": {
         "role": "status",
         "displayName": "Exhausted Red",
-        "canonical": "#dc3545"
+        "canonical": "#dc2626"
       }
     },
     "typographyMeta": {

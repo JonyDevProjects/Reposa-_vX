@@ -6,9 +6,9 @@
         <div class="col-md-8">
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-white py-3">
-                    <h5 class="mb-0 fw-bold text-primary">
+                    <h1 class="h4 mb-0 fw-bold text-primary">
                         <i class="bi bi-cart3 me-2"></i>{{ __('messages.cart.title') }}
-                    </h5>
+                    </h1>
                 </div>
                 <div class="card-body p-0">
                     @if($cartItems->isEmpty())
@@ -38,7 +38,7 @@
                                                     <i class="bi bi-archive text-primary"></i>
                                                 </div>
                                                 <div>
-                                                    <h6 class="mb-0 fw-bold">{{ $item->product->name }}</h6>
+                                                    <h3 class="h6 mb-0 fw-bold">{{ $item->product->name }}</h3>
                                                     <small class="text-muted">{{ $item->product->material }} - {{ $item->product->firmness }}</small>
                                                 </div>
                                             </div>
@@ -46,19 +46,19 @@
                                         <td style="width: 150px;">
                                             <form action="{{ route('cart.update', $item->id) }}" method="POST" class="d-flex align-items-center justify-content-center">
                                                 @csrf
-                                                <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" class="form-control form-control-sm text-center me-2" style="width: 60px;">
-                                                <button type="submit" class="btn btn-sm btn-outline-primary border-0">
+                                                <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" class="form-control form-control-sm text-center tabular-nums me-2" style="width: 60px;" aria-label="Cantidad para {{ $item->product->name }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-primary border-0" aria-label="Actualizar cantidad de {{ $item->product->name }}">
                                                     <i class="bi bi-arrow-repeat"></i>
                                                 </button>
                                             </form>
                                         </td>
-                                        <td class="text-end">{{ number_format($item->product->price, 2) }}€</td>
-                                        <td class="text-end fw-bold">{{ number_format($item->product->price * $item->quantity, 2) }}€</td>
+                                        <td class="text-end tabular-nums">{{ number_format($item->product->price, 2) }}€</td>
+                                        <td class="text-end fw-bold tabular-nums">{{ number_format($item->product->price * $item->quantity, 2) }}€</td>
                                         <td class="text-center">
                                             <form action="{{ route('cart.remove', $item->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-link text-danger p-0">
+                                                <button type="submit" class="btn btn-sm btn-link text-danger p-0" aria-label="Eliminar {{ $item->product->name }} del carrito">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </form>
@@ -76,10 +76,10 @@
         <div class="col-md-4">
             <div class="card shadow-sm border-0 sticky-top" style="top: 100px; z-index: 10;">
                 <div class="card-body py-4">
-                    <h5 class="fw-bold mb-4">{{ __('messages.cart.order_summary') }}</h5>
+                    <h2 class="h5 fw-bold mb-4">{{ __('messages.cart.order_summary') }}</h2>
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">{{ __('messages.cart.subtotal') }}</span>
-                        <span>{{ number_format($total, 2) }}€</span>
+                        <span class="tabular-nums">{{ number_format($total, 2) }}€</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">{{ __('messages.cart.shipping') }}</span>
