@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'layout' => [
+        'skip_to_content' => 'Skip to main content',
+        'search_placeholder' => 'Search pillows...',
+    ],
     'nav' => [
         'home' => 'Home',
         'catalog' => 'Catalog',

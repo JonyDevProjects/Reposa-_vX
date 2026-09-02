@@ -23,12 +23,17 @@ class CategoryFactory extends Factory
 
     public function definition(): array
     {
-        $nameEs = $this->faker->unique()->randomElement(array_keys(self::$names));
-        $nameEn = self::$names[$nameEs];
+        $nameEs = $this->faker->unique(true)->randomElement(array_keys(self::$names));
+        $slug = \Illuminate\Support\Str::slug($nameEs);
+
+        if (Category::where('slug', $slug)->exists()) {
+            $nameEs = $nameEs . ' ' . $this->faker->numberBetween(10, 999);
+            $slug = \Illuminate\Support\Str::slug($nameEs);
+        }
 
         return [
             'name' => $nameEs,
-            'slug' => \Illuminate\Support\Str::slug($nameEs),
+            'slug' => $slug,
         ];
     }
 

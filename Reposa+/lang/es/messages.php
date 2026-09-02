@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'layout' => [
+        'skip_to_content' => 'Saltar al contenido principal',
+        'search_placeholder' => 'Buscar almohadas...',
+    ],
     'nav' => [
         'home' => 'Inicio',
         'catalog' => 'Catálogo',

@@ -23,7 +23,26 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Crear categorías
-        $categories = Category::factory(5)->create();
+        $categoryList = [
+            'Cervical' => 'Cervical',
+            'Anti-ronquidos' => 'Anti-snoring',
+            'Viscoelástica' => 'Viscoelastic',
+            'Látex' => 'Latex',
+            'Espuma con memoria' => 'Memory Foam',
+            'Térmica' => 'Thermal',
+            'Viaje' => 'Travel',
+            'Infantil' => 'Kids',
+        ];
+
+        $categories = collect();
+        foreach ($categoryList as $nameEs => $nameEn) {
+            $cat = new Category();
+            $cat->slug = \Illuminate\Support\Str::slug($nameEs);
+            $cat->setTranslation('name', 'es', $nameEs);
+            $cat->setTranslation('name', 'en', $nameEn);
+            $cat->save();
+            $categories->push($cat);
+        }
 
         // Crear usuario administrador
         User::factory()->create([
