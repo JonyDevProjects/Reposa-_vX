@@ -7,7 +7,7 @@ Este documento define la planificación integral para transformar la interfaz, a
 El plan adopta como metodología la suite de diseño **Impeccable**, incorporando de manera secuencial y estructurada sus **22 comandos especializados**, articulados en **8 fases de ejecución**.
 
 **Fecha de creación:** 01 de septiembre de 2026  
-**Última sesión:** 01/09/2026 — Planificación del Roadmap de Diseño  
+**Última sesión:** 03/09/2026 — Cierre Fase 3, Aislamiento DB Testing, Seeders Deterministas y Refinado Visual Nocturno (Hero & Categorías)  
 **Stack de frontend objetivo:** 100% alineado con el stack actual del proyecto — **Laravel 11 (Vistas y Componentes Blade)**, **Bootstrap 5.3 + SCSS personalizado** (`resources/sass/app.scss`), **Vite**, **Bootstrap Icons**, **Vanilla JS / Bootstrap 5 JS Bundle** y **Axios**. Se respeta y potencia la arquitectura actual sin migrar a otros frameworks ni introducir dependencias superfluas.
 
 ---
@@ -367,9 +367,9 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 | **Fase 1** | Tokens SCSS y primeros componentes Blade extraídos | ✅ Completada |
 | **Fase 2** | Auditoría heurística y de accesibilidad completada | ✅ Completada |
 | **Fase 2** | Contrastes WCAG AA y accesibilidad por teclado diagnosticados | ✅ Completada |
-| **Fase 3** | Nueva escala tipográfica dual integrada | ⏳ Pendiente |
-| **Fase 3** | Paleta cromática de descanso aplicada en toda la app | ⏳ Pendiente |
-| **Fase 3** | Layouts y espaciados armónicos en catálogo y producto | ⏳ Pendiente |
+| **Fase 3** | Nueva escala tipográfica dual integrada (`_typography.scss`) | ✅ Completada |
+| **Fase 3** | Paleta cromática de descanso aplicada en toda la app (`_tokens.scss`) | ✅ Completada |
+| **Fase 3** | Layouts y espaciados armónicos en catálogo y producto (`_layout.scss`) | ✅ Completada |
 | **Fase 4** | Home persuasiva con propuesta de valor y Hero renovado | ⏳ Pendiente |
 | **Fase 4** | Microinteracciones y animaciones de favoritos y carrito | ⏳ Pendiente |
 | **Fase 4** | Confirmación de pedido emocional y de marca | ⏳ Pendiente |
@@ -393,6 +393,14 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 | Fecha | Fase afectada | Descripción de la desviación | Motivo |
 |---|---|---|---|
 | 01/09/2026 | Planificación | Integración del 100% de los 22 comandos de Impeccable en 8 fases coherentes | Maximizar la calidad del diseño y aprovechar al máximo las capacidades de la suite |
+| 02/09/2026 | Fase 1 (Fundamentos) | Generación formal de `.impeccable/design.json` además de tokens en SCSS | Permitir interoperabilidad técnica con herramientas de diseño automatizado e inspección JSON bidireccional |
+| 02/09/2026 | Fase 2 (Diagnóstico) | Formalización de 11 defectos específicos (DEF-01 a DEF-11) y doble scoring metodológico (Nielsen 23/40 e Impeccable 10/20) en `auditoria-heuristica-ux.md` | Transformar hallazgos abstractos en una lista de trabajo técnica priorizada y medible para las fases posteriores |
+| 02/09/2026 | Fase 3 (Identidad y Layout) | Priorización inmediata en Fase 3 de los 5 defectos clave de Fase 2: DEF-01 (contraste Serene Indigo), DEF-04 (recarga selectores), DEF-09 (encabezados semánticos), DEF-10 (fuentes inline) y DEF-11 (desacople de `.container` rígido) | Resolver de raíz las barreras de accesibilidad y estabilidad de layout antes de abordar las fases persuasivas y emocionales |
+| 02/09/2026 | Fase 3 (Infraestructura / DB) | Determinismo en `DatabaseSeeder` y control anti-duplicados en `CategoryFactory` | `CategoryFactory` lanzaba excepciones `1062 Duplicate entry` por colisión de slugs únicos, interrumpiendo silenciosamente el sembrado y dejando la BD sin productos |
+| 02/09/2026 | Fase 3 (Testing / CI) | Aislamiento completo de la base de datos de test (`reposaplus_testing` en MySQL y `phpunit.xml`) | La suite de tests (Pest) se ejecutaba contra `reposaplus_dev` con el trait `RefreshDatabase`, borrando todos los productos de la tienda de desarrollo tras cada comprobación técnica |
+| 02/09/2026 | Fase 3 (Frontend / Tipografía) | Cambio de color rígido en encabezados a `color: inherit` en `_typography.scss` y clases explícitas `text-white` | La regla inicial asignaba `color: var(--color-text-primary)` (`#182447` azul marino) a todos los encabezados y a `.navbar-brand`, provocando que el logotipo y el titular del hero fueran invisibles sobre fondos oscuros |
+| 02/09/2026 | Fase 3 (Frontend / Interacciones) | Rediseño del hover en tarjetas de categoría: sustitución de la inversión de fondo azul marino por elevación táctil luminosa (`4px`, sombra suave, fondo blanco persistente) | Invertir la tarjeta a azul oscuro sobre un lienzo blanco causaba un efecto de "agujero negro" y daba la sensación al usuario de que el contenido desaparecía |
+| 02/09/2026 | Fase 3 (Frontend / Identidad Visual) | Implementación de estilo Glassmorphism nocturno (`backdrop-filter: blur(12px)`, `rgba(255, 255, 255, 0.18)`) en los botones CTA de la cabecera Hero | Los botones con fondo sólido (púrpura `#4F46E5` o blanco puro) generaban un contraste desmedido y estridente sobre la fotografía nocturna, rompiendo la atmósfera de descanso |
 
 ---
 
