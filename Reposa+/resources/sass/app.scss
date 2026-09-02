@@ -4,11 +4,13 @@
 // Import Bootstrap
 @import "bootstrap/scss/bootstrap";
 
+// Reposa+ Typography System
+@import "typography";
+
 // Custom styles for Reposa+
 body {
     background-color: var(--color-canvas);
     color: var(--color-text-primary);
-    font-family: 'Inter', sans-serif;
 }
 
 .hero-section {

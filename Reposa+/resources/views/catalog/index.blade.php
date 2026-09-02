@@ -52,7 +52,7 @@
                         @if(request('q'))<input type="hidden" name="q" value="{{ request('q') }}">@endif
                         @if(request('sort'))<input type="hidden" name="sort" value="{{ request('sort') }}">@endif
 
-                        <h5 class="fw-bold mb-4"><i class="bi bi-funnel me-2"></i>{{ __('messages.catalog.filters') }}</h5>
+                        <h2 class="h5 fw-bold mb-4"><i class="bi bi-funnel me-2"></i>{{ __('messages.catalog.filters') }}</h2>
 
                         {{-- Search --}}
                         <div class="mb-4">
