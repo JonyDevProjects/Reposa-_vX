@@ -114,13 +114,18 @@
                         @auth
                             <form action="{{ route('favorites.toggle', $product) }}" method="POST" class="m-0">
                                 @csrf
-                                <button type="submit" class="btn {{ $isFavorite ? 'btn-danger' : 'btn-outline-danger' }} py-3 px-4" title="{{ __('messages.footer.favorites') }}" aria-label="{{ __('messages.footer.favorites') }}">
-                                    <i class="bi {{ $isFavorite ? 'bi-heart-fill' : 'bi-heart' }}"></i>
+                                <button type="submit" 
+                                        class="btn btn-favorite {{ $isFavorite ? 'btn-danger text-white' : 'btn-outline-danger' }} py-3 px-4" 
+                                        data-url="{{ route('favorites.toggle', $product) }}"
+                                        data-product-id="{{ $product->id }}"
+                                        title="{{ $isFavorite ? __('messages.catalog.remove_favorite') : __('messages.catalog.add_favorite') }}" 
+                                        aria-label="{{ $isFavorite ? __('messages.catalog.remove_favorite') : __('messages.catalog.add_favorite') }}">
+                                    <i class="bi {{ $isFavorite ? 'bi-heart-fill' : 'bi-heart' }} fs-5"></i>
                                 </button>
                             </form>
                         @else
-                            <a href="{{ route('login') }}" class="btn btn-outline-danger py-3 px-4" title="{{ __('messages.footer.favorites') }}">
-                                <i class="bi bi-heart"></i>
+                            <a href="{{ route('login') }}" class="btn btn-favorite btn-outline-danger py-3 px-4" title="{{ __('messages.catalog.login_favorite') }}" aria-label="{{ __('messages.catalog.login_favorite') }}">
+                                <i class="bi bi-heart fs-5"></i>
                             </a>
                         @endauth
                     </div>

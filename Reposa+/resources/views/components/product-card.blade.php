@@ -73,7 +73,7 @@
                     <form action="{{ route('cart.add', $product) }}" method="POST" class="m-0">
                         @csrf
                         <button type="submit" 
-                                class="btn btn-outline-primary btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm" 
+                                class="btn btn-outline-primary btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm btn-cart-add" 
                                 style="width: 38px; height: 38px;"
                                 aria-label="{{ __('messages.product.add_to_cart') ?? 'Añadir al carrito' }}"
                                 title="{{ __('messages.product.add_to_cart') ?? 'Añadir al carrito' }}">
@@ -94,8 +94,10 @@
                         <form action="{{ route('favorites.toggle', $product) }}" method="POST" class="m-0">
                             @csrf
                             <button type="submit" 
-                                    class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm {{ $isFavorite ? 'btn-danger text-white' : 'btn-outline-danger' }}" 
+                                    class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm btn-favorite {{ $isFavorite ? 'btn-danger text-white' : 'btn-outline-danger' }}" 
                                     style="width: 38px; height: 38px;"
+                                    data-url="{{ route('favorites.toggle', $product) }}"
+                                    data-product-id="{{ $product->id }}"
                                     title="{{ $isFavorite ? __('messages.catalog.remove_favorite') : __('messages.catalog.add_favorite') }}"
                                     aria-label="{{ $isFavorite ? __('messages.catalog.remove_favorite') : __('messages.catalog.add_favorite') }}">
                                 <i class="bi {{ $isFavorite ? 'bi-heart-fill' : 'bi-heart' }} fs-6"></i>
@@ -103,7 +105,7 @@
                         </form>
                     @else
                         <a href="{{ route('login') }}" 
-                           class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center shadow-sm" 
+                           class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center shadow-sm btn-favorite" 
                            style="width: 38px; height: 38px;"
                            title="{{ __('messages.catalog.login_favorite') }}"
                            aria-label="{{ __('messages.catalog.login_favorite') }}">

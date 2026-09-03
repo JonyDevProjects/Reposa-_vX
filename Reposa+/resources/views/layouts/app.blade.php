@@ -9,6 +9,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- impeccable-disable-next-line overused-font -- Brand approved dual typography in DESIGN.md -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
 
     <!-- Scripts and Styles -->
@@ -143,219 +144,37 @@
         </div>
     </footer>
 
-    <!-- Dynamic Toasts -->
-    <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1090">
+    <!-- Dynamic Sanctuary Toasts -->
+    <div id="toast-container" class="toast-sanctuary-container" aria-live="polite" aria-atomic="true">
         @if(session('success'))
-            <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+            <div id="flash-session-success" data-message="{{ session('success') }}" class="d-none"></div>
+            <noscript>
+                <div class="toast-sanctuary mb-3">
+                    <div class="toast-icon-badge badge-success"><i class="bi bi-check2-circle"></i></div>
+                    <div class="toast-content">
+                        <div class="toast-title">Éxito</div>
+                        <p class="toast-message">{{ session('success') }}</p>
                     </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
-            </div>
+            </noscript>
         @endif
 
         @if(session('error'))
-            <div class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
+            <div id="flash-session-error" data-message="{{ session('error') }}" class="d-none"></div>
+            <noscript>
+                <div class="toast-sanctuary mb-3">
+                    <div class="toast-icon-badge badge-error"><i class="bi bi-exclamation-octagon-fill"></i></div>
+                    <div class="toast-content">
+                        <div class="toast-title">Aviso</div>
+                        <p class="toast-message">{{ session('error') }}</p>
                     </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
-            </div>
+            </noscript>
         @endif
     </div>
 
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    
-    <!-- Initialize Toasts & AJAX Cart -->
-    <script type="module">
-        // Funcionalidad global de Toasts
-        function showToast(type, message) {
-            const container = document.getElementById('toast-container');
-            if (!container) return;
-            
-            const isSuccess = type === 'success';
-            const bgClass = isSuccess ? 'bg-success' : 'bg-danger';
-            const icon = isSuccess ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
-            
-            const toastHTML = `
-                <div class="toast align-items-center text-white ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
-                    <div class="d-flex">
-                        <div class="toast-body">
-                            <i class="bi ${icon} me-2"></i> ${message}
-                        </div>
-                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
-                </div>
-            `;
-            
-            container.insertAdjacentHTML('beforeend', toastHTML);
-            const toastElement = container.lastElementChild;
-            const toast = new bootstrap.Toast(toastElement);
-            toast.show();
-            
-            toastElement.addEventListener('hidden.bs.toast', () => {
-                toastElement.remove();
-            });
-        }
-
-        // Inicializar Toasts de servidor (PHP session)
-        var toastElList = [].slice.call(document.querySelectorAll('.toast'))
-        var toastList = toastElList.map(function (toastEl) {
-            return new bootstrap.Toast(toastEl)
-        });
-        toastList.forEach(toast => toast.show());
-
-        // Interceptar formularios de añadir al carrito
-        document.addEventListener('submit', function(e) {
-            const form = e.target;
-            if (form.action && form.action.includes('/cart/add/')) {
-                e.preventDefault();
-                
-                const btn = form.querySelector('button[type="submit"]');
-                const originalHtml = btn.innerHTML;
-                
-                // Estado de carga (opcional pero recomendable)
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
-                btn.disabled = true;
-
-                fetch(form.action, {
-                    method: 'POST',
-                    body: new FormData(form),
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json',
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const badge = document.getElementById('cart-badge');
-                        if (badge) {
-                            badge.innerText = data.cartCount;
-                            // Pequeña animación para destacar el cambio
-                            badge.style.transform = 'scale(1.3)';
-                            setTimeout(() => badge.style.transform = 'scale(1)', 200);
-                            badge.style.transition = 'transform 0.2s';
-                        }
-                        showToast('success', data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showToast('error', '{{ __('messages.errors.add_to_cart') }}');
-                })
-                .finally(() => {
-                    btn.innerHTML = originalHtml;
-                    btn.disabled = false;
-                });
-            }
-        });
-
-        // Interceptar clicks en botones de favorito
-        document.addEventListener('click', function(e) {
-            const btn = e.target.closest('.btn-favorite');
-            if (btn) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const url = btn.dataset.url;
-                const icon = btn.querySelector('i');
-                const originalHtml = btn.innerHTML;
-                
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm text-danger" role="status" aria-hidden="true"></span>';
-                btn.disabled = true;
-                
-                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-                
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    }
-                })
-                .then(response => {
-                    if (response.status === 401) {
-                        return response.json().then(data => {
-                            showToast('error', data.message);
-                            if (data.redirect) {
-                                setTimeout(() => window.location.href = data.redirect, 1500);
-                            }
-                            throw new Error('Unauthorized');
-                        });
-                    }
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        if (data.is_favorite) {
-                            icon.className = 'bi bi-heart-fill';
-                            btn.classList.add('btn-danger', 'text-white');
-                            btn.classList.remove('btn-outline-danger');
-                        } else {
-                            icon.className = 'bi bi-heart';
-                            btn.classList.remove('btn-danger', 'text-white');
-                            btn.classList.add('btn-outline-danger');
-                        }
-                        
-                        // Si estamos en la página de perfil y se desmarca como favorito, podemos ocultar la tarjeta
-                        const productId = btn.dataset.productId;
-                        if (productId) {
-                            const favCard = document.getElementById(`fav-card-${productId}`);
-                            if (favCard && !data.is_favorite) {
-                                favCard.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-                                favCard.style.opacity = '0';
-                                favCard.style.transform = 'scale(0.8)';
-                                setTimeout(() => {
-                                    favCard.remove();
-                                    // Si ya no quedan favoritos, mostrar el mensaje de vacío
-                                    const container = document.getElementById('favorites');
-                                    if (container && container.querySelectorAll('[id^="fav-card-"]').length === 0) {
-                                        const title = container.querySelector('h4')?.innerText || 'Las almohadas que más me gustan';
-                                        container.querySelector('.card').innerHTML = `
-                                            <h4 class="fw-bold mb-4">${title}</h4>
-                                            <div class="text-center py-5">
-                                                <i class="bi bi-heart fs-1 text-muted"></i>
-                                                <p class="mt-3 text-muted">{{ __('messages.favorites.empty') }}</p>
-                                                <a href="/catalog" class="btn btn-primary mt-2">{{ __('messages.favorites.btn_catalog') }}</a>
-                                            </div>
-                                        `;
-                                    }
-                                }, 300);
-                            }
-                        }
-                        
-                        // Microanimación
-                        btn.style.transform = 'scale(1.25)';
-                        setTimeout(() => btn.style.transform = 'scale(1)', 150);
-                        btn.style.transition = 'transform 0.15s ease-in-out';
-                        
-                        showToast('success', data.message);
-                    }
-                })
-                .catch(error => {
-                    if (error.message !== 'Unauthorized') {
-                        console.error('Error:', error);
-                        showToast('error', '{{ __('messages.errors.process_request') }}');
-                    }
-                })
-                .finally(() => {
-                    btn.innerHTML = '';
-                    btn.appendChild(icon);
-                    btn.disabled = false;
-                });
-            }
-        });
-    </script>
 
     @stack('scripts')
 </body>

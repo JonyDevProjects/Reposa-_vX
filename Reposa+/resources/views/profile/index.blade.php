@@ -245,12 +245,14 @@
                         <div class="row g-4">
                             @foreach($user->favorites as $product)
                                 <div class="col-md-6" id="fav-card-{{ $product->id }}">
-                                    <div class="card h-100 shadow-sm border-0 position-relative">
+                                    <div class="card card-product h-100 shadow-sm border-0 position-relative">
                                         <button type="button" 
                                                 class="btn btn-danger text-white btn-sm rounded-circle position-absolute top-0 end-0 m-3 btn-favorite" 
                                                 data-product-id="{{ $product->id }}"
                                                 data-url="{{ route('favorites.toggle', $product) }}"
-                                                title="{{ __('messages.favorites.removed') }}">
+                                                style="z-index: 2;"
+                                                title="{{ __('messages.catalog.remove_favorite') }}"
+                                                aria-label="{{ __('messages.catalog.remove_favorite') }}">
                                             <i class="bi bi-heart-fill"></i>
                                         </button>
                                         <a href="{{ route('products.show', $product) }}" class="text-decoration-none text-dark">
@@ -264,9 +266,9 @@
                                                 <p class="card-text text-muted small mb-3">{{ Str::limit($product->description, 60) }}</p>
                                                 <div class="d-flex justify-content-between align-items-center">
                                                     <span class="fs-5 fw-bold text-primary">{{ number_format($product->price, 2) }}€</span>
-                                                    <form action="{{ route('cart.add', $product) }}" method="POST" class="m-0">
+                                                    <form action="{{ route('cart.add', $product) }}" method="POST" class="m-0 position-relative" style="z-index: 2;">
                                                         @csrf
-                                                        <button type="submit" class="btn btn-outline-primary btn-sm rounded-circle"><i class="bi bi-cart-plus"></i></button>
+                                                        <button type="submit" class="btn btn-outline-primary btn-sm rounded-circle btn-cart-add" aria-label="{{ __('messages.product.add_to_cart') }}"><i class="bi bi-cart-plus"></i></button>
                                                     </form>
                                                 </div>
                                             </div>
