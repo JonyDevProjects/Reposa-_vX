@@ -243,7 +243,11 @@
                                 <div class="category-photo-wrapper">
                                     <img src="{{ $meta['image'] }}" 
                                          alt="{{ $category->name }}" 
-                                         loading="lazy">
+                                         width="320"
+                                         height="200"
+                                         style="aspect-ratio: 16 / 10; object-fit: cover;"
+                                         loading="lazy"
+                                         decoding="async">
                                     <div class="category-overlay"></div>
                                     <span class="category-badge-chip">
                                         <i class="bi bi-stars me-1"></i>{{ $meta['badge'] }}

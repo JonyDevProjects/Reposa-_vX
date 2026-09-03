@@ -6,9 +6,12 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Reposa+') - {{ __('messages.app.tagline') }}</title>
 
-    <!-- Fonts -->
+    <!-- Fonts & Core Web Vitals Preconnect/Prefetch -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     <!-- impeccable-disable-next-line overused-font -- Brand approved dual typography in DESIGN.md -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
 
@@ -172,6 +175,9 @@
             </noscript>
         @endif
     </div>
+
+    <!-- Phase 7: Ergonomic Mobile Navigation Bar (<768px Viewports) -->
+    @include('layouts.partials.mobile-nav')
 
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
