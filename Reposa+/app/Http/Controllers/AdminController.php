@@ -73,10 +73,22 @@ class AdminController extends Controller
         ));
     }
 
-    public function products()
+    public function products(Request $request)
     {
-        $products = Product::with('categories')->paginate(10);
-        return view('admin.products.index', compact('products'));
+        $query = Product::with('categories');
+
+        if ($request->filled('q')) {
+            $q = trim($request->q);
+            $query->where(function ($sub) use ($q) {
+                $sub->where('name', 'like', "%{$q}%")
+                    ->orWhere('description', 'like', "%{$q}%");
+            });
+        }
+
+        $products = $query->latest('id')->paginate(15)->withQueryString();
+        $totalProductsCount = Product::count();
+
+        return view('admin.products.index', compact('products', 'totalProductsCount'));
     }
 
     public function createProduct()
@@ -141,10 +153,35 @@ class AdminController extends Controller
         return back()->with('success', __('messages.admin.product_deleted'));
     }
 
-    public function orders()
+    public function orders(Request $request)
     {
-        $orders = Order::with('user', 'orderItems.product')->latest()->paginate(15);
-        return view('admin.orders.index', compact('orders'));
+        $query = Order::with('user', 'orderItems.product')->latest();
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('q')) {
+            $q = trim($request->q);
+            $query->where(function ($sub) use ($q) {
+                if (is_numeric($q)) {
+                    $sub->where('id', (int) $q);
+                } else {
+                    $sub->whereHas('user', function ($u) use ($q) {
+                        $u->where('name', 'like', "%{$q}%")
+                          ->orWhere('email', 'like', "%{$q}%");
+                    });
+                }
+            });
+        }
+
+        $orders = $query->paginate(20)->withQueryString();
+        $statusCounts = Order::select('status', DB::raw('count(*) as count'))
+            ->groupBy('status')
+            ->pluck('count', 'status');
+        $totalOrdersCount = Order::count();
+
+        return view('admin.orders.index', compact('orders', 'statusCounts', 'totalOrdersCount'));
     }
 
     // Gestión de Categorías
