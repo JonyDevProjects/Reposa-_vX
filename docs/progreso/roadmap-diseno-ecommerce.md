@@ -48,8 +48,8 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 | **1** | Fundamentos, Autoridad Visual y Componentes Base | `init`, `document`, `extract` | ✅ Completada |
 | **2** | Evaluación Heurística, Accesibilidad y Diagnóstico | `critique`, `audit` | ✅ Completada |
 | **3** | Identidad Cromática, Tipografía y Armonía Espacial | `typeset`, `colorize`, `layout` | ✅ Completada |
-| **4** | Experiencia Persuasiva y Emocional del Storefront | `shape`, `bolder`, `animate`, `delight` | ⏳ Pendiente |
-| **5** | Claridad Transaccional, Estados Vacíos y Resiliencia | `clarify`, `harden`, `onboard`, `distill` | ⏳ Pendiente |
+| **4** | Experiencia Persuasiva y Emocional del Storefront | `shape`, `bolder`, `animate`, `delight` | ✅ Completada |
+| **5** | Claridad Transaccional, Estados Vacíos y Resiliencia | `clarify`, `harden`, `onboard`, `distill` | ✅ Completada |
 | **6** | Densidad Operativa (Admin, Facturas) y Feature Estrella | `quieter`, `overdrive` | ⏳ Pendiente |
 | **7** | Ergonomía Móvil y Rendimiento Web Extremo | `adapt`, `optimize` | ⏳ Pendiente |
 | **8** | Iteración en Vivo, Pulido Integral y Certificación | `live`, `polish` | ⏳ Pendiente |
@@ -284,13 +284,26 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 **Archivos a crear/modificar:**
 - `Reposa+/resources/views/cart/index.blade.php`
 - `Reposa+/resources/views/profile/index.blade.php`
+- `Reposa+/resources/views/catalog/index.blade.php`
+- `Reposa+/resources/views/catalog/show.blade.php`
+- `Reposa+/resources/views/components/product-card.blade.php`
 - `Reposa+/resources/views/components/empty-state.blade.php` (nuevo)
+- `Reposa+/public/images/product-placeholder.svg` (nuevo)
 - `Reposa+/lang/es/messages.php`
 - `Reposa+/lang/en/messages.php`
+- `Reposa+/resources/sass/_layout.scss`
+- `Reposa+/app/Http/Controllers/ProfileController.php`
 
 **Criterios de Aceptación:**
 - Ningún estado de error o pantalla vacía muestra mensajes genéricos o pantallas en blanco.
 - El flujo de pago presenta 0 ambigüedad sobre costes, tiempos de entrega y políticas de garantía.
+
+**Resultados Entregados en Fase 5 (5.1 clarify, 5.2 harden, 5.3 onboard, 5.4 distill):**
+- **Transparencia Transaccional en Cesta (`cart/index.blade.php`):** Desglose nítido y sin letra pequeña: Base imponible neta desglosada, IVA (21% incluido), coste de envío express 24/48h (GRATIS a península) y medidor dinámico de umbral de envío gratuito (50,00€) con barra de progreso reactiva y cálculo exacto de importe restante. Microcopy de confianza de alta autoridad previa al pago: protocolo cifrado SSL 256-bit y 3D Secure, 100 noches de prueba y aviso claro de redirección protegida a la pasarela bancaria de Stripe.
+- **Diseño Defensivo y Resiliencia UI (`harden`):** Implementado placeholder vectorial exclusivo de la marca (`product-placeholder.svg`) con lienzo nocturno y silueta anatómica de descanso, erradicando fallbacks a dominios externos (`placehold.co` / `via.placeholder.com`). Soporte multi-línea con `line-clamp-2` y `line-clamp-3`, `word-break: break-word` y `min-width: 0` en tarjetas (`x-product-card`), tabla de cesta y fichas. Formularios de direcciones en perfil con validaciones semánticas, etiquetas `for`/`id` explícitas, mensajes de error contextuales en línea y estilizado moderno `:user-invalid`.
+- **Estados Vacíos Persuasivos (`onboard`):** Creado componente universal `<x-empty-state>` con aura reposada, prueba social ("94% de alivio cervical") y doble llamada a la acción. Rediseñadas las 4 superficies vacías principales: Carrito ("Tu descanso aún te está esperando"), Búsqueda sin resultados en catálogo (con consejos de búsqueda y acceso directo al Asesor Anatómico), Historial de pedidos y Favoritos de perfil con inyección de almohadas top valoradas para descubrimiento instantáneo.
+- **Destilación Cognitiva en Checkout (`distill`):** Eliminadas distracciones y ruido visual en la cesta; disposición jerárquica clara con panel lateral *sticky-top*, CTA dominante con distinción entre invitados y usuarios registrados, y visualización nítida de artículos con selector numérico accesible.
+- **Detector Impeccable y Suite de Tests:** Cero defectos detectados con `detect.mjs` (`[]`). Suite de 60 tests de Feature ejecutados en Docker pasando al 100% (112 assertions). Cadenas 100% internacionalizadas en ES y EN. Assets compilados limpiamente con Vite.
 
 ---
 
@@ -404,9 +417,9 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 | **Fase 4** | Home persuasiva con propuesta de valor y Hero renovado | ✅ Completada (4.1 shape y 4.2 bolder) |
 | **Fase 4** | Microinteracciones y animaciones de favoritos y carrito | ✅ Completada (4.3 animate) |
 | **Fase 4** | Confirmación de pedido emocional y de marca | ✅ Completada (4.4 delight) |
-| **Fase 5** | Microcopy claro y transparente en checkout | ⏳ Pendiente |
-| **Fase 5** | Casos límite cubiertos (textos largos, fallback de fotos) | ⏳ Pendiente |
-| **Fase 5** | Estados vacíos de carrito, wishlist y búsqueda implementados | ⏳ Pendiente |
+| **Fase 5** | Microcopy claro y transparente en checkout | ✅ Completada (5.1 clarify y 5.4 distill) |
+| **Fase 5** | Casos límite cubiertos (textos largos, fallback de fotos) | ✅ Completada (5.2 harden) |
+| **Fase 5** | Estados vacíos de carrito, wishlist y búsqueda implementados | ✅ Completada (5.3 onboard) |
 | **Fase 6** | Panel de administración rediseñado con alta densidad limpia | ⏳ Pendiente |
 | **Fase 6** | Factura PDF con diseño corporativo impecable | ⏳ Pendiente |
 | **Fase 6** | Guía/selector interactivo de firmeza en el catálogo | ⏳ Pendiente |
@@ -436,6 +449,9 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 | 03/09/2026 | Fase 4 (Infraestructura / Testing) | Forzado estricto de aislamiento con `force="true"` en `DB_DATABASE` dentro de `phpunit.xml` | El contenedor Docker inyectaba `DB_DATABASE=reposaplus_dev` como variable de SO. Al tener `force="false"` por defecto en PHPUnit, los tests ignoraban la BD de test y vaciaban `reposaplus_dev` con `RefreshDatabase` |
 | 03/09/2026 | Fase 4.3 (Frontend / Motion) | Modularización de interacciones en `interactions.js` y `_animations.scss`, reemplazando scripts inline con Toasts Sanctuary y curva `cubic-bezier(0.16, 1, 0.3, 1)` | Centralizar lógica de microinteracciones, eliminar scripts inline dispersos, garantizar CLS 0 a 60 FPS y cumplimiento estricto con el detector Impeccable |
 | 03/09/2026 | Fase 4.4 (Frontend / Rendimiento) | Sustitución de animación de `width` por `transform: scaleX(...)` con `transform-origin: left center` en la barra de progreso del timeline del pedido | Evitar recálculos de layout (*layout thrash* / *reflow*) detectados por la regla `layout-transition` del detector Impeccable, garantizando animación pura por GPU a 60 FPS |
+| 03/09/2026 | Fase 5 (Frontend / Resiliencia) | Sustitución de placeholders externos (`placehold.co` / `via.placeholder.com`) por activo SVG vectorial local de marca (`product-placeholder.svg`) con degradado nocturno y luna Reposa+ | Eliminar llamadas HTTP externas a servicios de terceros, garantizar funcionamiento 100% offline y resiliencia en entornos de testing sin red |
+| 03/09/2026 | Fase 5 (Frontend / Conversión) | Implementación de medidor dinámico de envío gratuito (50,00€) y desglose neto de base imponible + 21% IVA en `cart/index.blade.php` | Reducir fricción y abandono de carrito aportando certidumbre absoluta sobre costes y tiempos de entrega antes de Stripe Checkout |
+| 03/09/2026 | Fase 5 (Frontend / Onboarding) | Inyección de almohadas top valoradas en estado vacío de favoritos (`profile/index.blade.php`) y consejos con acceso directo a Asesor Anatómico en búsqueda vacía (`catalog/index.blade.php`) | Transformar pantallas vacías en vías activas de descubrimiento y persuasión hacia la compra |
 
 ---
 

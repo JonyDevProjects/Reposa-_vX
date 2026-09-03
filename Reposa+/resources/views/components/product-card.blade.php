@@ -7,13 +7,14 @@
 
 @php
     $isFavorite = in_array($product->id, $favoriteIds);
-    $imageUrl = $product->image_url ?: 'https://placehold.co/400x300/182447/ffffff?text=' . urlencode($product->name);
+    $imageUrl = $product->image_url ?: '/images/product-placeholder.svg';
     $productRoute = route('products.show', $product);
 @endphp
 
 <div {{ $attributes->merge(['class' => 'card card-product h-100 shadow-sm border-0 position-relative']) }}>
     <a href="{{ $productRoute }}" class="text-decoration-none text-dark d-block overflow-hidden" aria-label="{{ $product->name }}">
         <img src="{{ $imageUrl }}" 
+             onerror="this.onerror=null; this.src='/images/product-placeholder.svg';"
              class="card-img-top object-fit-cover" 
              style="height: 220px; width: 100%; transition: transform 0.4s ease;"
              alt="{{ $product->name }}"
@@ -32,7 +33,7 @@
             </span>
         </div>
 
-        <h3 class="card-title fw-bold mb-1 fs-5">
+        <h3 class="card-title fw-bold mb-1 fs-5 line-clamp-2" style="word-break: break-word; overflow-wrap: break-word; min-height: 2.6rem;">
             <a href="{{ $productRoute }}" class="text-decoration-none text-dark stretched-link">
                 @if($searchQuery)
                     {!! str_ireplace($searchQuery, '<mark class="bg-warning-subtle text-dark p-0 rounded-1">' . e($searchQuery) . '</mark>', e($product->name)) !!}
@@ -42,8 +43,8 @@
             </a>
         </h3>
 
-        <p class="card-text text-muted small mb-3 flex-grow-1">
-            @php $descLimit = Str::limit($product->description, 60); @endphp
+        <p class="card-text text-muted small mb-3 flex-grow-1 line-clamp-3" style="word-break: break-word; overflow-wrap: break-word;">
+            @php $descLimit = Str::limit($product->description, 90); @endphp
             @if($searchQuery)
                 {!! str_ireplace($searchQuery, '<mark class="bg-warning-subtle text-dark p-0 rounded-1">' . e($searchQuery) . '</mark>', e($descLimit)) !!}
             @else

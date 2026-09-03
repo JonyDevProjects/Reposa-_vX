@@ -170,11 +170,46 @@
                 <p class="text-muted mb-3">{{ __('messages.catalog.results_count', ['count' => $products->total()]) }}</p>
 
                 @if($products->isEmpty())
-                    <div class="text-center py-5">
-                        <i class="bi bi-search fs-1 text-muted"></i>
-                        <h4 class="mt-3">{{ __('messages.catalog.empty.title') }}</h4>
-                        <p class="text-muted">{{ __('messages.catalog.empty.desc') }}</p>
-                        <a href="/catalog" class="btn btn-primary mt-3">{{ __('messages.catalog.empty.btn') }}</a>
+                    <div class="card shadow-sm border-0 rounded-4 overflow-hidden p-3 p-md-4">
+                        <x-empty-state 
+                            icon="bi-search"
+                            :title="request('q') ? __('messages.catalog.empty.search_title') : __('messages.catalog.empty.title')"
+                            :description="request('q') ? __('messages.catalog.empty.search_subtitle', ['query' => request('q')]) : __('messages.catalog.empty.desc')"
+                            actionUrl="/catalog"
+                            :actionText="__('messages.catalog.empty.btn_reset')"
+                            actionIcon="bi-arrow-repeat"
+                            secondaryUrl="/#sleep-finder"
+                            :secondaryText="__('messages.catalog.empty.btn_advisor')"
+                            secondaryIcon="bi-stars"
+                        >
+                            <!-- Search Tips & Fast Category Discovery -->
+                            <div class="mt-4 pt-4 border-top text-start" style="max-width: 580px; margin: 0 auto;">
+                                <h4 class="h6 fw-bold text-navy mb-3">
+                                    <i class="bi bi-lightbulb text-warning me-2"></i>{{ __('messages.catalog.empty.tips_title') }}
+                                </h4>
+                                <ul class="list-unstyled text-muted small mb-4">
+                                    <li class="mb-2 d-flex align-items-start gap-2">
+                                        <i class="bi bi-check2 text-primary mt-1"></i>
+                                        <span>{{ __('messages.catalog.empty.tip_1') }}</span>
+                                    </li>
+                                    <li class="d-flex align-items-start gap-2">
+                                        <i class="bi bi-check2 text-primary mt-1"></i>
+                                        <span>{{ __('messages.catalog.empty.tip_2') }}</span>
+                                    </li>
+                                </ul>
+
+                                <!-- Direct Sleep Finder Banner Callout -->
+                                <div class="p-3 rounded-3 bg-indigo-subtle border border-primary-subtle d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+                                    <div>
+                                        <span class="fw-bold text-navy d-block small">{{ __('messages.catalog.empty.advisor_banner_title') }}</span>
+                                        <span class="text-muted" style="font-size: 0.78rem;">{{ __('messages.catalog.empty.advisor_banner_desc') }}</span>
+                                    </div>
+                                    <a href="/#sleep-finder" class="btn btn-primary btn-sm rounded-pill px-3 flex-shrink-0 text-decoration-none">
+                                        <i class="bi bi-stars me-1"></i>{{ __('messages.catalog.empty.btn_advisor') }}
+                                    </a>
+                                </div>
+                            </div>
+                        </x-empty-state>
                     </div>
                 @else
                     <div class="row g-4">
