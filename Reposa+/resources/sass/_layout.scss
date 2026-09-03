@@ -286,3 +286,277 @@ body {
         box-shadow: 0 10px 20px -4px rgba(24, 36, 71, 0.08);
     }
 }
+
+// =============================================================================
+// Phase 4.1: Sleep Finder (Floating Discovery Bar) & Photographic Categories
+// =============================================================================
+
+.sleep-finder-wrapper {
+    margin-top: -52px;
+    position: relative;
+    z-index: 20;
+
+    @media (max-width: 767.98px) {
+        margin-top: -36px;
+    }
+}
+
+.sleep-finder-card {
+    background-color: #ffffff;
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px -8px rgba(24, 36, 71, 0.12), 0 8px 16px -4px rgba(24, 36, 71, 0.06);
+    padding: var(--space-5);
+
+    @media (min-width: 992px) {
+        padding: var(--space-6) var(--space-7);
+    }
+}
+
+.finder-step-box {
+    background-color: var(--color-canvas);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 14px;
+    padding: var(--space-4);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.finder-pill-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-2);
+
+    @media (max-width: 575.98px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.finder-pill-btn {
+    border: 1.5px solid var(--color-border-subtle);
+    background-color: #ffffff;
+    color: var(--color-text-primary);
+    border-radius: 10px;
+    padding: 10px 8px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.2s ease,
+                border-color 0.2s ease,
+                color 0.2s ease,
+                box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    user-select: none;
+
+    i {
+        font-size: 1.25rem;
+        color: var(--color-serene-indigo);
+        transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .pill-label {
+        font-weight: 600;
+        line-height: 1.2;
+    }
+
+    .pill-hint {
+        font-size: 0.6875rem;
+        font-weight: 400;
+        color: var(--color-text-muted);
+        line-height: 1.2;
+    }
+
+    &:hover {
+        border-color: var(--color-serene-indigo);
+        background-color: var(--color-periwinkle-subtle);
+        color: var(--color-serene-indigo);
+        transform: translateY(-2px);
+    }
+
+    &.active {
+        background-color: var(--color-serene-indigo) !important;
+        border-color: var(--color-serene-indigo) !important;
+        color: #ffffff !important;
+        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
+
+        i {
+            color: #ffffff !important;
+            transform: scale(1.1);
+        }
+
+        .pill-hint {
+            color: rgba(255, 255, 255, 0.85) !important;
+        }
+    }
+
+    &:focus-visible {
+        outline: var(--focus-outline);
+        outline-offset: 2px;
+    }
+}
+
+.finder-cta-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.btn-finder-action {
+    background: linear-gradient(135deg, var(--color-navy) 0%, #2a3c70 100%);
+    color: #ffffff !important;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-family: var(--font-display);
+    padding: 14px 28px;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.2s ease;
+    box-shadow: 0 8px 20px -4px rgba(24, 36, 71, 0.25);
+    text-decoration: none;
+    width: 100%;
+    text-align: center;
+
+    &:hover,
+    &:focus {
+        background: linear-gradient(135deg, #20315c 0%, #354b8c 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 26px -4px rgba(24, 36, 71, 0.32);
+        color: #ffffff !important;
+    }
+
+    &:focus-visible {
+        outline: var(--focus-outline);
+        outline-offset: 3px;
+    }
+}
+
+// --- Photographic Category Cards ---
+.category-photo-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.2s ease;
+
+    .category-photo-wrapper {
+        position: relative;
+        height: 140px;
+        width: 100%;
+        background-color: #f1f5f9;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .category-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(24, 36, 71, 0.05) 0%, rgba(24, 36, 71, 0.35) 100%);
+            pointer-events: none;
+        }
+
+        .category-badge-chip {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: var(--color-serene-indigo);
+            border: 1px solid rgba(79, 70, 229, 0.2);
+            font-size: 0.6875rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.02em;
+            box-shadow: 0 2px 8px rgba(24, 36, 71, 0.1);
+        }
+    }
+
+    .category-card-body {
+        padding: var(--space-4);
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+
+        .category-name {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: 4px;
+            transition: color 0.2s ease;
+        }
+
+        .category-desc {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            line-height: 1.4;
+            margin-bottom: 0;
+        }
+    }
+}
+
+.category-photo-link {
+    text-decoration: none;
+    display: block;
+    height: 100%;
+
+    &:hover .category-photo-card,
+    &:focus-visible .category-photo-card {
+        transform: translateY(-4px);
+        border-color: #cbd5e1;
+        box-shadow: 0 14px 28px -4px rgba(24, 36, 71, 0.1), 0 6px 12px -2px rgba(24, 36, 71, 0.05);
+
+        .category-photo-wrapper img {
+            transform: scale(1.06);
+        }
+
+        .category-name {
+            color: var(--color-serene-indigo);
+        }
+    }
+
+    &:focus-visible {
+        outline: var(--focus-outline);
+        outline-offset: 4px;
+        border-radius: var(--radius-card);
+    }
+}
+
+// Prefers-reduced-motion accessibility floor
+@media (prefers-reduced-motion: reduce) {
+    .sleep-finder-card,
+    .finder-pill-btn,
+    .btn-finder-action,
+    .category-photo-card,
+    .category-photo-wrapper img,
+    .category-photo-link,
+    .hover-lift {
+        transition: none !important;
+        transform: none !important;
+    }
+}
+
