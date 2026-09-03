@@ -16,9 +16,12 @@
         <img src="{{ $imageUrl }}" 
              onerror="this.onerror=null; this.src='/images/product-placeholder.svg';"
              class="card-img-top object-fit-cover" 
-             style="height: 220px; width: 100%; transition: transform 0.4s ease;"
+             width="360"
+             height="220"
+             style="aspect-ratio: 16 / 10; width: 100%; height: 220px; transition: transform 0.4s ease;" 
              alt="{{ $product->name }}"
-             loading="lazy">
+             loading="lazy"
+             decoding="async">
     </a>
 
     <div class="card-body d-flex flex-column p-3 p-md-4">
@@ -74,16 +77,14 @@
                     <form action="{{ route('cart.add', $product) }}" method="POST" class="m-0">
                         @csrf
                         <button type="submit" 
-                                class="btn btn-outline-primary btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm btn-cart-add" 
-                                style="width: 38px; height: 38px;"
+                                class="btn btn-outline-primary btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm btn-cart-add btn-card-action" 
                                 aria-label="{{ __('messages.product.add_to_cart') ?? 'Añadir al carrito' }}"
                                 title="{{ __('messages.product.add_to_cart') ?? 'Añadir al carrito' }}">
                             <i class="bi bi-cart-plus fs-6"></i>
                         </button>
                     </form>
                 @else
-                    <button class="btn btn-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm opacity-50" 
-                            style="width: 38px; height: 38px;" 
+                    <button class="btn btn-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm opacity-50 btn-card-action" 
                             disabled 
                             aria-label="{{ __('messages.product.out_of_stock') ?? 'Agotado' }}">
                         <i class="bi bi-cart-x fs-6"></i>
@@ -95,8 +96,7 @@
                         <form action="{{ route('favorites.toggle', $product) }}" method="POST" class="m-0">
                             @csrf
                             <button type="submit" 
-                                    class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm btn-favorite {{ $isFavorite ? 'btn-danger text-white' : 'btn-outline-danger' }}" 
-                                    style="width: 38px; height: 38px;"
+                                    class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm btn-favorite btn-card-action {{ $isFavorite ? 'btn-danger text-white' : 'btn-outline-danger' }}" 
                                     data-url="{{ route('favorites.toggle', $product) }}"
                                     data-product-id="{{ $product->id }}"
                                     title="{{ $isFavorite ? __('messages.catalog.remove_favorite') : __('messages.catalog.add_favorite') }}"
@@ -106,8 +106,7 @@
                         </form>
                     @else
                         <a href="{{ route('login') }}" 
-                           class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center shadow-sm btn-favorite" 
-                           style="width: 38px; height: 38px;"
+                           class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center shadow-sm btn-favorite btn-card-action" 
                            title="{{ __('messages.catalog.login_favorite') }}"
                            aria-label="{{ __('messages.catalog.login_favorite') }}">
                             <i class="bi bi-heart fs-6"></i>

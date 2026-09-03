@@ -176,9 +176,9 @@ export function initCartInteractions() {
         })
         .then(data => {
             if (data.success) {
-                // Update badge with elastic spring bump
-                const badge = document.getElementById('cart-badge');
-                if (badge) {
+                // Update badges (Desktop & Mobile) with elastic spring bump
+                const badges = document.querySelectorAll('#cart-badge, #mobile-cart-badge, .js-cart-badge');
+                badges.forEach(badge => {
                     badge.innerText = data.cartCount;
                     badge.classList.remove('badge-cart-pulse');
                     // Force reflow to retrigger animation
@@ -187,7 +187,7 @@ export function initCartInteractions() {
                     badge.addEventListener('animationend', () => {
                         badge.classList.remove('badge-cart-pulse');
                     }, { once: true });
-                }
+                });
 
                 // Show Sanctuary Toast
                 showToast('success', data.message || 'Almohada añadida a tu carrito.', {
@@ -411,6 +411,98 @@ export function initOrderTimelineInteractions() {
 }
 
 /**
+ * Initializes Sticky Purchase Bar on Product Detail Viewport (Mobile <768px)
+ */
+export function initStickyPurchaseBar() {
+    const stickyBar = document.getElementById('sticky-purchase-bar');
+    const mainBuyBtn = document.getElementById('main-buy-btn') || document.getElementById('product-actions-wrap');
+    if (!stickyBar || !mainBuyBtn) return;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            // Show when user has scrolled past the main purchase button
+            if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
+                stickyBar.classList.add('is-visible');
+            } else {
+                stickyBar.classList.remove('is-visible');
+            }
+        });
+    }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    });
+
+    observer.observe(mainBuyBtn);
+
+    // Synchronize quantity input fields between sticky and main forms
+    const stickyQtyInput = stickyBar.querySelector('input[name="quantity"]');
+    const mainQtyInput = document.querySelector('#main-buy-form input[name="quantity"]');
+    if (stickyQtyInput && mainQtyInput) {
+        stickyQtyInput.addEventListener('input', () => {
+            mainQtyInput.value = stickyQtyInput.value;
+        });
+        mainQtyInput.addEventListener('input', () => {
+            stickyQtyInput.value = mainQtyInput.value;
+        });
+    }
+}
+
+/**
+ * Initializes Touch-Optimized Product Gallery
+ */
+export function initProductGallery() {
+    const viewport = document.getElementById('product-gallery-viewport');
+    const thumbBtns = document.querySelectorAll('.gallery-thumb-btn');
+    const counterEl = document.getElementById('gallery-counter');
+    if (!viewport || thumbBtns.length === 0) return;
+
+    const totalSlides = thumbBtns.length;
+
+    function setActiveSlide(index) {
+        thumbBtns.forEach((btn, idx) => {
+            const isActive = idx === index;
+            btn.classList.toggle('active', isActive);
+            btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+
+        if (counterEl) {
+            counterEl.textContent = `${index + 1} / ${totalSlides}`;
+        }
+    }
+
+    thumbBtns.forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetIndex = parseInt(btn.dataset.slideIndex, 10);
+            const targetSlide = document.getElementById(`gallery-slide-${targetIndex}`);
+            if (targetSlide) {
+                targetSlide.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest',
+                    inline: 'start'
+                });
+                setActiveSlide(targetIndex);
+            }
+        });
+    });
+
+    // Detect scroll position on mobile swiping
+    let scrollTimeout = null;
+    viewport.addEventListener('scroll', () => {
+        if (scrollTimeout) clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            const slideWidth = viewport.clientWidth;
+            if (slideWidth > 0) {
+                const activeIndex = Math.round(viewport.scrollLeft / slideWidth);
+                if (activeIndex >= 0 && activeIndex < totalSlides) {
+                    setActiveSlide(activeIndex);
+                }
+            }
+        }, 60);
+    }, { passive: true });
+}
+
+/**
  * Initialize all microinteractions when DOM is ready
  */
 export function initInteractions() {
@@ -418,4 +510,7 @@ export function initInteractions() {
     initFavoriteInteractions();
     initServerFlashToasts();
     initOrderTimelineInteractions();
+    initStickyPurchaseBar();
+    initProductGallery();
 }
+

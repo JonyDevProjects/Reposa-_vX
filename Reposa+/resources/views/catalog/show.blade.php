@@ -3,6 +3,26 @@
 @section('title', $product->name)
 
 @section('content')
+    @php
+        $galleryImages = [
+            [
+                'url' => $product->image_url ?: '/images/pillow-detail.png',
+                'label' => __('messages.mobile.gallery_badge_main'),
+                'alt' => $product->name . ' - ' . __('messages.mobile.gallery_badge_main'),
+            ],
+            [
+                'url' => '/images/products/pillow_cervical.png',
+                'label' => __('messages.mobile.gallery_badge_ergonomic'),
+                'alt' => $product->name . ' - ' . __('messages.mobile.gallery_badge_ergonomic'),
+            ],
+            [
+                'url' => '/images/products/pillow_viscoelastica.png',
+                'label' => __('messages.mobile.gallery_badge_cover'),
+                'alt' => $product->name . ' - ' . __('messages.mobile.gallery_badge_cover'),
+            ],
+        ];
+    @endphp
+
     <div class="container py-5">
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb">
@@ -13,16 +33,61 @@
         </nav>
 
         <div class="row g-5">
-            <!-- Product Image -->
+            <!-- Product Gallery (Touch-Optimized, CLS 0 & Multi-View) -->
             <div class="col-md-6">
-                <div class="card border-0 shadow-sm overflow-hidden rounded-4 position-relative">
-                    <img src="{{ $product->image_url ?? '/images/pillow-detail.png' }}" 
-                         onerror="this.onerror=null; this.src='/images/product-placeholder.svg';"
-                         class="img-fluid product-main-img w-100" 
-                         alt="{{ $product->name }}">
+                <div class="card border-0 shadow-sm overflow-hidden rounded-4 position-relative product-gallery-card">
+                    <div class="product-gallery-viewport" id="product-gallery-viewport">
+                        @foreach($galleryImages as $index => $img)
+                            <div class="product-gallery-slide {{ $index === 0 ? 'active' : '' }}" 
+                                 id="gallery-slide-{{ $index }}" 
+                                 data-index="{{ $index }}">
+                                <img src="{{ $img['url'] }}" 
+                                     onerror="this.onerror=null; this.src='/images/product-placeholder.svg';"
+                                     class="img-fluid product-main-img w-100 object-fit-cover" 
+                                     width="600" 
+                                     height="600" 
+                                     style="aspect-ratio: 1 / 1;"
+                                     alt="{{ $img['alt'] }}"
+                                     @if($index === 0) loading="eager" fetchpriority="high" @else loading="lazy" @endif
+                                     decoding="async">
+                                <span class="badge bg-light text-primary border border-primary-subtle position-absolute top-0 start-0 m-3 shadow-sm rounded-pill px-3 py-1 fw-semibold small">
+                                    {{ $img['label'] }}
+                                </span>
+                            </div>
+                        @endforeach
+                    </div>
                     <x-badge-stock :stock="$product->stock" class="position-absolute top-0 end-0 m-3 shadow" />
                 </div>
-                <div class="row mt-3 g-2">
+
+                <!-- Accessible Touch Thumbnails & Navigation Indicator -->
+                <div class="d-flex align-items-center justify-content-between gap-2 mt-3 product-gallery-thumbs" role="tablist" aria-label="{{ __('messages.mobile.gallery_label') }}">
+                    <div class="d-flex gap-2">
+                        @foreach($galleryImages as $index => $img)
+                            <button type="button" 
+                                    class="gallery-thumb-btn {{ $index === 0 ? 'active' : '' }}" 
+                                    data-slide-index="{{ $index }}"
+                                    role="tab"
+                                    aria-selected="{{ $index === 0 ? 'true' : 'false' }}"
+                                    aria-controls="gallery-slide-{{ $index }}"
+                                    aria-label="{{ __('messages.mobile.gallery_thumbnail', ['number' => $index + 1, 'total' => count($galleryImages)]) }}">
+                                <img src="{{ $img['url'] }}" 
+                                     onerror="this.onerror=null; this.src='/images/product-placeholder.svg';"
+                                     alt="{{ $img['label'] }}" 
+                                     width="54" 
+                                     height="54" 
+                                     style="aspect-ratio: 1 / 1;"
+                                     class="object-fit-cover rounded-2"
+                                     loading="lazy"
+                                     decoding="async">
+                            </button>
+                        @endforeach
+                    </div>
+                    <div class="gallery-touch-indicator text-muted small d-md-none">
+                        <i class="bi bi-hand-index-thumb me-1"></i><span class="tabular-nums" id="gallery-counter">1 / {{ count($galleryImages) }}</span>
+                    </div>
+                </div>
+
+                <div class="row mt-4 g-2">
                     <div class="col-4">
                         <div class="card border-0 bg-light rounded-3 p-3 text-center h-100">
                             <i class="bi bi-truck text-primary fs-4"></i>
@@ -95,21 +160,22 @@
 
                     <p class="text-muted mb-5 lead prose-reading">{{ $product->description }}</p>
 
-                    <div class="d-flex flex-column flex-md-row gap-3 mb-5">
+                    <!-- Purchase Actions Form (Observed by Sticky Purchase Bar) -->
+                    <div class="d-flex flex-column flex-md-row gap-3 mb-5" id="product-actions-wrap">
                         @if($product->stock > 0)
-                            <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-flex gap-3 w-100">
+                            <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-flex gap-3 w-100" id="main-buy-form">
                                 @csrf
-                                <div class="input-group" style="width: 130px;">
-                                    <button class="btn btn-outline-secondary" type="button" onclick="this.nextElementSibling.stepDown()" aria-label="Disminuir cantidad">-</button>
-                                    <input type="number" name="quantity" class="form-control text-center tabular-nums" value="1" min="1" max="{{ $product->stock }}" aria-label="Cantidad">
-                                    <button class="btn btn-outline-secondary" type="button" onclick="this.previousElementSibling.stepUp()" aria-label="Aumentar cantidad">+</button>
+                                <div class="input-group" style="width: 136px;">
+                                    <button class="btn btn-outline-secondary btn-touch-target" type="button" onclick="this.nextElementSibling.stepDown()" aria-label="Disminuir cantidad">-</button>
+                                    <input type="number" name="quantity" class="form-control text-center tabular-nums fw-bold fs-6" value="1" min="1" max="{{ $product->stock }}" aria-label="Cantidad">
+                                    <button class="btn btn-outline-secondary btn-touch-target" type="button" onclick="this.previousElementSibling.stepUp()" aria-label="Aumentar cantidad">+</button>
                                 </div>
-                                <button type="submit" class="btn btn-primary btn-cta-bold flex-grow-1 py-3 fw-bold">
+                                <button type="submit" id="main-buy-btn" class="btn btn-primary btn-cta-bold flex-grow-1 py-3 fw-bold">
                                     <i class="bi bi-cart-plus me-2"></i>{{ __('messages.product.add_to_cart') }}
                                 </button>
                             </form>
                         @else
-                            <button class="btn btn-secondary flex-grow-1 py-3 fw-bold" disabled>
+                            <button class="btn btn-secondary flex-grow-1 py-3 fw-bold" id="main-buy-btn" disabled>
                                 <i class="bi bi-cart-x me-2"></i>{{ __('messages.catalog.show.no_stock') }}
                             </button>
                         @endif
@@ -118,7 +184,7 @@
                             <form action="{{ route('favorites.toggle', $product) }}" method="POST" class="m-0">
                                 @csrf
                                 <button type="submit" 
-                                        class="btn btn-favorite {{ $isFavorite ? 'btn-danger text-white' : 'btn-outline-danger' }} py-3 px-4" 
+                                        class="btn btn-favorite {{ $isFavorite ? 'btn-danger text-white' : 'btn-outline-danger' }} py-3 px-4 btn-touch-target" 
                                         data-url="{{ route('favorites.toggle', $product) }}"
                                         data-product-id="{{ $product->id }}"
                                         title="{{ $isFavorite ? __('messages.catalog.remove_favorite') : __('messages.catalog.add_favorite') }}" 
@@ -127,7 +193,7 @@
                                 </button>
                             </form>
                         @else
-                            <a href="{{ route('login') }}" class="btn btn-favorite btn-outline-danger py-3 px-4" title="{{ __('messages.catalog.login_favorite') }}" aria-label="{{ __('messages.catalog.login_favorite') }}">
+                            <a href="{{ route('login') }}" class="btn btn-favorite btn-outline-danger py-3 px-4 btn-touch-target" title="{{ __('messages.catalog.login_favorite') }}" aria-label="{{ __('messages.catalog.login_favorite') }}">
                                 <i class="bi bi-heart fs-5"></i>
                             </a>
                         @endauth
@@ -138,4 +204,50 @@
             </div>
         </div>
     </div>
+
+    <!-- Phase 7: Sticky Purchase Bar for Mobile (<768px Viewports) -->
+    <div id="sticky-purchase-bar" class="sticky-purchase-bar d-md-none" aria-label="{{ __('messages.mobile.sticky_bar_label') }}">
+        <div class="sticky-purchase-inner container-fluid px-3 py-2">
+            <div class="d-flex align-items-center justify-content-between gap-2">
+                <!-- Mini Thumbnail & Price -->
+                <div class="d-flex align-items-center gap-2 min-w-0" style="max-width: 48%;">
+                    <img src="{{ $product->image_url ?: '/images/pillow-detail.png' }}" 
+                         onerror="this.onerror=null; this.src='/images/product-placeholder.svg';"
+                         alt="{{ $product->name }}" 
+                         width="44" 
+                         height="44" 
+                         style="aspect-ratio: 1 / 1;"
+                         class="rounded-2 object-fit-cover border border-light-subtle flex-shrink-0"
+                         loading="lazy"
+                         decoding="async">
+                    <div class="text-truncate">
+                        <span class="d-block text-truncate fw-bold text-navy small">{{ $product->name }}</span>
+                        <x-price :amount="$product->price" size="sm" />
+                    </div>
+                </div>
+
+                <!-- Fast Sticky Add to Cart CTA -->
+                <div class="flex-grow-1 d-flex justify-content-end">
+                    @if($product->stock > 0)
+                        <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-flex align-items-center gap-2 m-0 w-100 justify-content-end" id="sticky-buy-form">
+                            @csrf
+                            <div class="input-group input-group-sm flex-nowrap" style="width: 86px;">
+                                <button class="btn btn-outline-secondary btn-touch-target-sm px-2" type="button" onclick="this.nextElementSibling.stepDown()" aria-label="Disminuir cantidad">-</button>
+                                <input type="number" name="quantity" class="form-control text-center tabular-nums p-0 fw-bold" value="1" min="1" max="{{ $product->stock }}" aria-label="Cantidad">
+                                <button class="btn btn-outline-secondary btn-touch-target-sm px-2" type="button" onclick="this.previousElementSibling.stepUp()" aria-label="Aumentar cantidad">+</button>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sticky-buy fw-bold px-3 py-2 text-nowrap">
+                                <i class="bi bi-cart-plus me-1"></i>{{ __('messages.mobile.sticky_add_to_cart') }}
+                            </button>
+                        </form>
+                    @else
+                        <button class="btn btn-secondary btn-sticky-buy fw-bold px-3 py-2 text-nowrap" disabled>
+                            <i class="bi bi-cart-x me-1"></i>{{ __('messages.mobile.sticky_out_of_stock') }}
+                        </button>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
+
