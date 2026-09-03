@@ -226,6 +226,13 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 - **Internacionalización y Accesibilidad A11y:** Incorporadas cadenas completas en `lang/es/messages.php` y `lang/en/messages.php`. Soporte nativo de navegación por teclado (`aria-pressed`, `role="group"`), anillo de foco accesible y cláusula `@media (prefers-reduced-motion: reduce)` en `_layout.scss`.
 - **Detector Impeccable:** Ejecutado `detect.mjs` arrojando `[]` (0 defectos de diseño). Suite de 60 tests de Feature al 100% verde.
 
+**Resultados Entregados en Fase 4.2 (`bolder`):**
+- **Hero de Alto Impacto y Gradiente Atmosférico:** Transformada la sección Hero en `home.blade.php` con un gradiente radial nocturno estratificado (*Midnight Sanctuary*) sobre `/images/hero.png` que garantiza contraste WCAG 2.1 AA superior a 6:1 en todo el bloque tipográfico. Titular persuasivo enfocado en beneficio emocional y descanso profundo.
+- **Métricas de Confianza Focalizadas (Hero Trust Metrics):** Incorporada barra translúcida de métricas de autoridad ("+10.000 descansos reparadores", "100 noches de prueba sin riesgo", "Envío gratis 24/48h a península") con tipografía tabular (`tabular-nums`), cajas de icono de alto contraste e internacionalización completa ES/EN.
+- **Botones de Acción Principal (CTA) Táctiles con Sombras Ambientales:** Rediseñados los botones de llamada a la acción principal (`btn-hero-primary`, `.btn-hero-secondary`, `.btn-cta-bold`) con altura táctil ergonómica generosa (mínimo 52px), padding táctil expandido, transiciones suaves y sombras ambientales multi-capa (`--shadow-ambient-cta`, `--shadow-hero-primary`, `--shadow-hero-lifted`) que eliminan la sensación plana y mejoran el punto focal sin estridencias.
+- **Componente Reutilizable de Insignias y Sellos de Confianza (`<x-trust-seals>`):** Creado componente Blade polimórfico con variantes `cards` (rejilla de 4 pilares: 100 noches, 24/48h express, Stripe SSL 256-bit y OEKO-TEX), `compact` (ficha de producto `catalog/show.blade.php`), `checkout` (resumen de carrito `cart/index.blade.php`) y `footer` (pie de página global `layouts/app.blade.php`). Incluye isotipos vectoriales limpios de Stripe, Visa, Mastercard y candado de seguridad SSL sin dependencias externas.
+- **Detector Impeccable y Verificación de Regresión:** Cero defectos reportados por `detect.mjs` en las vistas modificadas (`[]`). Suite de 60 tests de Feature al 100% verde (112 assertions).
+
 ---
 
 ## Fase 5: Claridad Transaccional, Estados Vacíos y Resiliencia (PRIORIDAD ALTA)
