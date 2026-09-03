@@ -101,7 +101,7 @@
                                     <input type="number" name="quantity" class="form-control text-center tabular-nums" value="1" min="1" max="{{ $product->stock }}" aria-label="Cantidad">
                                     <button class="btn btn-outline-secondary" type="button" onclick="this.previousElementSibling.stepUp()" aria-label="Aumentar cantidad">+</button>
                                 </div>
-                                <button type="submit" class="btn btn-primary flex-grow-1 py-3 fw-bold">
+                                <button type="submit" class="btn btn-primary btn-cta-bold flex-grow-1 py-3 fw-bold">
                                     <i class="bi bi-cart-plus me-2"></i>{{ __('messages.product.add_to_cart') }}
                                 </button>
                             </form>
@@ -125,28 +125,7 @@
                         @endauth
                     </div>
 
-                    <div class="card bg-light border-0 p-4 rounded-4">
-                        <div class="row g-3">
-                            <div class="col-6">
-                                <div class="d-flex align-items-center">
-                                    <i class="bi bi-truck fs-3 text-primary me-3"></i>
-                                    <div>
-                                        <small class="d-block fw-bold">{{ __('messages.product.free_shipping') }}</small>
-                                        <small class="text-muted">{{ __('messages.product.free_shipping_desc') }}</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="d-flex align-items-center">
-                                    <i class="bi bi-arrow-return-left fs-3 text-primary me-3"></i>
-                                    <div>
-                                        <small class="d-block fw-bold">{{ __('messages.product.trial_days') }}</small>
-                                        <small class="text-muted">{{ __('messages.product.free_returns') }}</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <x-trust-seals variant="compact" />
                 </div>
             </div>
         </div>

@@ -132,8 +132,13 @@
                 </div>
             </div>
             <hr class="my-4 opacity-25">
-            <div class="text-center opacity-75">
-                <small>&copy; 2026 Reposa+. {{ __('messages.footer.rights') }}</small>
+            <div class="row align-items-center opacity-75">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    <small>&copy; 2026 Reposa+. {{ __('messages.footer.rights') }}</small>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <x-trust-seals variant="footer" />
+                </div>
             </div>
         </div>
     </footer>

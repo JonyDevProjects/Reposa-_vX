@@ -135,13 +135,15 @@ body {
     box-shadow: var(--shadow-card);
 }
 
-// --- Hero Section Layout (Full-Bleed Fluid Header) ---
+// --- Hero Section Layout (Full-Bleed Fluid Header - Phase 4.2 Bolder) ---
 .hero-section {
-    background-image: linear-gradient(rgba(24, 36, 71, 0.85), rgba(24, 36, 71, 0.85)), url('/images/hero.png');
+    background: radial-gradient(circle at 50% 25%, rgba(66, 86, 154, 0.48) 0%, rgba(24, 36, 71, 0.90) 65%, rgba(24, 36, 71, 0.96) 100%), url('/images/hero.png');
     background-size: cover;
     background-position: center;
     color: #ffffff !important;
-    padding: var(--space-8) 0;
+    padding: var(--space-8) 0 calc(var(--space-9) + 24px);
+    position: relative;
+    overflow: hidden;
 
     h1, h2, h3, h4, h5, h6,
     .display-1, .display-2, .display-3, .display-hero,
@@ -150,58 +152,134 @@ body {
     }
 
     @media (min-width: 992px) {
-        padding: var(--space-9) 0;
+        padding: calc(var(--space-9) + 8px) 0 calc(var(--space-9) + 36px);
     }
 }
 
-// Hero CTAs (Glassmorphism Nocturno - Suave, Elegante y sin deslumbramiento)
+// Hero CTAs (Bolder, Tactile Generous & Soft Ambient Shadows)
 .btn-hero-primary {
-    background: rgba(255, 255, 255, 0.18) !important;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: linear-gradient(135deg, var(--color-serene-indigo) 0%, #3730a3 100%) !important;
     color: #ffffff !important;
-    border: 1.5px solid rgba(255, 255, 255, 0.45) !important;
-    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    font-weight: 700;
     font-family: var(--font-display);
+    font-size: 1.0625rem;
     border-radius: 12px;
-    padding: 12px 36px;
+    min-height: 52px;
+    padding: 14px 36px;
     transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
                 background-color 0.2s ease,
-                border-color 0.2s ease,
-                box-shadow 0.2s ease;
-    box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.2), inset 0 1px 1px 0 rgba(255, 255, 255, 0.35);
+                border-color 0.2s ease;
+    box-shadow: var(--shadow-hero-primary);
 
     &:hover,
     &:focus {
-        background: rgba(255, 255, 255, 0.28) !important;
-        border-color: rgba(255, 255, 255, 0.75) !important;
+        background: linear-gradient(135deg, #4338ca 0%, #312e81 100%) !important;
+        border-color: rgba(255, 255, 255, 0.65) !important;
         color: #ffffff !important;
         transform: translateY(-2px);
-        box-shadow: 0 12px 28px 0 rgba(0, 0, 0, 0.25), inset 0 1px 1px 0 rgba(255, 255, 255, 0.5);
+        box-shadow: var(--shadow-hero-lifted);
+    }
+
+    &:focus-visible {
+        outline: 3px solid #b1cdff;
+        outline-offset: 3px;
     }
 }
 
 .btn-hero-secondary {
-    background: rgba(255, 255, 255, 0.06) !important;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    color: rgba(255, 255, 255, 0.9) !important;
-    border: 1px solid rgba(255, 255, 255, 0.25) !important;
-    font-weight: 500;
+    background: rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #ffffff !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.40) !important;
+    font-weight: 600;
     font-family: var(--font-display);
+    font-size: 1.0625rem;
     border-radius: 12px;
-    padding: 12px 36px;
+    min-height: 52px;
+    padding: 14px 34px;
     transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
                 background-color 0.2s ease,
                 border-color 0.2s ease,
                 color 0.2s ease;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 
     &:hover,
     &:focus {
-        background: rgba(255, 255, 255, 0.14) !important;
-        border-color: rgba(255, 255, 255, 0.45) !important;
+        background: rgba(255, 255, 255, 0.22) !important;
+        border-color: rgba(255, 255, 255, 0.75) !important;
         color: #ffffff !important;
         transform: translateY(-2px);
+        box-shadow: 0 12px 26px rgba(0, 0, 0, 0.3);
+    }
+
+    &:focus-visible {
+        outline: 3px solid #ffffff;
+        outline-offset: 3px;
+    }
+}
+
+// Hero Trust Metrics Strip (Phase 4.2 Bolder)
+.hero-metrics-strip {
+    max-width: 860px;
+    margin: var(--space-6) auto 0;
+    padding: var(--space-3) var(--space-4);
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 20px;
+    box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.35);
+
+    @media (min-width: 768px) {
+        padding: var(--space-4) var(--space-5);
+    }
+
+    .hero-metric-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-3);
+        padding: var(--space-2) var(--space-3);
+        text-align: left;
+    }
+
+    .metric-icon-wrap {
+        width: 44px;
+        height: 44px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: rgba(79, 70, 229, 0.30);
+        border: 1px solid rgba(177, 205, 255, 0.25);
+        color: #ffffff;
+        font-size: 1.25rem;
+    }
+
+    .metric-text-wrap {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .metric-number {
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #ffffff;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+    }
+
+    .metric-label {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.88);
+        line-height: 1.2;
     }
 }
 
@@ -546,6 +624,128 @@ body {
     }
 }
 
+// =============================================================================
+// Phase 4.2: Trust Pillars, Security Seals & Tactile CTA Styling
+// =============================================================================
+
+// Tactile Generous CTA Buttons
+.btn-cta-bold {
+    min-height: 52px;
+    padding: 14px 32px;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    border-radius: 12px;
+    box-shadow: var(--shadow-ambient-cta);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.2s ease,
+                border-color 0.2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-cta-lifted);
+    }
+
+    &:focus-visible {
+        outline: var(--focus-outline);
+        outline-offset: 3px;
+    }
+}
+
+// 4 Pillars of Rest & Trust (Grid)
+.trust-pillars-grid {
+    .trust-card {
+        background-color: var(--color-surface);
+        border: 1px solid var(--color-border-subtle);
+        border-radius: var(--radius-card);
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                    box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                    border-color 0.2s ease;
+        box-shadow: var(--shadow-card);
+
+        &:hover {
+            transform: translateY(-4px);
+            border-color: var(--color-border-medium);
+            box-shadow: var(--shadow-lifted);
+        }
+    }
+
+    .trust-icon-box {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--color-periwinkle-subtle);
+        color: var(--color-serene-indigo);
+    }
+
+    .trust-badge-pill {
+        background-color: var(--color-slate-subtle);
+        color: var(--color-text-primary);
+        border: 1px solid var(--color-border-subtle);
+        border-radius: 20px;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        padding: 4px 10px;
+        width: fit-content;
+    }
+
+    .stripe-badge-text {
+        font-size: 0.6875rem;
+        font-weight: 600;
+        color: var(--color-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    .stripe-wordmark-svg {
+        color: #635bff;
+    }
+}
+
+// Compact Trust Strip (Product Detail Page)
+.trust-compact-box {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-ambient);
+
+    @media (min-width: 576px) {
+        .border-end-sm {
+            border-right: 1px solid var(--color-border-subtle);
+        }
+    }
+}
+
+// Checkout / Cart Trust Seal Box
+.trust-checkout-seal {
+    background-color: var(--color-slate-subtle);
+    border: 1px dashed var(--color-border-medium);
+    border-radius: 12px;
+
+    .shadow-2xs {
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+}
+
+// Footer Trust Strip
+.footer-trust-strip {
+    font-size: 0.8125rem;
+
+    .stripe-footer-svg {
+        opacity: 0.85;
+        transition: opacity 0.2s ease;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+}
+
 // Prefers-reduced-motion accessibility floor
 @media (prefers-reduced-motion: reduce) {
     .sleep-finder-card,
@@ -554,6 +754,10 @@ body {
     .category-photo-card,
     .category-photo-wrapper img,
     .category-photo-link,
+    .btn-hero-primary,
+    .btn-hero-secondary,
+    .btn-cta-bold,
+    .trust-card,
     .hover-lift {
         transition: none !important;
         transform: none !important;

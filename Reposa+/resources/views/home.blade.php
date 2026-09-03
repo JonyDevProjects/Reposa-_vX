@@ -3,14 +3,60 @@
 @section('title', __('messages.nav.home'))
 
 @section('content')
-    <!-- Hero Section -->
+    <!-- Hero Section (Bolder Visual Impact & Authority) -->
     <section class="hero-section text-center position-relative overflow-hidden">
         <div class="container position-relative z-1">
             <h1 class="display-3 fw-bold mb-3 text-white">{{ __('messages.home.hero.title') }}</h1>
-            <p class="lead mb-5 text-white opacity-90 mx-auto" style="max-width: 65ch;">{{ __('messages.home.hero.subtitle') }}</p>
-            <div class="d-flex justify-content-center gap-3">
-                <a href="/catalog" class="btn btn-hero-primary btn-lg px-5">{{ __('messages.home.hero.btn_catalog') }}</a>
-                <a href="#featured" class="btn btn-hero-secondary btn-lg px-5">{{ __('messages.home.hero.btn_featured') }}</a>
+            <p class="lead mb-4 text-white opacity-90 mx-auto" style="max-width: 65ch;">{{ __('messages.home.hero.subtitle') }}</p>
+            
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                <a href="/catalog" class="btn btn-hero-primary btn-lg px-4 py-3 d-inline-flex align-items-center justify-content-center gap-2">
+                    <span>{{ __('messages.home.hero.btn_catalog') }}</span>
+                    <i class="bi bi-arrow-right fs-5"></i>
+                </a>
+                <a href="#featured" class="btn btn-hero-secondary btn-lg px-4 py-3 d-inline-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-stars"></i>
+                    <span>{{ __('messages.home.hero.btn_featured') }}</span>
+                </a>
+            </div>
+
+            <!-- Hero Trust Metrics Strip (Phase 4.2 Bolder) -->
+            <div class="hero-metrics-strip mt-5 mx-auto" role="region" aria-label="Métricas de confianza y garantía">
+                <div class="row g-2 g-md-3 justify-content-center align-items-center">
+                    <div class="col-12 col-md-4">
+                        <div class="hero-metric-item">
+                            <div class="metric-icon-wrap" aria-hidden="true">
+                                <i class="bi bi-moon-stars-fill"></i>
+                            </div>
+                            <div class="metric-text-wrap">
+                                <span class="metric-number tabular-nums">{{ __('messages.home.hero.metrics.restful_value') }}</span>
+                                <span class="metric-label">{{ __('messages.home.hero.metrics.restful_label') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="hero-metric-item">
+                            <div class="metric-icon-wrap" aria-hidden="true">
+                                <i class="bi bi-shield-check"></i>
+                            </div>
+                            <div class="metric-text-wrap">
+                                <span class="metric-number tabular-nums">{{ __('messages.home.hero.metrics.trial_value') }}</span>
+                                <span class="metric-label">{{ __('messages.home.hero.metrics.trial_label') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="hero-metric-item">
+                            <div class="metric-icon-wrap" aria-hidden="true">
+                                <i class="bi bi-truck"></i>
+                            </div>
+                            <div class="metric-text-wrap">
+                                <span class="metric-number tabular-nums">{{ __('messages.home.hero.metrics.shipping_value') }}</span>
+                                <span class="metric-label">{{ __('messages.home.hero.metrics.shipping_label') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -231,37 +277,21 @@
                 @endforeach
             </div>
             <div class="text-center mt-5">
-                <a href="/catalog" class="btn btn-primary px-5 py-3 fw-semibold shadow-sm">{{ __('messages.home.featured.btn_all') }}</a>
+                <a href="/catalog" class="btn btn-primary btn-cta-bold px-5 py-3 fw-bold">{{ __('messages.home.featured.btn_all') }}</a>
             </div>
         </div>
     </section>
 
-    <!-- Value Propositions -->
-    <section class="section-spacing bg-primary text-white">
+    <!-- Trust & Rest Guarantee Pillars (Phase 4.2 Bolder) -->
+    <section class="section-spacing bg-white border-top border-light-subtle" aria-label="{{ __('messages.home.trust.section_title') }}">
         <div class="container">
-            <div class="row g-4 text-center">
-                <div class="col-md-4">
-                    <div class="p-3">
-                        <i class="bi bi-truck fs-1 mb-3 d-inline-block text-white"></i>
-                        <h3 class="h5 fw-bold text-white">{{ __('messages.home.features.express.title') }}</h3>
-                        <p class="opacity-75 small text-white mb-0">{{ __('messages.home.features.express.desc') }}</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="p-3">
-                        <i class="bi bi-shield-check fs-1 mb-3 d-inline-block text-white"></i>
-                        <h3 class="h5 fw-bold text-white">{{ __('messages.home.features.guarantee.title') }}</h3>
-                        <p class="opacity-75 small text-white mb-0">{{ __('messages.home.features.guarantee.desc') }}</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="p-3">
-                        <i class="bi bi-heart-pulse fs-1 mb-3 d-inline-block text-white"></i>
-                        <h3 class="h5 fw-bold text-white">{{ __('messages.home.features.health.title') }}</h3>
-                        <p class="opacity-75 small text-white mb-0">{{ __('messages.home.features.health.desc') }}</p>
-                    </div>
-                </div>
+            <div class="text-center mb-5">
+                <h2 class="display-6 fw-bold mb-2 text-navy">{{ __('messages.home.trust.section_title') }}</h2>
+                <p class="text-muted mx-auto" style="max-width: 60ch;">{{ __('messages.home.trust.section_subtitle') }}</p>
+                <div class="bg-secondary mx-auto mt-3" style="height: 3px; width: 50px; border-radius: 2px;"></div>
             </div>
+            
+            <x-trust-seals variant="cards" />
         </div>
     </section>
 
