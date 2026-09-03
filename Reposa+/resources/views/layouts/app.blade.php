@@ -47,8 +47,8 @@
                 </form>
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-globe"></i> {{ strtoupper(app()->getLocale()) }}
+                        <a class="nav-link dropdown-toggle d-inline-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-globe me-1"></i> {{ strtoupper(app()->getLocale()) }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item {{ app()->getLocale() == 'es' ? 'active' : '' }}" href="{{ route('lang.switch', 'es') }}">Español</a></li>
@@ -130,7 +130,7 @@
                 <div class="col-md-3">
                     <h6 class="fw-bold mb-3">{{ __('messages.footer.subscribe') }}</h6>
                     <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="Email" aria-label="Email">
+                        <input type="email" name="newsletter_email" class="form-control" placeholder="Email" aria-label="Email" autocomplete="email">
                         <button class="btn btn-secondary" type="button">{{ __('messages.footer.subscribe_btn') }}</button>
                     </div>
                 </div>

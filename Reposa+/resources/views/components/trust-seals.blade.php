@@ -82,8 +82,8 @@
                 <div class="d-flex align-items-center gap-2">
                     <i class="bi bi-moon-stars text-primary fs-4 flex-shrink-0"></i>
                     <div>
-                        <span class="d-block fw-bold text-navy small">100 Noches</span>
-                        <span class="text-muted" style="font-size: 0.75rem;">Prueba en casa</span>
+                        <span class="d-block fw-bold text-navy small">{{ __('messages.home.trust.compact_trial_title') }}</span>
+                        <span class="text-muted" style="font-size: 0.75rem;">{{ __('messages.home.trust.compact_trial_desc') }}</span>
                     </div>
                 </div>
             </div>
@@ -91,8 +91,8 @@
                 <div class="d-flex align-items-center gap-2">
                     <i class="bi bi-truck text-primary fs-4 flex-shrink-0"></i>
                     <div>
-                        <span class="d-block fw-bold text-navy small">Envío Gratis</span>
-                        <span class="text-muted" style="font-size: 0.75rem;">24/48h península</span>
+                        <span class="d-block fw-bold text-navy small">{{ __('messages.home.trust.compact_shipping_title') }}</span>
+                        <span class="text-muted" style="font-size: 0.75rem;">{{ __('messages.home.trust.compact_shipping_desc') }}</span>
                     </div>
                 </div>
             </div>
@@ -100,8 +100,8 @@
                 <div class="d-flex align-items-center gap-2">
                     <i class="bi bi-shield-lock text-primary fs-4 flex-shrink-0"></i>
                     <div>
-                        <span class="d-block fw-bold text-navy small">Pago Stripe</span>
-                        <span class="text-muted" style="font-size: 0.75rem;">SSL 256-bit seguro</span>
+                        <span class="d-block fw-bold text-navy small">{{ __('messages.home.trust.compact_stripe_title') }}</span>
+                        <span class="text-muted" style="font-size: 0.75rem;">{{ __('messages.home.trust.compact_stripe_desc') }}</span>
                     </div>
                 </div>
             </div>
@@ -126,7 +126,7 @@
             <span class="badge bg-light text-dark border px-1 py-0" style="font-size: 0.65rem;">Mastercard</span>
         </div>
         <p class="text-muted mb-0" style="font-size: 0.75rem;">
-            <i class="bi bi-shield-check text-success me-1"></i>100 noches de prueba con devolución gratuita garantizada
+            <i class="bi bi-shield-check text-success me-1"></i>{{ __('messages.cart.trial_guarantee_pill') }}
         </p>
     </div>
 
@@ -135,7 +135,7 @@
     <div {{ $attributes->merge(['class' => 'footer-trust-strip d-flex flex-wrap align-items-center justify-content-center justify-content-md-end gap-3 text-white-50']) }}>
         <div class="d-inline-flex align-items-center gap-2">
             <i class="bi bi-shield-lock-fill text-white-50 small"></i>
-            <span class="small" style="font-size: 0.75rem;">Pago Seguro Stripe SSL</span>
+            <span class="small" style="font-size: 0.75rem;">{{ __('messages.home.trust.footer_payment_title') }}</span>
         </div>
         <div class="d-inline-flex align-items-center gap-2">
             <svg class="stripe-footer-svg text-white" viewBox="0 0 60 25" width="40" height="17" fill="rgba(255,255,255,0.75)" aria-label="Stripe">

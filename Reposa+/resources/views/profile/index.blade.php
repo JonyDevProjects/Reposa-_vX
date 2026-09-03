@@ -19,7 +19,7 @@
                     <a href="#overview" class="list-group-item list-group-item-action border-0 px-0 active"><i class="bi bi-person me-2"></i> {{ __('messages.profile.sidebar.profile') }}</a>
                     <a href="#orders" class="list-group-item list-group-item-action border-0 px-0"><i class="bi bi-box me-2"></i> {{ __('messages.profile.sidebar.orders') }}</a>
                     <a href="#addresses" class="list-group-item list-group-item-action border-0 px-0"><i class="bi bi-geo-alt me-2"></i> {{ __('messages.profile.sidebar.addresses') }}</a>
-                    <a href="#favorites" class="list-group-item list-group-item-action border-0 px-0"><i class="bi bi-heart me-2"></i> Favoritos</a>
+                    <a href="#favorites" class="list-group-item list-group-item-action border-0 px-0"><i class="bi bi-heart me-2"></i> {{ __('messages.profile.sidebar.favorites') }}</a>
                     <form method="POST" action="{{ route('logout') }}" class="d-inline">
                         @csrf
                         <button type="submit" class="list-group-item list-group-item-action border-0 px-0 text-danger"><i class="bi bi-box-arrow-right me-2"></i> {{ __('messages.nav.logout') }}</button>
@@ -115,7 +115,7 @@
                         <x-empty-state 
                             icon="bi-bag-check"
                             :title="__('messages.profile.no_orders')"
-                            description="Tus pedidos y facturas oficiales de descanso aparecerán aquí en cuanto comiences a dormir mejor."
+                            :description="__('messages.profile.no_orders_desc')"
                             actionUrl="/catalog"
                             :actionText="__('messages.profile.go_to_store')"
                             actionIcon="bi-chevron-right"
@@ -168,7 +168,7 @@
                         <x-empty-state 
                             icon="bi-geo-alt"
                             :title="__('messages.profile.no_addresses')"
-                            description="Añade tu dirección postal de entrega para recibir tus almohadas en 24/48h con total comodidad."
+                            :description="__('messages.profile.no_addresses_desc')"
                         >
                             <div class="mt-2">
                                 <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addAddressModal">
