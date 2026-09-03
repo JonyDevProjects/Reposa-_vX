@@ -1380,10 +1380,286 @@ body {
     .timeline-node-btn,
     .timeline-progress-fill,
     .ritual-box,
-    .btn-download-invoice {
+    .btn-download-invoice,
+    .posture-select-btn,
+    .quick-firmness-pill,
+    .spine-pulse-dot {
         transition: none !important;
         transform: none !important;
         animation: none !important;
     }
 }
+
+// =============================================================================
+// Phase 6: Operational Density (Admin Quieter) & Signature Feature (Overdrive)
+// =============================================================================
+
+// --- Subphase 6.1: Quieter High-Density Administration ---
+.admin-sidebar-card {
+    border: 1px solid var(--color-border-subtle, #e2e8f0);
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.admin-sidebar-nav {
+    .list-group-item {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #334155;
+        border: none;
+        border-radius: 6px;
+        margin: 2px 8px;
+        transition: all 0.15s ease;
+
+        &:hover {
+            background-color: #f1f5f9;
+            color: #0f172a;
+        }
+
+        &.active {
+            background-color: var(--color-deep-sanctuary-navy, #182447);
+            color: #ffffff;
+            font-weight: 600;
+        }
+    }
+}
+
+.kpi-card-quieter {
+    border: 1px solid var(--color-border-subtle, #e2e8f0);
+    border-radius: 12px;
+    background: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 12px rgba(24, 36, 71, 0.06);
+    }
+
+    .kpi-icon-pill {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+}
+
+.table-admin {
+    font-size: 0.85rem;
+
+    thead th {
+        background-color: #f8fafc;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        font-weight: 600;
+        padding: 0.65rem 0.85rem;
+        border-bottom: 1px solid #e2e8f0;
+        white-space: nowrap;
+    }
+
+    tbody td {
+        padding: 0.65rem 0.85rem;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+
+    tbody tr:hover {
+        background-color: #f8fafc;
+    }
+}
+
+.admin-badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: 50rem;
+    border: 1px solid transparent;
+    letter-spacing: 0.02em;
+
+    &.admin-badge-pending {
+        background-color: #fef3c7;
+        color: #92400e;
+        border-color: #fde68a;
+    }
+
+    &.admin-badge-processing {
+        background-color: #e0e7ff;
+        color: #3730a3;
+        border-color: #c7d2fe;
+    }
+
+    &.admin-badge-shipped {
+        background-color: #e0f2fe;
+        color: #0369a1;
+        border-color: #bae6fd;
+    }
+
+    &.admin-badge-delivered,
+    &.admin-badge-completed {
+        background-color: #d1fae5;
+        color: #065f46;
+        border-color: #a7f3d0;
+    }
+
+    &.admin-badge-cancelled {
+        background-color: #f1f5f9;
+        color: #475569;
+        border-color: #e2e8f0;
+    }
+
+    &.admin-badge-refunded {
+        background-color: #fee2e2;
+        color: #991b1b;
+        border-color: #fecaca;
+    }
+}
+
+// --- Subphase 6.3: Signature Feature (Firmness Advisor & Guide) ---
+.firmness-advisor-wrapper {
+    .firmness-advisor-card {
+        border: 1px solid var(--color-border-subtle, #e2e8f0);
+        background: #ffffff;
+        box-shadow: 0 4px 20px -2px rgba(24, 36, 71, 0.08);
+    }
+
+    .advisor-badge-pill {
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        color: #ffffff;
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .posture-select-btn {
+        background-color: #ffffff;
+        border-color: var(--color-border-subtle, #e2e8f0) !important;
+        border-radius: 12px;
+        cursor: pointer;
+        outline: none;
+
+        .posture-desc-sub {
+            font-size: 0.7rem;
+            line-height: 1.3;
+        }
+
+        &:hover {
+            border-color: var(--color-serene-indigo, #4f46e5) !important;
+            background-color: #f8fafc;
+            transform: translateY(-2px);
+        }
+
+        &.active {
+            border-color: var(--color-deep-sanctuary-navy, #182447) !important;
+            background-color: #eff6ff;
+            box-shadow: 0 0 0 2px var(--color-serene-indigo, #4f46e5);
+            transform: translateY(-2px);
+
+            .posture-icon i {
+                color: var(--color-deep-sanctuary-navy, #182447) !important;
+                transform: scale(1.1);
+            }
+        }
+    }
+
+    .range-slider-wrapper {
+        .firmness-slider {
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(to right, #93c5fd 0%, #6366f1 50%, #1e1b4b 100%);
+            outline: none;
+            cursor: pointer;
+
+            &::-webkit-slider-thumb {
+                width: 22px;
+                height: 22px;
+                border-radius: 50%;
+                background: #182447;
+                border: 3px solid #ffffff;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+                cursor: pointer;
+                transition: transform 0.15s ease;
+
+                &:hover {
+                    transform: scale(1.15);
+                }
+            }
+
+            &::-moz-range-thumb {
+                width: 22px;
+                height: 22px;
+                border-radius: 50%;
+                background: #182447;
+                border: 3px solid #ffffff;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+                cursor: pointer;
+            }
+        }
+
+        .marker-point {
+            cursor: pointer;
+            font-size: 0.72rem;
+            transition: color 0.15s ease;
+
+            &:hover {
+                color: var(--color-serene-indigo, #4f46e5);
+            }
+        }
+    }
+
+    .quick-firmness-pill {
+        font-size: 0.75rem;
+        font-weight: 500;
+        border-color: #cbd5e1;
+        color: #475569;
+        transition: all 0.15s ease;
+
+        &:hover {
+            border-color: var(--color-deep-sanctuary-navy, #182447);
+            color: var(--color-deep-sanctuary-navy, #182447);
+        }
+
+        &.active {
+            background-color: var(--color-deep-sanctuary-navy, #182447);
+            border-color: var(--color-deep-sanctuary-navy, #182447);
+            color: #ffffff;
+            font-weight: 600;
+        }
+    }
+
+    .advisor-preview-card {
+        background-color: #f8fafc;
+        border-color: var(--color-border-subtle, #e2e8f0);
+
+        .spine-pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+            display: inline-block;
+            animation: pulse-cervical 2s infinite;
+        }
+    }
+}
+
+@keyframes pulse-cervical {
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
 

@@ -43,6 +43,9 @@
     </div>
 
     <div class="container pb-5">
+        {{-- Phase 6.3 Signature Feature: Interactive Anatomical Firmness Guide --}}
+        @include('catalog.partials.firmness-guide')
+
         <div class="row g-4">
             <!-- Sidebar / Filters -->
             <div class="col-md-3">

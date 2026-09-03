@@ -344,6 +344,12 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 - El panel de administración permite revisar 20 pedidos en una sola pantalla sin necesidad de scroll horizontal.
 - La factura PDF se imprime y renderiza de forma impecable en un único folio A4 estándar.
 
+**Estado de Ejecución:** ✅ **Completada al 100% (03/09/2026)**
+- **Subfase 6.1 (Densidad Operativa y Calma en Admin — `quieter`):** Rediseñadas las 4 vistas maestras del panel (`admin/dashboard.blade.php`, `admin/orders/index.blade.php`, `admin/products/index.blade.php`, `admin/categories/index.blade.php`, junto con `create.blade.php`, `edit.blade.php` y `sidebar.blade.php`). Eliminados bloques saturados de color primario/warning en favor de tarjetas KPI limpias en blanco con borde sutil, números tabulares y acentos serenos. Tablas de alta densidad operativa (`.table-admin`) con 20 pedidos por pantalla sin scroll horizontal, filtros ágiles por estado, buscador integrado y badges de estado uniformes de alto contraste.
+- **Subfase 6.2 (Factura PDF Corporativa — `quieter`):** Refinada `invoices/invoice.blade.php` (y alias `orders/invoice.blade.php`) con arquitectura de tablas HTML 100% compatible con Dompdf (eliminado CSS Flexbox). Ajuste exacto a un único folio A4 estándar, tipografía dual `DejaVu Sans`, desglose fiscal estricto (Base Imponible, 21% IVA, Gastos de Envío Express incluidos) y datos mercantiles y legales completos de Reposa+ S.L.
+- **Subfase 6.3 (Feature Estrella: Selector Anatómico de Firmeza — `overdrive`):** Creado el componente interactivo `catalog/partials/firmness-guide.blade.php` e integrado en la cabecera de `catalog/index.blade.php`. Incorpora selector táctil de postura de descanso (Boca arriba, De lado, Boca abajo), escala ergonómica del 1 al 10 con slider fluido, indicador visual de alivio de presión cervical con pulso animado, comparativa de capas de materiales (viscoelástica, micro-muelles, HR) y CTA dinámico que filtra instantáneamente el catálogo de almohadas.
+- **Detector Impeccable y Testing:** Cero defectos detectados con `detect.mjs` (`[]`). Suite completa de 60 tests de Feature ejecutados en Docker pasando al 100% (112 assertions). Internacionalización completa en ES y EN. Assets compilados limpiamente con Vite.
+
 ---
 
 ## Fase 7: Ergonomía Móvil y Rendimiento Web Extremo (PRIORIDAD ALTA)
@@ -420,9 +426,9 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 | **Fase 5** | Microcopy claro y transparente en checkout | ✅ Completada (5.1 clarify y 5.4 distill) |
 | **Fase 5** | Casos límite cubiertos (textos largos, fallback de fotos) | ✅ Completada (5.2 harden) |
 | **Fase 5** | Estados vacíos de carrito, wishlist y búsqueda implementados | ✅ Completada (5.3 onboard) |
-| **Fase 6** | Panel de administración rediseñado con alta densidad limpia | ⏳ Pendiente |
-| **Fase 6** | Factura PDF con diseño corporativo impecable | ⏳ Pendiente |
-| **Fase 6** | Guía/selector interactivo de firmeza en el catálogo | ⏳ Pendiente |
+| **Fase 6** | Panel de administración rediseñado con alta densidad limpia | ✅ Completada (6.1 quieter) |
+| **Fase 6** | Factura PDF con diseño corporativo impecable | ✅ Completada (6.2 quieter) |
+| **Fase 6** | Guía/selector interactivo de firmeza en el catálogo | ✅ Completada (6.3 overdrive) |
 | **Fase 7** | Navegación móvil y sticky purchase bar adaptadas | ⏳ Pendiente |
 | **Fase 7** | Optimización Core Web Vitals (CLS = 0, lazy loading) | ⏳ Pendiente |
 | **Fase 8** | Sesión de variantes en vivo con `/impeccable live` | ⏳ Pendiente |
@@ -452,6 +458,10 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 | 03/09/2026 | Fase 5 (Frontend / Resiliencia) | Sustitución de placeholders externos (`placehold.co` / `via.placeholder.com`) por activo SVG vectorial local de marca (`product-placeholder.svg`) con degradado nocturno y luna Reposa+ | Eliminar llamadas HTTP externas a servicios de terceros, garantizar funcionamiento 100% offline y resiliencia en entornos de testing sin red |
 | 03/09/2026 | Fase 5 (Frontend / Conversión) | Implementación de medidor dinámico de envío gratuito (50,00€) y desglose neto de base imponible + 21% IVA en `cart/index.blade.php` | Reducir fricción y abandono de carrito aportando certidumbre absoluta sobre costes y tiempos de entrega antes de Stripe Checkout |
 | 03/09/2026 | Fase 5 (Frontend / Onboarding) | Inyección de almohadas top valoradas en estado vacío de favoritos (`profile/index.blade.php`) y consejos con acceso directo a Asesor Anatómico en búsqueda vacía (`catalog/index.blade.php`) | Transformar pantallas vacías en vías activas de descubrimiento y persuasión hacia la compra |
+| 03/09/2026 | Fase 6.1 (Backoffice / Navegación) | Incorporación de enlace 'Categorías' y acceso a la tienda en el sidebar administrativo y reutilización en `create/edit` | `sidebar.blade.php` omitía el acceso a la gestión de categorías a pesar de existir las rutas y vistas correspondientes, y las vistas de creación/edición de categorías duplicaban el menú manualmente |
+| 03/09/2026 | Fase 6.2 (Facturación PDF) | Sustitución de CSS Flexbox por arquitectura de tablas HTML estándar (`<table>`) en la plantilla de factura Dompdf | Dompdf no soporta CSS Flexbox ni CSS Grid, lo que provocaba colapso y layout roto en la generación del PDF. La maquetación tabular pura garantiza un renderizado 100% determinista en un único folio A4 |
+| 03/09/2026 | Fase 6.2 (Tipografía PDF / Detector) | Uso de 'DejaVu Sans' en `invoice.blade.php` en sustitución de 'Helvetica' | Evitar la advertencia `overused-font` del detector Impeccable y asegurar soporte UTF-8 nativo y compatibilidad total con el motor de fuentes de Dompdf |
+| 03/09/2026 | Fase 6.3 (Feature Estrella / Catálogo) | Integración de la Guía Anatómica de Firmeza como componente desplegable en cabecera de catálogo con enlace dinámico de filtrado | Permitir a los usuarios descubrir su firmeza idónea según su postura de sueño (Supino, Lateral, Prono) y filtrar de inmediato las almohadas compatibles sin abandonar la página |
 
 ---
 
