@@ -220,6 +220,12 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 - La página de inicio transmite sensación de producto de gama alta con una jerarquía visual indudable.
 - Animaciones a 60 FPS con respeto estricto a la preferencia del sistema `@media (prefers-reduced-motion: reduce)`.
 
+**Resultados Entregados en Fase 4.1 (`shape`):**
+- **Floating Sleep Finder ("Asesor Anatómico Reposa+"):** Implementado módulo interactivo de descubrimiento en la Home (`home.blade.php`) superpuesto de forma fluida tras la cabecera Hero. Incluye selector de 2 pasos ergonómicos: postura habitual (*De lado*, *Boca arriba*, *Boca abajo*) que preselecciona inteligentemente la firmeza anatómica recomendada, y nivel de firmeza (*Suave*, *Media*, *Firme/Anatómica*). Botón dinámico que computa y actualiza al vuelo la URL filtrada hacia `/catalog?firmness=...`.
+- **Tarjetas Fotográficas de Categoría con Chips de Beneficio:** Sustituido el listado plano monocromático por tarjetas fotográficas de producto de alta resolución con overlay degradado sutil, tipografía jerárquica clara y badges destacados de beneficio ergonómico (*Alivio cervical*, *Efecto memoria*, *Frescor térmico*, *Respiración libre*, *Soporte activo*, *Cero presión*, *Confort portátil*, *Hipoalergénico*).
+- **Internacionalización y Accesibilidad A11y:** Incorporadas cadenas completas en `lang/es/messages.php` y `lang/en/messages.php`. Soporte nativo de navegación por teclado (`aria-pressed`, `role="group"`), anillo de foco accesible y cláusula `@media (prefers-reduced-motion: reduce)` en `_layout.scss`.
+- **Detector Impeccable:** Ejecutado `detect.mjs` arrojando `[]` (0 defectos de diseño). Suite de 60 tests de Feature al 100% verde.
+
 ---
 
 ## Fase 5: Claridad Transaccional, Estados Vacíos y Resiliencia (PRIORIDAD ALTA)
@@ -370,7 +376,7 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 | **Fase 3** | Nueva escala tipográfica dual integrada (`_typography.scss`) | ✅ Completada |
 | **Fase 3** | Paleta cromática de descanso aplicada en toda la app (`_tokens.scss`) | ✅ Completada |
 | **Fase 3** | Layouts y espaciados armónicos en catálogo y producto (`_layout.scss`) | ✅ Completada |
-| **Fase 4** | Home persuasiva con propuesta de valor y Hero renovado | ⏳ Pendiente |
+| **Fase 4** | Home persuasiva con propuesta de valor y Hero renovado | 🔄 En Progreso (4.1 shape completada) |
 | **Fase 4** | Microinteracciones y animaciones de favoritos y carrito | ⏳ Pendiente |
 | **Fase 4** | Confirmación de pedido emocional y de marca | ⏳ Pendiente |
 | **Fase 5** | Microcopy claro y transparente en checkout | ⏳ Pendiente |
@@ -401,6 +407,8 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 | 02/09/2026 | Fase 3 (Frontend / Tipografía) | Cambio de color rígido en encabezados a `color: inherit` en `_typography.scss` y clases explícitas `text-white` | La regla inicial asignaba `color: var(--color-text-primary)` (`#182447` azul marino) a todos los encabezados y a `.navbar-brand`, provocando que el logotipo y el titular del hero fueran invisibles sobre fondos oscuros |
 | 02/09/2026 | Fase 3 (Frontend / Interacciones) | Rediseño del hover en tarjetas de categoría: sustitución de la inversión de fondo azul marino por elevación táctil luminosa (`4px`, sombra suave, fondo blanco persistente) | Invertir la tarjeta a azul oscuro sobre un lienzo blanco causaba un efecto de "agujero negro" y daba la sensación al usuario de que el contenido desaparecía |
 | 02/09/2026 | Fase 3 (Frontend / Identidad Visual) | Implementación de estilo Glassmorphism nocturno (`backdrop-filter: blur(12px)`, `rgba(255, 255, 255, 0.18)`) en los botones CTA de la cabecera Hero | Los botones con fondo sólido (púrpura `#4F46E5` o blanco puro) generaban un contraste desmedido y estridente sobre la fotografía nocturna, rompiendo la atmósfera de descanso |
+| 03/09/2026 | Fase 4 (Frontend / Descubrimiento) | Sustitución de accesos planos por 'Floating Sleep Finder' en 2 pasos y tarjetas de categoría fotográficas con chips de beneficio anatómico | Maximizar la capacidad persuasiva desde el primer pliegue de la Home, guiando al usuario sin fricción técnica hacia su almohada ideal |
+| 03/09/2026 | Fase 4 (Infraestructura / Testing) | Forzado estricto de aislamiento con `force="true"` en `DB_DATABASE` dentro de `phpunit.xml` | El contenedor Docker inyectaba `DB_DATABASE=reposaplus_dev` como variable de SO. Al tener `force="false"` por defecto en PHPUnit, los tests ignoraban la BD de test y vaciaban `reposaplus_dev` con `RefreshDatabase` |
 
 ---
 
