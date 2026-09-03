@@ -21,7 +21,7 @@
             </h1>
             <p class="text-muted small mb-0">
                 @if(!$cartItems->isEmpty())
-                    {{ $totalItemsCount }} {{ $totalItemsCount === 1 ? 'almohada en tu cesta de descanso' : 'almohadas en tu cesta de descanso' }}
+                    {{ $totalItemsCount }} {{ $totalItemsCount === 1 ? __('messages.cart.items_count_single') : __('messages.cart.items_count_plural') }}
                 @else
                     {{ __('messages.app.tagline') }}
                 @endif
@@ -162,7 +162,7 @@
                     </div>
                     <div class="small">
                         <span class="fw-bold text-navy d-block">{{ __('messages.cart.shipping_info') }}</span>
-                        <span class="text-muted">Pedidos tramitados antes de las 14:00 h salen en expedición hoy mismo.</span>
+                        <span class="text-muted">{{ __('messages.cart.shipping_dispatch_hint') }}</span>
                     </div>
                 </div>
             </div>
@@ -220,7 +220,7 @@
                         <div class="d-flex justify-content-between align-items-baseline mb-4">
                             <div>
                                 <span class="h5 fw-bold text-navy mb-0 d-block">{{ __('messages.cart.total') }}</span>
-                                <small class="text-muted" style="font-size: 0.75rem;">Impuestos y envío incluidos</small>
+                                <small class="text-muted" style="font-size: 0.75rem;">{{ __('messages.cart.taxes_included') }}</small>
                             </div>
                             <x-price :amount="$total" size="lg" />
                         </div>

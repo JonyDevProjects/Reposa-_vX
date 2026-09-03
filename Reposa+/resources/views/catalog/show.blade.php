@@ -166,9 +166,9 @@
                             <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-flex gap-3 w-100" id="main-buy-form">
                                 @csrf
                                 <div class="input-group" style="width: 136px;">
-                                    <button class="btn btn-outline-secondary btn-touch-target" type="button" onclick="this.nextElementSibling.stepDown()" aria-label="Disminuir cantidad">-</button>
-                                    <input type="number" name="quantity" class="form-control text-center tabular-nums fw-bold fs-6" value="1" min="1" max="{{ $product->stock }}" aria-label="Cantidad">
-                                    <button class="btn btn-outline-secondary btn-touch-target" type="button" onclick="this.previousElementSibling.stepUp()" aria-label="Aumentar cantidad">+</button>
+                                    <button class="btn btn-outline-secondary btn-touch-target" type="button" onclick="this.nextElementSibling.stepDown()" aria-label="{{ __('messages.catalog.show.decrease_qty') }}">-</button>
+                                    <input type="number" name="quantity" class="form-control text-center tabular-nums fw-bold fs-6" value="1" min="1" max="{{ $product->stock }}" aria-label="{{ __('messages.cart.quantity') }}">
+                                    <button class="btn btn-outline-secondary btn-touch-target" type="button" onclick="this.previousElementSibling.stepUp()" aria-label="{{ __('messages.catalog.show.increase_qty') }}">+</button>
                                 </div>
                                 <button type="submit" id="main-buy-btn" class="btn btn-primary btn-cta-bold flex-grow-1 py-3 fw-bold">
                                     <i class="bi bi-cart-plus me-2"></i>{{ __('messages.product.add_to_cart') }}
@@ -232,9 +232,9 @@
                         <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-flex align-items-center gap-2 m-0 w-100 justify-content-end" id="sticky-buy-form">
                             @csrf
                             <div class="input-group input-group-sm flex-nowrap" style="width: 86px;">
-                                <button class="btn btn-outline-secondary btn-touch-target-sm px-2" type="button" onclick="this.nextElementSibling.stepDown()" aria-label="Disminuir cantidad">-</button>
-                                <input type="number" name="quantity" class="form-control text-center tabular-nums p-0 fw-bold" value="1" min="1" max="{{ $product->stock }}" aria-label="Cantidad">
-                                <button class="btn btn-outline-secondary btn-touch-target-sm px-2" type="button" onclick="this.previousElementSibling.stepUp()" aria-label="Aumentar cantidad">+</button>
+                                <button class="btn btn-outline-secondary btn-touch-target-sm px-2" type="button" onclick="this.nextElementSibling.stepDown()" aria-label="{{ __('messages.catalog.show.decrease_qty') }}">-</button>
+                                <input type="number" name="quantity" class="form-control text-center tabular-nums p-0 fw-bold" value="1" min="1" max="{{ $product->stock }}" aria-label="{{ __('messages.cart.quantity') }}">
+                                <button class="btn btn-outline-secondary btn-touch-target-sm px-2" type="button" onclick="this.previousElementSibling.stepUp()" aria-label="{{ __('messages.catalog.show.increase_qty') }}">+</button>
                             </div>
                             <button type="submit" class="btn btn-primary btn-sticky-buy fw-bold px-3 py-2 text-nowrap">
                                 <i class="bi bi-cart-plus me-1"></i>{{ __('messages.mobile.sticky_add_to_cart') }}

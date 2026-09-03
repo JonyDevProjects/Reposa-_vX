@@ -72,7 +72,7 @@
                     </div>
                     <div class="col-lg-4 text-lg-end mt-2 mt-lg-0">
                         <span class="badge bg-light text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold small">
-                            <i class="bi bi-patch-check-fill text-primary me-1"></i> Asesor Anatómico Reposa+
+                            <i class="bi bi-patch-check-fill text-primary me-1"></i> {{ __('messages.home.finder.advisor_badge') }}
                         </span>
                     </div>
                 </div>
@@ -132,7 +132,7 @@
                                             aria-pressed="false">
                                         <i class="bi bi-cloud"></i>
                                         <span class="pill-label">{{ __('messages.home.finder.firmness_soft') }}</span>
-                                        <span class="pill-hint">Efecto nube</span>
+                                        <span class="pill-hint">{{ __('messages.home.finder.firmness_soft_hint') }}</span>
                                     </button>
                                     <button type="button" 
                                             class="finder-pill-btn js-firmness-btn" 
@@ -140,7 +140,7 @@
                                             aria-pressed="false">
                                         <i class="bi bi-bullseye"></i>
                                         <span class="pill-label">{{ __('messages.home.finder.firmness_medium') }}</span>
-                                        <span class="pill-hint">Equilibrio</span>
+                                        <span class="pill-hint">{{ __('messages.home.finder.firmness_medium_hint') }}</span>
                                     </button>
                                     <button type="button" 
                                             class="finder-pill-btn js-firmness-btn active" 
@@ -148,7 +148,7 @@
                                             aria-pressed="true">
                                         <i class="bi bi-layers-half"></i>
                                         <span class="pill-label">{{ __('messages.home.finder.firmness_firm') }}</span>
-                                        <span class="pill-hint">Soporte firme</span>
+                                        <span class="pill-hint">{{ __('messages.home.finder.firmness_firm_hint') }}</span>
                                     </button>
                                 </div>
                             </div>
@@ -165,7 +165,7 @@
                                 <i class="bi bi-arrow-right fs-5"></i>
                             </a>
                             <p class="text-muted text-center mt-2 mb-0" style="font-size: 0.75rem;">
-                                <i class="bi bi-shield-check text-success me-1"></i>100 noches de prueba sin compromiso
+                                <i class="bi bi-shield-check text-success me-1"></i>{{ __('messages.home.finder.trial_guarantee_hint') }}
                             </p>
                         </div>
                     </div>
@@ -233,8 +233,8 @@
                     @php
                         $meta = $categoryMeta[$category->slug] ?? [
                             'image' => '/images/pillow-detail.png',
-                            'badge' => 'Reposa+',
-                            'desc' => 'Confort anatómico diseñado para tu bienestar diario',
+                            'badge' => __('messages.home.finder.default_category_badge'),
+                            'desc' => __('messages.home.finder.default_category_desc'),
                         ];
                     @endphp
                     <div class="col-6 col-md-4 col-lg-3">

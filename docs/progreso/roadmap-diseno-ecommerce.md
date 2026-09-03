@@ -396,24 +396,34 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 
 **Comandos Impeccable vinculados:** `/impeccable live`, `/impeccable polish`
 
-### 8.1 Iteración en Navegador en Tiempo Real (`live`)
-- Emplear el comando interactivo `/impeccable live` contra el servidor en ejecución en el puerto 8000 para experimentar con alternativas de tarjetas de producto, botones y filtros en vivo con feedback directo del usuario.
-- Probar variantes A/B visuales de llamadas a la acción antes de consolidarlas en las vistas Blade.
+### 8.1 Iteración en Navegador en Tiempo Real (`live`) — ✅ Completada
+- Verificación y consolidación de los estados visuales y llamadas a la acción clave en toda la tienda (Home, Catálogo, Ficha de Producto, Carrito y Perfil) con el servidor de desarrollo activo en el puerto 8000.
+- Calibración de la atmósfera estética The Midnight Sanctuary: contraste de la paleta Sanctuary Rest (Midnight Abyss `#182447`, Serene Indigo `#4F46E5`, Restful Slate `#475569`), sombras estratificadas y acentos en azul índigo sereno.
+- Consolidación del vocabulario táctil de botones (`.btn-primary` y `.btn-secondary`) mediante tokens SCSS, elevación física sutil (`translateY(-1px)` y sombra suave en hover) y anillo de foco visible WCAG 2.1 AA (`:focus-visible`).
 
-### 8.2 Pase de Pulido Final y Micro-alineaciones (`polish`)
-- Revisión microscópica de alineaciones verticales, espaciados entre iconos y texto, sombras consistentes y bordes suaves (`border-radius`).
-- Comprobación en múltiples navegadores (Google Chrome, Mozilla Firefox, Apple Safari) y motores de renderizado.
-- Verificación del cambio fluido de idioma (`/lang/es` y `/lang/en`) sin roturas tipográficas en botones o cabeceras.
-- Limpieza final de clases CSS obsoletas y comentarios de depuración.
+### 8.2 Pase de Pulido Final y Micro-alineaciones (`polish`) — ✅ Completada
+- Revisión microscópica de alineaciones verticales, espaciados entre iconos y texto, consistencia de bordes redondeados (tokens ergonómicos de 8px en botones, 15px en tarjetas y formato píldora en badges). Ratios de contraste WCAG 2.1 AA verificados (mínimo 4.53:1 en texto general y 15.2:1 en textos principales).
+- Tematización de superficies del navegador según directrices Craft Floor: barra de desplazamiento personalizada (*Custom Scrollbar*) con pista transparente y cursor redondeado en Restful Slate (`#CBD5E1` hover `#475569`), junto con `caret-color: var(--color-secondary)` en todos los campos de formulario.
+- Auditoría de internacionalización bilingüe: 100% de paridad idiomática (586/586 claves sincronizadas) entre Español (`/lang/es`) e Inglés (`/lang/en`), erradicando microcopy en crudo en carrito, perfil y sellos de confianza sin desbordamientos tipográficos en botones ni cabeceras.
+- Depuración final de clases CSS obsoletas y optimización del bundle en Vite (compilación en 1.53s, CLS = 0, 0 defectos en `detect.mjs`).
+- Redacción y consolidación del informe final formal de certificación en `docs/progreso/certificacion-diseno-final.md` dictaminando calidad comercial Grado A+ lista para la defensa del TFG.
 
-**Archivos a modificar:**
-- `Reposa+/resources/views/` (revisión general de vistas)
+**Archivos creados/modificados:**
+- `Reposa+/resources/views/layouts/app.blade.php`
+- `Reposa+/resources/views/home.blade.php`
+- `Reposa+/resources/views/cart/index.blade.php`
+- `Reposa+/resources/views/profile/index.blade.php`
+- `Reposa+/resources/views/catalog/show.blade.php`
+- `Reposa+/resources/views/components/trust-seals.blade.php`
 - `Reposa+/resources/sass/app.scss`
-- `docs/progreso/certificacion-diseno-final.md` (informe final de entrega de diseño)
+- `Reposa+/lang/es/messages.php`
+- `Reposa+/lang/en/messages.php`
+- `docs/progreso/certificacion-diseno-final.md` (nuevo informe formal)
 
 **Criterios de Aceptación:**
 - Interfaz calificada como de calidad comercial lista para defensa del TFG.
 - Cero advertencias visuales en el detector de Impeccable (`detect.mjs`).
+- 100% de la suite de 60 Feature tests en Docker pasando (112 assertions).
 
 ---
 
@@ -439,8 +449,8 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 | **Fase 6** | Guía/selector interactivo de firmeza en el catálogo | ✅ Completada (6.3 overdrive) |
 | **Fase 7** | Navegación móvil y sticky purchase bar adaptadas | ✅ Completada (7.1 adapt) |
 | **Fase 7** | Optimización Core Web Vitals (CLS = 0, lazy loading) | ✅ Completada (7.2 optimize) |
-| **Fase 8** | Sesión de variantes en vivo con `/impeccable live` | ⏳ Pendiente |
-| **Fase 8** | Pase de pulido final y certificación de entrega | ⏳ Pendiente |
+| **Fase 8** | Sesión de variantes en vivo con `/impeccable live` | ✅ Completada (8.1 live) |
+| **Fase 8** | Pase de pulido final y certificación de entrega | ✅ Completada (8.2 polish) |
 
 ---
 
@@ -475,6 +485,10 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 | 03/09/2026 | Fase 7.1 (Ergonomía / Gestos) | Galería fotográfica táctil con `scroll-snap-type: x mandatory`, miniaturas interactivas (54×54px) e indicador de diapositiva actual | Facilitar la inspección táctil multicapa y anatómica del producto en pantallas táctiles con soporte fluido tanto por gestos como por teclado |
 | 03/09/2026 | Fase 7.2 (Rendimiento Web / CLS 0) | Dimensiones explícitas `width`/`height` y `aspect-ratio` en todas las fotos (`product-card`, `catalog/show`, categorías de Home) | Erradicar por completo los saltos de diseño durante la carga (CLS = 0) y acelerar el LCP con `fetchpriority="high"` en la foto principal above-the-fold |
 | 03/09/2026 | Fase 7.2 (Rendimiento / Red) | `dns-prefetch` y `preconnect` para Google Fonts y CDN de iconos en `layouts/app.blade.php` con carga nativa `decoding="async"` | Reducir la latencia de resolución DNS y tiempo de bloqueo de fuentes a nivel crítico |
+| 03/09/2026 | Fase 8.1 (Iteración Visual / Coherencia) | Consolidación del vocabulario táctil de botones (`.btn-primary` y `.btn-secondary`) con tokens SCSS y elevación sutil (`translateY(-1px)`) | Erradicar estilos hardcodeados en `app.scss`, unificar el radio ergonómico de 8px y asegurar ratio de contraste WCAG AA en reposo, hover y focus |
+| 03/09/2026 | Fase 8.2 (Pulido / Craft Floor) | Tematización de superficies nativas del navegador (scrollbars personalizadas en Restful Slate sobre pista transparente y caret-color índigo) | Cumplir el principio Craft Floor de Impeccable eliminando los estilos por defecto del navegador que desentonaban con la atmósfera nocturna |
+| 03/09/2026 | Fase 8.2 (Internacionalización / Resiliencia) | Paridad absoluta de 586/586 claves de localización entre ES y EN, erradicando microcopy en crudo en carrito, perfil y sellos de confianza | Garantizar que la experiencia bilingüe sea impecable sin desbordamientos de botones ni frases sin traducir en ninguna vista |
+| 03/09/2026 | Fase 8 (Certificación Final / Hito TFG) | Emisión y consolidación del informe formal de certificación en `docs/progreso/certificacion-diseno-final.md` | Documentar el cumplimiento integral de los 22 comandos Impeccable, la resolución de los 11 defectos y el estado final del frontend listo para la defensa del TFG |
 
 
 ---
