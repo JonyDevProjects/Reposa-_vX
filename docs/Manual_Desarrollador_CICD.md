@@ -192,13 +192,16 @@ docker compose -f docker-compose.dev.yml down
 
 ## 4. Entorno 3: Docker Compose — Desarrollo Ligero
 
-Este entorno es identico al Dev Container pero ejecutado directamente desde la terminal, sin necesidad de IDE.
+Este entorno es idéntico al Dev Container pero ejecutado directamente desde la terminal, sin necesidad de IDE. Es el **entorno estándar utilizado por agentes de IA autónomos (Antigravity CLI)** y scripts de automatización.
+
+> 📘 **Referencia Arquitectónica:** Para un análisis detallado sobre la equivalencia técnica 1:1 entre Dev Containers y Docker CLI Directo, el reparto de responsabilidades host-contenedor y la justificación de uso en agentes de IA, consulta [**Referencia de Entornos: Dev Containers vs. Docker CLI Directo**](./referencia-entorno-dev-containers-vs-docker-cli.md).
 
 ### Cuando usarlo
 
 - Desarrollo sin IDE (terminal puro)
-- CI local o scripts de automatizacion
-- Verificacion rapida del entorno Docker de desarrollo
+- Agentes de IA autónomos (Antigravity CLI / scripts headless)
+- CI local o scripts de automatización
+- Verificación rápida del entorno Docker de desarrollo
 
 ### Comandos
 
