@@ -233,6 +233,14 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 - **Componente Reutilizable de Insignias y Sellos de Confianza (`<x-trust-seals>`):** Creado componente Blade polimórfico con variantes `cards` (rejilla de 4 pilares: 100 noches, 24/48h express, Stripe SSL 256-bit y OEKO-TEX), `compact` (ficha de producto `catalog/show.blade.php`), `checkout` (resumen de carrito `cart/index.blade.php`) y `footer` (pie de página global `layouts/app.blade.php`). Incluye isotipos vectoriales limpios de Stripe, Visa, Mastercard y candado de seguridad SSL sin dependencias externas.
 - **Detector Impeccable y Verificación de Regresión:** Cero defectos reportados por `detect.mjs` en las vistas modificadas (`[]`). Suite de 60 tests de Feature al 100% verde (112 assertions).
 
+**Resultados Entregados en Fase 4.3 (`animate`):**
+- **Microinteracción del Botón de Favoritos (Heartbeat Spring Feedback):** Diseñada y coreografiada la animación del botón de favoritos con feedback de latido en dos pulsos con rebote amortiguado (`@keyframes heartBeatPulse`, `@keyframes heartIconPulse`) e interpolación de rotación y escala sobre el icono. Retirada de favoritos suave y desinflada (`@keyframes heartDeflate`). Integrado de forma universal en `<x-product-card>`, ficha de producto (`catalog/show.blade.php`) y perfil (`profile/index.blade.php`).
+- **Transición Fluida y Amortiguada para Modales, Selectores y Desplegables:** Implementada la curva rectora `$ease-cushioned: cubic-bezier(0.16, 1, 0.3, 1)` en `_animations.scss` para modales (`.modal.fade .modal-dialog`), selectores e inputs con micro-elevación y resplandor indigo en foco (`.form-select:focus`, `.form-control:focus`), y acordeones/dropdowns con apertura serena.
+- **Elevación Suave (*Smooth Lift*) en Tarjetas de Producto:** Tarjetas `<x-product-card>` con radio de 16px, reposo nítido con sombra ambiental suave (`box-shadow: 0 2px 8px rgba(24, 36, 71, 0.05)`) y elevación progresiva de `-6px` con sombra reactiva multicapa en hover (`0 20px 35px -8px rgba(24, 36, 71, 0.13), 0 8px 16px -4px rgba(24, 36, 71, 0.06)`), micro-zoom suave de la imagen (1.04) y soporte completo para navegación por teclado con `:focus-within`.
+- **Notificaciones Toast Flotantes Reposa+ (Sanctuary Toasts):** Sistema de toasts no intrusivos (`.toast-sanctuary`) con pastilla cromática de estado, tipografía jerarquizada (título en negrita y mensaje secundario), temporizador de auto-cierre con barra de progreso visual, botón de cierre accesible y coreografía de entrada elástica (`@keyframes toastArrival`) y salida serena (`@keyframes toastSereneOut`). Integración con pulsación en el badge del carrito (`@keyframes cartBadgePulse`).
+- **Módulo Dedicado de Interacciones y Accesibilidad:** Creado `resources/js/interactions.js` integrado en `app.js` eliminando scripts inline repetitivos. Respeto estricto a `@media (prefers-reduced-motion: reduce)` anulando transformaciones espaciales pero conservando el cambio de estado visual a 60 FPS sin saltos de layout (CLS = 0).
+- **Detector Impeccable y Verificación de Tests:** Cero defectos detectados con `detect.mjs` (`[]`). Suite de 60 tests de Feature al 100% pasando (112 assertions).
+
 ---
 
 ## Fase 5: Claridad Transaccional, Estados Vacíos y Resiliencia (PRIORIDAD ALTA)
@@ -383,9 +391,9 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 | **Fase 3** | Nueva escala tipográfica dual integrada (`_typography.scss`) | ✅ Completada |
 | **Fase 3** | Paleta cromática de descanso aplicada en toda la app (`_tokens.scss`) | ✅ Completada |
 | **Fase 3** | Layouts y espaciados armónicos en catálogo y producto (`_layout.scss`) | ✅ Completada |
-| **Fase 4** | Home persuasiva con propuesta de valor y Hero renovado | 🔄 En Progreso (4.1 shape completada) |
-| **Fase 4** | Microinteracciones y animaciones de favoritos y carrito | ⏳ Pendiente |
-| **Fase 4** | Confirmación de pedido emocional y de marca | ⏳ Pendiente |
+| **Fase 4** | Home persuasiva con propuesta de valor y Hero renovado | 🔄 En Progreso (4.1 shape y 4.2 bolder completadas) |
+| **Fase 4** | Microinteracciones y animaciones de favoritos y carrito | ✅ Completada (4.3 animate) |
+| **Fase 4** | Confirmación de pedido emocional y de marca | ⏳ Pendiente (4.4 delight) |
 | **Fase 5** | Microcopy claro y transparente en checkout | ⏳ Pendiente |
 | **Fase 5** | Casos límite cubiertos (textos largos, fallback de fotos) | ⏳ Pendiente |
 | **Fase 5** | Estados vacíos de carrito, wishlist y búsqueda implementados | ⏳ Pendiente |
@@ -416,6 +424,7 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 | 02/09/2026 | Fase 3 (Frontend / Identidad Visual) | Implementación de estilo Glassmorphism nocturno (`backdrop-filter: blur(12px)`, `rgba(255, 255, 255, 0.18)`) en los botones CTA de la cabecera Hero | Los botones con fondo sólido (púrpura `#4F46E5` o blanco puro) generaban un contraste desmedido y estridente sobre la fotografía nocturna, rompiendo la atmósfera de descanso |
 | 03/09/2026 | Fase 4 (Frontend / Descubrimiento) | Sustitución de accesos planos por 'Floating Sleep Finder' en 2 pasos y tarjetas de categoría fotográficas con chips de beneficio anatómico | Maximizar la capacidad persuasiva desde el primer pliegue de la Home, guiando al usuario sin fricción técnica hacia su almohada ideal |
 | 03/09/2026 | Fase 4 (Infraestructura / Testing) | Forzado estricto de aislamiento con `force="true"` en `DB_DATABASE` dentro de `phpunit.xml` | El contenedor Docker inyectaba `DB_DATABASE=reposaplus_dev` como variable de SO. Al tener `force="false"` por defecto en PHPUnit, los tests ignoraban la BD de test y vaciaban `reposaplus_dev` con `RefreshDatabase` |
+| 03/09/2026 | Fase 4.3 (Frontend / Motion) | Modularización de interacciones en `interactions.js` y `_animations.scss`, reemplazando scripts inline con Toasts Sanctuary y curva `cubic-bezier(0.16, 1, 0.3, 1)` | Centralizar lógica de microinteracciones, eliminar scripts inline dispersos, garantizar CLS 0 a 60 FPS y cumplimiento estricto con el detector Impeccable |
 
 ---
 
