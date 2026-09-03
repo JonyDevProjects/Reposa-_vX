@@ -136,6 +136,36 @@ $ease-gentle: cubic-bezier(0.4, 0, 0.2, 1);
     }
 }
 
+// 6. Aura serena de confirmación de pedido (Phase 4.4 delight)
+@keyframes sereneAuraGlow {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.32), 0 6px 20px -2px rgba(5, 150, 105, 0.22);
+    }
+    50% {
+        box-shadow: 0 0 0 12px rgba(5, 150, 105, 0), 0 10px 28px -2px rgba(5, 150, 105, 0.35);
+    }
+}
+
+// 7. Pulso suave para el nodo activo del timeline
+@keyframes sereneNodePulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.35), 0 4px 14px rgba(79, 70, 229, 0.25);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(79, 70, 229, 0), 0 8px 22px rgba(79, 70, 229, 0.35);
+    }
+}
+
+// 8. Relleno suave de la barra de progreso del timeline
+@keyframes timelineProgressFill {
+    from {
+        transform: scaleX(0);
+    }
+    to {
+        transform: scaleX(var(--timeline-progress-scale, 1));
+    }
+}
+
 // --- Componente: Botón de Favoritos con Microinteracción ---
 .btn-favorite {
     position: relative;
@@ -487,7 +517,10 @@ $ease-gentle: cubic-bezier(0.4, 0, 0.2, 1);
     .accordion-button::after,
     .dropdown-menu,
     .toast-sanctuary,
-    .badge-cart-pulse {
+    .badge-cart-pulse,
+    .serene-confirm-badge,
+    .timeline-node-btn,
+    .timeline-progress-fill {
         transform: none !important;
         animation: none !important;
         transition: none !important;

@@ -358,10 +358,64 @@ export function initServerFlashToasts() {
 }
 
 /**
+ * Interactive Timeline Step Inspector on Order Detail / Confirmation Page (Phase 4.4 delight)
+ */
+export function initOrderTimelineInteractions() {
+    const timelineContainer = document.querySelector('.order-timeline-card');
+    if (!timelineContainer) return;
+
+    const stepButtons = timelineContainer.querySelectorAll('.timeline-node-btn');
+    const panel = timelineContainer.querySelector('.timeline-detail-panel');
+    const panelIcon = panel ? panel.querySelector('.detail-panel-icon i') : null;
+    const panelTitle = panel ? panel.querySelector('.detail-panel-title') : null;
+    const panelText = panel ? panel.querySelector('.detail-panel-text') : null;
+
+    if (!stepButtons.length || !panel) return;
+
+    stepButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const stepLi = btn.closest('.timeline-step');
+            if (!stepLi) return;
+
+            stepButtons.forEach(b => {
+                b.setAttribute('aria-expanded', 'false');
+                b.classList.remove('is-inspecting');
+            });
+
+            btn.setAttribute('aria-expanded', 'true');
+            btn.classList.add('is-inspecting');
+
+            const title = stepLi.dataset.stepTitle || '';
+            const detail = stepLi.dataset.stepDetail || '';
+            const iconClass = stepLi.dataset.stepIcon || 'bi-info-circle';
+
+            const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (prefersReduced) {
+                if (panelIcon) panelIcon.className = `bi ${iconClass}`;
+                if (panelTitle) panelTitle.textContent = title;
+                if (panelText) panelText.textContent = detail;
+                return;
+            }
+
+            panel.style.transition = 'opacity 0.16s cubic-bezier(0.16, 1, 0.3, 1)';
+            panel.style.opacity = '0.35';
+
+            setTimeout(() => {
+                if (panelIcon) panelIcon.className = `bi ${iconClass}`;
+                if (panelTitle) panelTitle.textContent = title;
+                if (panelText) panelText.textContent = detail;
+                panel.style.opacity = '1';
+            }, 160);
+        });
+    });
+}
+
+/**
  * Initialize all microinteractions when DOM is ready
  */
 export function initInteractions() {
     initCartInteractions();
     initFavoriteInteractions();
     initServerFlashToasts();
+    initOrderTimelineInteractions();
 }
