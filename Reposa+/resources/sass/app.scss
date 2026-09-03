@@ -10,18 +10,8 @@
 // Reposa+ Spatial Rhythm & Layout
 @import "layout";
 
-.card-product {
-    border: none;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    background: white;
-    border-radius: 15px;
-    overflow: hidden;
-}
-
-.card-product:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(24, 36, 71, 0.1);
-}
+// Reposa+ Motion System & Microinteractions (Phase 4.3 animate)
+@import "animations";
 
 .btn-primary {
     background-color: #182447;

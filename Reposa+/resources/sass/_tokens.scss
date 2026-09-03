@@ -55,6 +55,10 @@ $shadow-ambient:        0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0
 $shadow-card:           0 2px 8px rgba(24, 36, 71, 0.06);
 $shadow-lifted:         0 10px 20px rgba(24, 36, 71, 0.10);
 $shadow-floating-badge: 0 4px 12px rgba(24, 36, 71, 0.15);
+$shadow-ambient-cta:    0 10px 25px -5px rgba(24, 36, 71, 0.18), 0 8px 10px -6px rgba(24, 36, 71, 0.10);
+$shadow-cta-lifted:     0 16px 32px -4px rgba(24, 36, 71, 0.24), 0 8px 16px -4px rgba(24, 36, 71, 0.12);
+$shadow-hero-primary:   0 12px 28px -4px rgba(79, 70, 229, 0.42), 0 8px 12px -6px rgba(79, 70, 229, 0.22);
+$shadow-hero-lifted:    0 18px 36px -4px rgba(79, 70, 229, 0.52), 0 10px 18px -4px rgba(79, 70, 229, 0.26);
 
 // --- Motion & Transitions ---
 $ease-gentle:      cubic-bezier(0.4, 0, 0.2, 1);
@@ -114,6 +118,10 @@ $transition-lift:  transform 0.3s $ease-gentle, box-shadow 0.3s $ease-gentle;
     --shadow-card: #{$shadow-card};
     --shadow-lifted: #{$shadow-lifted};
     --shadow-floating: #{$shadow-floating-badge};
+    --shadow-ambient-cta: #{$shadow-ambient-cta};
+    --shadow-cta-lifted: #{$shadow-cta-lifted};
+    --shadow-hero-primary: #{$shadow-hero-primary};
+    --shadow-hero-lifted: #{$shadow-hero-lifted};
 
     // Transitions
     --transition-lift: #{$transition-lift};

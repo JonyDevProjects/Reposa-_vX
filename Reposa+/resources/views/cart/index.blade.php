@@ -93,26 +93,19 @@
 
                     @if(!$cartItems->isEmpty())
                         @guest
-                        <x-button href="{{ route('cart.login') }}" size="lg" :pill="true" class="w-100 shadow-sm text-decoration-none" icon="bi-chevron-right" iconPosition="right">
+                        <x-button href="{{ route('cart.login') }}" size="lg" :pill="true" class="w-100 btn-cta-bold text-decoration-none" icon="bi-chevron-right" iconPosition="right">
                             {{ __('messages.cart.checkout') }}
                         </x-button>
                         @endguest
 
                         @auth
-                        <x-button href="{{ route('stripe.checkout') }}" size="lg" :pill="true" class="w-100 shadow-sm text-decoration-none" icon="bi-credit-card">
+                        <x-button href="{{ route('stripe.checkout') }}" size="lg" :pill="true" class="w-100 btn-cta-bold text-decoration-none" icon="bi-credit-card">
                             {{ __('messages.cart.pay') }}
                         </x-button>
                         @endauth
                     @endif
                     
-                    <div class="mt-4 text-center">
-                        <p class="small text-muted mb-0">
-                            <i class="bi bi-shield-check text-success me-1"></i> {{ __('messages.cart.secure_payment') }}
-                        </p>
-                        <p class="small text-muted">
-                            {{ __('messages.cart.shipping_info') }}
-                        </p>
-                    </div>
+                    <x-trust-seals variant="checkout" />
                 </div>
             </div>
         </div>
