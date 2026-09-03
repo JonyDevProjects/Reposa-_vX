@@ -16,7 +16,10 @@
             <!-- Product Image -->
             <div class="col-md-6">
                 <div class="card border-0 shadow-sm overflow-hidden rounded-4 position-relative">
-                    <img src="{{ $product->image_url ?? '/images/pillow-detail.png' }}" class="img-fluid product-main-img" alt="{{ $product->name }}">
+                    <img src="{{ $product->image_url ?? '/images/pillow-detail.png' }}" 
+                         onerror="this.onerror=null; this.src='/images/product-placeholder.svg';"
+                         class="img-fluid product-main-img w-100" 
+                         alt="{{ $product->name }}">
                     <x-badge-stock :stock="$product->stock" class="position-absolute top-0 end-0 m-3 shadow" />
                 </div>
                 <div class="row mt-3 g-2">
@@ -49,7 +52,7 @@
                             <span class="badge bg-light text-primary border me-1">{{ $category->name }}</span>
                         @endforeach
                     </div>
-                    <h1 class="display-5 fw-bold mb-3">{{ $product->name }}</h1>
+                    <h1 class="display-5 fw-bold mb-3 text-break">{{ $product->name }}</h1>
                     
                     <div class="d-flex align-items-center mb-4">
                         <div class="text-warning me-2">

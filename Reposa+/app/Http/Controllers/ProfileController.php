@@ -12,7 +12,12 @@ class ProfileController extends Controller
         $user = auth()->user();
         $user->load(['profile', 'addresses', 'orders', 'orderSummary', 'favorites.categories']);
         
-        return view('profile.index', compact('user'));
+        $recommendedProducts = Product::where('stock', '>', 0)
+            ->whereNotIn('id', $user->favorites->pluck('id')->toArray())
+            ->take(3)
+            ->get();
+
+        return view('profile.index', compact('user', 'recommendedProducts'));
     }
 
     public function toggleFavorite(Product $product)

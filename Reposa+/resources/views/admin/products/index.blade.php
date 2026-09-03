@@ -33,7 +33,11 @@
                             @foreach($products as $product)
                             <tr>
                                 <td>
-                                    <img src="{{ $product->image_url ?? 'https://via.placeholder.com/50' }}" alt="{{ $product->name }}" class="rounded shadow-sm" style="width: 40px; height: 40px; object-fit: cover;">
+                                    <img src="{{ $product->image_url ?: '/images/product-placeholder.svg' }}" 
+                                         onerror="this.onerror=null; this.src='/images/product-placeholder.svg';" 
+                                         alt="{{ $product->name }}" 
+                                         class="rounded shadow-sm" 
+                                         style="width: 40px; height: 40px; object-fit: cover;">
                                 </td>
                                 <td class="fw-bold">{{ $product->name }}</td>
                                 <td>{{ number_format($product->price, 2) }}€</td>
