@@ -241,6 +241,16 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 - **Módulo Dedicado de Interacciones y Accesibilidad:** Creado `resources/js/interactions.js` integrado en `app.js` eliminando scripts inline repetitivos. Respeto estricto a `@media (prefers-reduced-motion: reduce)` anulando transformaciones espaciales pero conservando el cambio de estado visual a 60 FPS sin saltos de layout (CLS = 0).
 - **Detector Impeccable y Verificación de Tests:** Cero defectos detectados con `detect.mjs` (`[]`). Suite de 60 tests de Feature al 100% pasando (112 assertions).
 
+**Resultados Entregados en Fase 4.4 (`delight`) y Cierre de Fase 4:**
+- **Pantalla de Confirmación y Detalle de Pedido Rediseñada (`orders/show.blade.php`):** Celebración serena y sobria acorde a la atmósfera *Midnight Sanctuary* / descanso premium con insignia animada de aura restauradora (`sereneAuraGlow`), evitando confeti estridente o ruidoso. Encabezado inmersivo con badge dinámico de estado, referencia, fecha y confirmación de pago seguro.
+- **Timeline Interactivo de Fases de Descanso:** 4 etapas secuenciales (*Confirmado*, *Preparando descanso*, *En reparto express*, *Entregado*) con conector visual compositado en GPU (`transform: scaleX(...)`), control de estado dinámico por pedido y panel interactivo accesible que actualiza al vuelo los detalles técnicos y de logística ergonómica al interactuar con cada fase.
+- **Microcopy Cálido y Empático de Marca:** Titulares y mensajes reconfortantes (*"Prepárate para dormir como nunca"*, *"Tu nuevo descanso está en camino"*) y bloque memorable del *Ritual de bienvenida a tu almohada* (aireado de 24h, periodo de adaptación cervical de 7-14 noches y 100 noches de garantía).
+- **Tarjeta de Resumen Económico y Acceso Directo a Factura PDF:** Tarjeta lateral adherente (*sticky-top*) con desglose transparente (subtotal, envío express gratuito 24/48h, IVA 21%, total destacado con tipografía tabular), botón de descarga directa de factura PDF (`orders.invoice`) y datos de entrega con soporte postural.
+- **Internacionalización Completa ES/EN:** Cadenas 100% bilingües en `lang/es/messages.php` y `lang/en/messages.php`.
+- **Rendimiento y Cero Defectos Impeccable:** Animación de progreso por GPU mediante `transform: scaleX()`, resolviendo la alerta de reflow `layout-transition` detectada por `detect.mjs` (`[]` - 0 defectos). Assets compilados limpiamente con Vite (`npm run build`).
+- **Suite de Tests:** 60 tests de Feature ejecutados en Docker pasando al 100% (112 assertions).
+- **Cierre de Fase 4:** Fase 4 completada al 100% en todas sus subfases (4.1 shape, 4.2 bolder, 4.3 animate, 4.4 delight).
+
 ---
 
 ## Fase 5: Claridad Transaccional, Estados Vacíos y Resiliencia (PRIORIDAD ALTA)
@@ -391,9 +401,9 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 | **Fase 3** | Nueva escala tipográfica dual integrada (`_typography.scss`) | ✅ Completada |
 | **Fase 3** | Paleta cromática de descanso aplicada en toda la app (`_tokens.scss`) | ✅ Completada |
 | **Fase 3** | Layouts y espaciados armónicos en catálogo y producto (`_layout.scss`) | ✅ Completada |
-| **Fase 4** | Home persuasiva con propuesta de valor y Hero renovado | 🔄 En Progreso (4.1 shape y 4.2 bolder completadas) |
+| **Fase 4** | Home persuasiva con propuesta de valor y Hero renovado | ✅ Completada (4.1 shape y 4.2 bolder) |
 | **Fase 4** | Microinteracciones y animaciones de favoritos y carrito | ✅ Completada (4.3 animate) |
-| **Fase 4** | Confirmación de pedido emocional y de marca | ⏳ Pendiente (4.4 delight) |
+| **Fase 4** | Confirmación de pedido emocional y de marca | ✅ Completada (4.4 delight) |
 | **Fase 5** | Microcopy claro y transparente en checkout | ⏳ Pendiente |
 | **Fase 5** | Casos límite cubiertos (textos largos, fallback de fotos) | ⏳ Pendiente |
 | **Fase 5** | Estados vacíos de carrito, wishlist y búsqueda implementados | ⏳ Pendiente |
@@ -425,6 +435,7 @@ El plan adopta como metodología la suite de diseño **Impeccable**, incorporand
 | 03/09/2026 | Fase 4 (Frontend / Descubrimiento) | Sustitución de accesos planos por 'Floating Sleep Finder' en 2 pasos y tarjetas de categoría fotográficas con chips de beneficio anatómico | Maximizar la capacidad persuasiva desde el primer pliegue de la Home, guiando al usuario sin fricción técnica hacia su almohada ideal |
 | 03/09/2026 | Fase 4 (Infraestructura / Testing) | Forzado estricto de aislamiento con `force="true"` en `DB_DATABASE` dentro de `phpunit.xml` | El contenedor Docker inyectaba `DB_DATABASE=reposaplus_dev` como variable de SO. Al tener `force="false"` por defecto en PHPUnit, los tests ignoraban la BD de test y vaciaban `reposaplus_dev` con `RefreshDatabase` |
 | 03/09/2026 | Fase 4.3 (Frontend / Motion) | Modularización de interacciones en `interactions.js` y `_animations.scss`, reemplazando scripts inline con Toasts Sanctuary y curva `cubic-bezier(0.16, 1, 0.3, 1)` | Centralizar lógica de microinteracciones, eliminar scripts inline dispersos, garantizar CLS 0 a 60 FPS y cumplimiento estricto con el detector Impeccable |
+| 03/09/2026 | Fase 4.4 (Frontend / Rendimiento) | Sustitución de animación de `width` por `transform: scaleX(...)` con `transform-origin: left center` en la barra de progreso del timeline del pedido | Evitar recálculos de layout (*layout thrash* / *reflow*) detectados por la regla `layout-transition` del detector Impeccable, garantizando animación pura por GPU a 60 FPS |
 
 ---
 
