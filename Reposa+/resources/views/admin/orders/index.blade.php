@@ -92,6 +92,7 @@
                                     <th class="text-end" style="width: 100px;">Total</th>
                                     <th style="width: 120px;">Fecha</th>
                                     <th style="width: 155px;">Estado</th>
+                                    <th style="width: 165px;">{{ __('messages.admin.orders.shipment_tracking') }}</th>
                                     <th class="text-end" style="width: 110px;">{{ __('messages.admin.orders.actions') }}</th>
                                 </tr>
                             </thead>
@@ -105,8 +106,13 @@
 
                                     {{-- Customer --}}
                                     <td>
-                                        <div class="fw-semibold text-dark text-truncate" style="max-width: 150px;">{{ $order->user->name }}</div>
-                                        <div class="text-muted text-truncate" style="font-size: 0.72rem; max-width: 150px;">{{ $order->user->email }}</div>
+                                        <div class="fw-semibold text-dark text-truncate" style="max-width: 150px;">
+                                            {{ $order->customer_name }}
+                                            @if($order->isGuest())
+                                                <span class="badge bg-secondary-subtle text-secondary border ms-1" style="font-size: 0.65rem;">Invitado</span>
+                                            @endif
+                                        </div>
+                                        <div class="text-muted text-truncate" style="font-size: 0.72rem; max-width: 150px;">{{ $order->customer_email }}</div>
                                     </td>
 
                                     {{-- Products --}}
@@ -162,6 +168,37 @@
                                         @endif
                                     </td>
 
+                                    {{-- Shipment / Paquetería --}}
+                                    <td>
+                                        @if($order->shipment)
+                                            <div class="d-flex flex-column gap-1">
+                                                <div>
+                                                    <span class="badge bg-{{ $order->shipment->status_color }}-subtle text-{{ $order->shipment->status_color }} border" style="font-size: 0.7rem;">
+                                                        {{ $order->shipment->status_label }}
+                                                    </span>
+                                                </div>
+                                                <div class="font-monospace text-muted" style="font-size: 0.68rem;">
+                                                    <i class="bi bi-upc me-1"></i>{{ $order->shipment->tracking_number }}
+                                                </div>
+                                                <div class="d-flex gap-1 mt-1">
+                                                    @if($order->shipment->status !== \App\Models\Shipment::STATUS_DELIVERED)
+                                                        <form action="{{ route('admin.shipments.advance', $order->shipment) }}" method="POST" class="d-inline">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.68rem;" title="{{ __('messages.admin.orders.advance_status') }}">
+                                                                <i class="bi bi-fast-forward-fill me-1"></i>Avanzar
+                                                            </button>
+                                                        </form>
+                                                    @endif
+                                                    <a href="{{ route('admin.shipments.label', $order->shipment) }}" target="_blank" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 0.68rem;" title="{{ __('messages.admin.orders.view_label') }}">
+                                                        <i class="bi bi-tag-fill me-1"></i>Etiqueta
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <span class="text-muted small">&mdash;</span>
+                                        @endif
+                                    </td>
+
                                     {{-- Actions --}}
                                     <td class="text-end text-nowrap">
                                         <div class="btn-group btn-group-sm">
@@ -200,7 +237,7 @@
                                                                     {{ __('messages.admin.orders.refund_desc') }} 
                                                                     <strong class="text-danger">{{ number_format($order->total_amount, 2) }}€</strong> 
                                                                     {{ __('messages.admin.orders.refund_to_client') }} 
-                                                                    <strong>{{ $order->user->name }}</strong>.
+                                                                    <strong>{{ $order->customer_name }}</strong>.
                                                                 </p>
                                                                 <p class="text-muted small mb-3">
                                                                     <i class="bi bi-info-circle me-1"></i>{{ __('messages.admin.orders.stock_restore') }}
@@ -225,7 +262,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted py-5">
+                                    <td colspan="8" class="text-center text-muted py-5">
                                         <div class="py-3">
                                             <i class="bi bi-inbox fs-2 text-muted opacity-50 d-block mb-2"></i>
                                             <p class="mb-0 small">{{ __('messages.admin.orders.no_orders_found') }}</p>

@@ -37,15 +37,70 @@
 
             {{-- Acciones rápidas en cabecera --}}
             <div class="d-flex flex-row flex-md-column gap-2 flex-shrink-0 align-self-start align-self-md-center">
-                <a href="{{ route('orders.invoice', $order) }}" class="btn btn-light btn-sm fw-semibold shadow-sm text-primary text-nowrap">
+                <a href="{{ route('orders.invoice', ['order' => $order, 'token' => $order->guest_token]) }}" class="btn btn-light btn-sm fw-semibold shadow-sm text-primary text-nowrap">
                     <i class="bi bi-file-earmark-pdf-fill me-1 text-danger" aria-hidden="true"></i>{{ __('messages.orders.show.download_invoice') }}
                 </a>
-                <a href="{{ route('profile') }}#orders" class="btn btn-outline-light btn-sm text-nowrap">
-                    <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>{{ __('messages.orders.show.back_to_orders') }}
-                </a>
+                @if(auth()->check())
+                    <a href="{{ route('profile') }}#orders" class="btn btn-outline-light btn-sm text-nowrap">
+                        <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>{{ __('messages.orders.show.back_to_orders') }}
+                    </a>
+                @else
+                    <a href="{{ url('/catalog') }}" class="btn btn-outline-light btn-sm text-nowrap">
+                        <i class="bi bi-bag me-1" aria-hidden="true"></i>{{ __('messages.cart.view_catalog') }}
+                    </a>
+                @endif
             </div>
         </div>
     </section>
+
+    {{-- Conversión Invitado a Usuario Registrado en 1 Clic --}}
+    @if($order->isGuest() && !auth()->check())
+        <section class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden" style="background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%); border: 1px solid #cbd5e1 !important;">
+            <div class="card-body p-4">
+                <div class="row align-items-center g-3">
+                    <div class="col-lg-7">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px; font-size: 1.25rem;">
+                                <i class="bi bi-person-check-fill"></i>
+                            </div>
+                            <div>
+                                <span class="badge bg-primary-subtle text-primary fw-bold text-uppercase px-2 py-1 mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">Acceso Rápido</span>
+                                <h2 class="h5 fw-bold text-navy mb-1">{{ __('messages.orders.claim_account_title') }}</h2>
+                                <p class="text-muted small mb-2">{{ __('messages.orders.claim_account_subtitle') }}</p>
+                                <div class="d-flex flex-wrap gap-2 small text-secondary">
+                                    <span><i class="bi bi-envelope-check me-1 text-success"></i><strong>{{ $order->customer_email }}</strong></span>
+                                    <span>&bull;</span>
+                                    <span><i class="bi bi-shield-check me-1 text-primary"></i>Datos de envío asociados</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        @if($errors->has('password'))
+                            <div class="alert alert-danger py-1 px-2 small mb-2">{{ $errors->first('password') }}</div>
+                        @endif
+                        <form action="{{ route('orders.claim_account', $order) }}" method="POST" class="row g-2">
+                            @csrf
+                            <input type="hidden" name="token" value="{{ $order->guest_token }}">
+                            <div class="col-sm-6">
+                                <input type="password" name="password" class="form-control form-control-sm @error('password') is-invalid @enderror" 
+                                       placeholder="Contraseña (mín. 8)" required autocomplete="new-password">
+                            </div>
+                            <div class="col-sm-6">
+                                <input type="password" name="password_confirmation" class="form-control form-control-sm" 
+                                       placeholder="Repite contraseña" required autocomplete="new-password">
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary btn-sm w-100 fw-semibold shadow-sm">
+                                    <i class="bi bi-lock-fill me-1"></i> {{ __('messages.orders.claim_btn') }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    @endif
 
     @php
         $statusStepMap = [
@@ -176,6 +231,81 @@
             </div>
         @endif
     </section>
+
+    {{-- Seguimiento de Paquetería en Tiempo Real (Correos Express) --}}
+    @if($order->shipment)
+        <section class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden" aria-labelledby="shipment-tracking-heading">
+            <div class="card-header bg-white border-bottom py-3 px-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-primary px-2 py-1 text-uppercase fw-bold" style="font-size: 0.72rem;">
+                            <i class="bi bi-truck me-1"></i>{{ $order->shipment->carrier }}
+                        </span>
+                        <h2 id="shipment-tracking-heading" class="h6 fw-bold mb-0 text-navy">
+                            {{ __('messages.shipment.timeline_title') }}
+                        </h2>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <span class="font-monospace fw-bold px-2 py-1 bg-light border rounded text-dark small">
+                            <i class="bi bi-upc me-1"></i>{{ $order->shipment->tracking_number }}
+                        </span>
+                        <span class="badge bg-{{ $order->shipment->status_color }}-subtle text-{{ $order->shipment->status_color }} border px-2 py-1 fw-semibold small">
+                            <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>{{ $order->shipment->status_label }}
+                        </span>
+                        @if($order->shipment->estimated_delivery_date)
+                            <span class="text-muted small">
+                                <i class="bi bi-calendar-check me-1 text-primary"></i>Entrega estimada: <strong>{{ $order->shipment->estimated_delivery_date->format('d/m/Y') }}</strong>
+                            </span>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                @php
+                    $events = $order->shipment->tracking_history ?? [];
+                    $sortedEvents = array_reverse($events);
+                @endphp
+
+                @if(!empty($sortedEvents))
+                    <div class="tracking-timeline-list position-relative ps-2">
+                        @foreach($sortedEvents as $idx => $event)
+                            <div class="d-flex gap-3 mb-3 position-relative">
+                                <div class="d-flex flex-column align-items-center flex-shrink-0">
+                                    <div class="rounded-circle {{ $idx === 0 ? 'bg-primary text-white shadow-sm' : 'bg-light text-muted border' }} d-flex align-items-center justify-content-center" 
+                                         style="width: 32px; height: 32px; font-size: 0.85rem; z-index: 2;">
+                                        @if($idx === 0)
+                                            <i class="bi bi-geo-alt-fill"></i>
+                                        @else
+                                            <i class="bi bi-check2"></i>
+                                        @endif
+                                    </div>
+                                    @if(!$loop->last)
+                                        <div class="flex-grow-1" style="width: 2px; background-color: #e2e8f0; min-height: 28px;"></div>
+                                    @endif
+                                </div>
+                                <div class="flex-grow-1 pb-2">
+                                    <div class="d-flex flex-wrap align-items-baseline justify-content-between gap-2">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="fw-bold text-dark small">{{ $event['status_label'] ?? ucfirst($event['status'] ?? '') }}</span>
+                                            @if(!empty($event['location']))
+                                                <span class="badge bg-light text-secondary border small py-0 px-2">{{ $event['location'] }}</span>
+                                            @endif
+                                        </div>
+                                        <span class="text-muted small tabular-nums">
+                                            {{ isset($event['timestamp']) ? \Carbon\Carbon::parse($event['timestamp'])->format('d/m/Y H:i') : '' }}
+                                        </span>
+                                    </div>
+                                    <p class="text-muted small mb-0 mt-1">{{ $event['description'] ?? '' }}</p>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-muted small mb-0">Expedición registrada. Los eventos en tiempo real se actualizarán cuando el paquete sea recogido en plataforma.</p>
+                @endif
+            </div>
+        </section>
+    @endif
 
     {{-- Cuadrícula principal de compra y resumen --}}
     <div class="row g-4">
@@ -325,13 +455,19 @@
                     </div>
 
                     <div class="d-grid gap-2">
-                        <a href="{{ route('orders.invoice', $order) }}" class="btn btn-primary btn-download-invoice">
+                        <a href="{{ route('orders.invoice', ['order' => $order, 'token' => $order->guest_token]) }}" class="btn btn-primary btn-download-invoice">
                             <i class="bi bi-file-earmark-pdf-fill me-2 text-danger" aria-hidden="true"></i>{{ __('messages.orders.show.download_invoice_pdf') }}
                         </a>
 
-                        <a href="{{ route('profile') }}#orders" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>{{ __('messages.orders.show.back_to_orders') }}
-                        </a>
+                        @if(auth()->check())
+                            <a href="{{ route('profile') }}#orders" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>{{ __('messages.orders.show.back_to_orders') }}
+                            </a>
+                        @else
+                            <a href="{{ url('/catalog') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-bag me-1" aria-hidden="true"></i>{{ __('messages.cart.view_catalog') }}
+                            </a>
+                        @endif
                     </div>
 
                     {{-- Garantías Reposa+ --}}
@@ -360,11 +496,18 @@
                     </h2>
 
                     <div class="small text-muted mb-2">
-                        <strong class="text-dark d-block">{{ $order->user->name ?? 'Cliente Reposa+' }}</strong>
-                        <span>{{ $order->user->email ?? '' }}</span>
+                        <strong class="text-dark d-block">{{ $order->customer_name }}</strong>
+                        <span>{{ $order->customer_email }}</span>
+                        @if($order->shipping_phone)
+                            <div class="mt-1"><i class="bi bi-telephone me-1 text-primary"></i>{{ $order->shipping_phone }}</div>
+                        @endif
                     </div>
 
-                    @if($order->user && $order->user->addresses && $order->user->addresses->count() > 0)
+                    @if($order->shipping_street)
+                        <p class="mb-0 text-muted small">
+                            <i class="bi bi-geo-alt me-1 text-primary" aria-hidden="true"></i>{{ $order->shipping_street }}, {{ $order->shipping_zip_code }} {{ $order->shipping_city }} {{ $order->shipping_province ? '(' . $order->shipping_province . ')' : '' }}
+                        </p>
+                    @elseif($order->user && $order->user->addresses && $order->user->addresses->count() > 0)
                         @php $mainAddr = $order->user->addresses->where('is_main', true)->first() ?? $order->user->addresses->first(); @endphp
                         <p class="mb-0 text-muted small">
                             <i class="bi bi-geo-alt me-1 text-primary" aria-hidden="true"></i>{{ $mainAddr->street }}, {{ $mainAddr->zip_code }} {{ $mainAddr->city }}

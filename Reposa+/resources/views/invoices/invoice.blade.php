@@ -312,9 +312,12 @@
             <td style="width: 48.5%;">
                 <div class="party-card">
                     <div class="party-title">{{ __('messages.invoice.customer_data') }}</div>
-                    <div class="party-name">{{ $order->user->name }}</div>
-                    <div class="party-text">{{ $order->user->email }}</div>
-                    @if($order->user->addresses && $order->user->addresses->isNotEmpty())
+                    <div class="party-name">{{ $order->customer_name }}</div>
+                    <div class="party-text">{{ $order->customer_email }}</div>
+                    @if($order->shipping_street)
+                        <div class="party-text">{{ $order->shipping_street }}</div>
+                        <div class="party-text">{{ $order->shipping_zip_code }} {{ $order->shipping_city }} @if($order->shipping_province)({{ $order->shipping_province }})@endif</div>
+                    @elseif($order->user && $order->user->addresses && $order->user->addresses->isNotEmpty())
                         @php $addr = $order->user->addresses->first(); @endphp
                         <div class="party-text">{{ $addr->street }}</div>
                         <div class="party-text">{{ $addr->zip_code }} {{ $addr->city }} (España)</div>
@@ -328,7 +331,7 @@
                 <div class="party-card">
                     <div class="party-title">{{ __('messages.invoice.payment_delivery') }}</div>
                     <div class="party-name">{{ __('messages.invoice.payment_method') }}: Stripe Checkout</div>
-                    @if($order->user->pm_last_four)
+                    @if($order->user && $order->user->pm_last_four)
                         <div class="party-text">{{ __('messages.invoice.card_ending') }} {{ $order->user->pm_last_four }}</div>
                     @else
                         <div class="party-text">Tarjeta de Crédito / Débito Segura (SSL)</div>

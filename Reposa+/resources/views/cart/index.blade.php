@@ -225,18 +225,10 @@
                             <x-price :amount="$total" size="lg" />
                         </div>
 
-                        <!-- CTA Checkout Action -->
-                        @guest
-                            <x-button href="{{ route('cart.login') }}" size="lg" :pill="true" class="w-100 btn-cta-bold text-decoration-none py-3" icon="bi-box-arrow-in-right" iconPosition="right">
-                                {{ __('messages.cart.btn_login') }}
-                            </x-button>
-                        @endguest
-
-                        @auth
-                            <x-button href="{{ route('stripe.checkout') }}" size="lg" :pill="true" class="w-100 btn-cta-bold text-decoration-none py-3" icon="bi-shield-lock-fill">
-                                {{ __('messages.cart.btn_stripe') }}
-                            </x-button>
-                        @endauth
+                        <!-- CTA Checkout Action (Adaptativo para Invitados y Usuarios) -->
+                        <x-button href="{{ route('checkout.page') }}" size="lg" :pill="true" class="w-100 btn-cta-bold text-decoration-none py-3" icon="bi-shield-lock-fill">
+                            {{ __('messages.checkout.title') }}
+                        </x-button>
 
                         <!-- Trust Microcopy & Redirect Notice -->
                         <p class="text-center text-muted small mt-2 mb-3" style="font-size: 0.78rem;">

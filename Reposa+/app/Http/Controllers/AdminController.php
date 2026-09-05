@@ -7,6 +7,8 @@ use App\Models\Product;
 use App\Models\Order;
 use App\Models\Refund;
 use App\Models\Category;
+use App\Models\Shipment;
+use App\Services\Shipping\ShippingServiceInterface;
 use App\Mail\OrderRefunded;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -155,7 +157,7 @@ class AdminController extends Controller
 
     public function orders(Request $request)
     {
-        $query = Order::with('user', 'orderItems.product')->latest();
+        $query = Order::with(['user', 'orderItems.product', 'shipment'])->latest();
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -170,6 +172,11 @@ class AdminController extends Controller
                     $sub->whereHas('user', function ($u) use ($q) {
                         $u->where('name', 'like', "%{$q}%")
                           ->orWhere('email', 'like', "%{$q}%");
+                    })
+                    ->orWhere('shipping_name', 'like', "%{$q}%")
+                    ->orWhere('shipping_email', 'like', "%{$q}%")
+                    ->orWhereHas('shipment', function ($s) use ($q) {
+                        $s->where('tracking_number', 'like', "%{$q}%");
                     });
                 }
             });
@@ -296,7 +303,7 @@ class AdminController extends Controller
             }
 
             try {
-                Mail::to($order->user->email)->send(new OrderRefunded($order, $refund));
+                Mail::to($order->customer_email)->send(new OrderRefunded($order, $refund));
             } catch (\Exception $e) {
                 Log::error("Failed to send refund email for order {$order->id}", [
                     'error' => $e->getMessage(),
@@ -310,5 +317,28 @@ class AdminController extends Controller
             ]);
             return back()->with('error', __('messages.admin.refund_error', ['error' => $e->getMessage()]));
         }
+    }
+
+    public function advanceShipment(Shipment $shipment, ShippingServiceInterface $shippingService)
+    {
+        $oldStatus = $shipment->status;
+        $updatedShipment = $shippingService->advanceTrackingStatus($shipment);
+
+        if ($oldStatus === $updatedShipment->status) {
+            return back()->with('info', 'El envío ya se encuentra en su estado final (' . $updatedShipment->status_label . ').');
+        }
+
+        return back()->with('success', __('messages.admin.shipment_advanced', [
+            'tracking' => $updatedShipment->tracking_number,
+            'status' => $updatedShipment->status_label,
+        ]));
+    }
+
+    public function viewShipmentLabel(Shipment $shipment, ShippingServiceInterface $shippingService)
+    {
+        $labelData = $shippingService->generateLabel($shipment);
+        $order = $shipment->order;
+
+        return view('admin.shipments.label', compact('shipment', 'labelData', 'order'));
     }
 }

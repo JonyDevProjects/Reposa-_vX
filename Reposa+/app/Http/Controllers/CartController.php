@@ -151,55 +151,164 @@ class CartController extends Controller
         return back()->with('success', __('messages.cart.removed'));
     }
 
-    public function checkout()
+    public function checkoutPage(\App\Services\Shipping\ShippingServiceInterface $shippingService)
     {
-        $user = Auth::user();
-        
-        // Sincronizar carrito de sesión si existe antes de proceder
-        $sessionCart = session()->get('cart', []);
-        if (!empty($sessionCart)) {
-            foreach ($sessionCart as $productId => $item) {
-                $cartItem = CartItem::where('user_id', $user->id)
-                                    ->where('product_id', $productId)
-                                    ->first();
-                if ($cartItem) {
-                    $cartItem->increment('quantity', $item['quantity']);
-                } else {
-                    CartItem::create([
-                        'user_id' => $user->id,
-                        'product_id' => $productId,
-                        'quantity' => $item['quantity']
-                    ]);
-                }
-            }
-            session()->forget('cart');
+        $cartItems = $this->getCurrentCartItems();
+
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('cart.index')->with('error', __('messages.cart.empty'));
         }
 
-        $cartItems = CartItem::where('user_id', $user->id)->with('product')->get();
+        $total = $cartItems->sum(fn($i) => $i->product->price * $i->quantity);
+        $shippingRates = $shippingService->calculateRates($total);
+
+        $user = Auth::user();
+        $userAddresses = $user ? $user->addresses()->get() : collect();
+        $userPhone = $user?->profile?->phone;
+
+        return view('checkout.index', compact('cartItems', 'total', 'shippingRates', 'user', 'userAddresses', 'userPhone'));
+    }
+
+    protected function getCurrentCartItems()
+    {
+        if (Auth::check()) {
+            return CartItem::where('user_id', Auth::id())->with('product')->get();
+        }
+
+        $sessionCart = session()->get('cart', []);
+        return collect($sessionCart)->map(function ($item, $productId) {
+            $product = Product::find($productId);
+            if (!$product) return null;
+            return (object) [
+                'id' => $productId,
+                'product_id' => $productId,
+                'quantity' => $item['quantity'],
+                'product' => $product,
+            ];
+        })->filter();
+    }
+
+    public function checkout(Request $request, \App\Services\Shipping\ShippingServiceInterface $shippingService)
+    {
+        $user = Auth::user();
+
+        // Sincronizar carrito de sesión si existe para usuario autenticado
+        if ($user) {
+            $sessionCart = session()->get('cart', []);
+            if (!empty($sessionCart)) {
+                foreach ($sessionCart as $productId => $item) {
+                    $cartItem = CartItem::where('user_id', $user->id)
+                                        ->where('product_id', $productId)
+                                        ->first();
+                    if ($cartItem) {
+                        $cartItem->increment('quantity', $item['quantity']);
+                    } else {
+                        CartItem::create([
+                            'user_id' => $user->id,
+                            'product_id' => $productId,
+                            'quantity' => $item['quantity']
+                        ]);
+                    }
+                }
+                session()->forget('cart');
+            }
+            $cartItems = CartItem::where('user_id', $user->id)->with('product')->get();
+        } else {
+            $cartItems = $this->getCurrentCartItems();
+        }
 
         if ($cartItems->isEmpty()) {
             return back()->with('error', __('messages.cart.empty'));
         }
 
-        $total = $cartItems->sum(function($item) {
-            return $item->product->price * $item->quantity;
-        });
+        $guestToken = null;
+        if (!$user) {
+            $request->validate([
+                'shipping_name' => 'required|string|max:255',
+                'shipping_email' => 'required|email|max:255',
+                'shipping_phone' => 'required|string|max:30',
+                'shipping_street' => 'required|string|max:255',
+                'shipping_city' => 'required|string|max:255',
+                'shipping_zip_code' => 'required|string|max:20',
+                'shipping_province' => 'nullable|string|max:100',
+            ]);
 
-        // Crear el pedido dentro de una transacción
+            $guestToken = \Illuminate\Support\Str::random(40);
+            $shippingName = $request->shipping_name;
+            $shippingEmail = $request->shipping_email;
+            $shippingPhone = $request->shipping_phone;
+            $shippingStreet = $request->shipping_street;
+            $shippingCity = $request->shipping_city;
+            $shippingZip = $request->shipping_zip_code;
+            $shippingProvince = $request->shipping_province ?? '';
+            $serviceType = $request->input('shipping_service_type', 'standard_48h');
+        } else {
+            if ($request->filled('address_id') && $request->address_id !== 'new') {
+                $address = $user->addresses()->find($request->address_id);
+                $shippingStreet = $address?->street ?? 'Dirección guardada';
+                $shippingCity = $address?->city ?? 'Ciudad';
+                $shippingZip = $address?->zip_code ?? '00000';
+                $shippingProvince = $address?->province ?? '';
+            } elseif ($request->filled('shipping_street')) {
+                $shippingStreet = $request->shipping_street;
+                $shippingCity = $request->shipping_city ?? 'Ciudad';
+                $shippingZip = $request->shipping_zip_code ?? '00000';
+                $shippingProvince = $request->shipping_province ?? '';
+            } else {
+                $mainAddress = $user->addresses()->where('is_main', true)->first() ?? $user->addresses()->first();
+                $shippingStreet = $mainAddress?->street ?? 'Dirección no especificada';
+                $shippingCity = $mainAddress?->city ?? 'Ciudad';
+                $shippingZip = $mainAddress?->zip_code ?? '00000';
+                $shippingProvince = $mainAddress?->province ?? '';
+            }
+
+            $shippingName = $request->input('shipping_name', $user->name);
+            $shippingEmail = $request->input('shipping_email', $user->email);
+            $shippingPhone = $request->input('shipping_phone', $user->profile?->phone ?? '');
+            $serviceType = $request->input('shipping_service_type', 'standard_48h');
+        }
+
+        $itemsTotal = $cartItems->sum(fn($item) => $item->product->price * $item->quantity);
+        $shippingCost = match ($serviceType) {
+            'express_24h' => 7.95,
+            'pickup_point' => 3.50,
+            default => ($itemsTotal >= 50.0 ? 0.00 : 4.95),
+        };
+        $total = $itemsTotal + $shippingCost;
+
         try {
-            $order = DB::transaction(function () use ($user, $total, $cartItems) {
+            $order = DB::transaction(function () use (
+                $user, $guestToken, $total, $shippingCost, $serviceType,
+                $shippingName, $shippingEmail, $shippingPhone,
+                $shippingStreet, $shippingCity, $shippingZip, $shippingProvince,
+                $cartItems
+            ) {
                 $order = Order::create([
-                    'user_id' => $user->id,
+                    'user_id' => $user?->id,
+                    'guest_token' => $guestToken,
+                    'shipping_name' => $shippingName,
+                    'shipping_email' => $shippingEmail,
+                    'shipping_phone' => $shippingPhone,
+                    'shipping_street' => $shippingStreet,
+                    'shipping_city' => $shippingCity,
+                    'shipping_zip_code' => $shippingZip,
+                    'shipping_province' => $shippingProvince,
+                    'shipping_country' => 'ES',
+                    'shipping_service_type' => $serviceType,
+                    'shipping_cost' => $shippingCost,
                     'total_amount' => $total,
                     'status' => 'pending'
                 ]);
 
-                // Mover items del carrito a order_items, verificando y decrementando stock
                 foreach ($cartItems as $item) {
                     $product = Product::lockForUpdate()->find($item->product_id);
 
                     if ($product->stock < $item->quantity) {
-                        throw new \Exception(__('messages.cart.stock_insufficient', ['name' => $product->name, 'available' => $product->stock, 'requested' => $item->quantity]));
+                        throw new \Exception(__('messages.cart.stock_insufficient', [
+                            'name' => $product->name,
+                            'available' => $product->stock,
+                            'requested' => $item->quantity
+                        ]));
                     }
 
                     $product->decrement('stock', $item->quantity);
@@ -210,7 +319,14 @@ class CartController extends Controller
                         'quantity' => $item->quantity,
                         'price_at_purchase' => $item->product->price
                     ]);
-                    $item->delete(); // Vaciar el carrito
+
+                    if ($user) {
+                        $item->delete();
+                    }
+                }
+
+                if (!$user) {
+                    session()->forget('cart');
                 }
 
                 return $order;
@@ -219,15 +335,38 @@ class CartController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
-        // Enviar el correo de confirmación
+        // Crear expedición en el servicio de paquetería mock
         try {
-            Mail::to($user->email)->send(new OrderConfirmed($order));
+            $shippingService->createShipment($order, [
+                'name' => $shippingName,
+                'email' => $shippingEmail,
+                'phone' => $shippingPhone,
+                'street' => $shippingStreet,
+                'city' => $shippingCity,
+                'zip_code' => $shippingZip,
+                'province' => $shippingProvince,
+                'country' => 'ES',
+            ], $serviceType);
         } catch (\Exception $e) {
-            // Si falla el envío del correo, el pedido sigue siendo válido
-            return redirect('/profile#orders')->with('success', __('messages.cart.order_success_no_email'));
+            // Continuar si paquetería mock falla
         }
 
-        return redirect('/profile#orders')->with('success', __('messages.cart.order_success'));
+        if ($guestToken) {
+            session(['guest_order_token' => $guestToken]);
+        }
+
+        try {
+            Mail::to($order->customer_email)->send(new OrderConfirmed($order));
+        } catch (\Exception $e) {
+            // El pedido sigue siendo válido aunque falle el email
+        }
+
+        if ($user) {
+            return redirect('/profile#orders')->with('success', __('messages.cart.order_success'));
+        }
+
+        return redirect()->route('orders.show', ['order' => $order->id, 'token' => $guestToken])
+            ->with('success', __('messages.cart.order_success'));
     }
 
     public function orders()
@@ -243,63 +382,131 @@ class CartController extends Controller
 
     public function showOrder(Order $order)
     {
-        if ($order->user_id !== auth()->id()) {
-            abort(403);
+        if ($order->user_id) {
+            if (!auth()->check() || $order->user_id !== auth()->id()) {
+                abort(403);
+            }
+        } else {
+            $token = request('token') ?? session('guest_order_token');
+            if (!$token || $order->guest_token !== $token) {
+                abort(403);
+            }
         }
 
-        $order->load('orderItems.product');
+        $order->load(['orderItems.product', 'shipment', 'user.addresses']);
 
         return view('orders.show', compact('order'));
     }
 
-    public function stripeCheckout()
+    public function stripeCheckout(Request $request, \App\Services\Shipping\ShippingServiceInterface $shippingService)
     {
         $user = Auth::user();
 
-        // Sincronizar carrito de sesión si existe
-        $sessionCart = session()->get('cart', []);
-        if (!empty($sessionCart)) {
-            foreach ($sessionCart as $productId => $item) {
-                $cartItem = CartItem::where('user_id', $user->id)
-                                    ->where('product_id', $productId)
-                                    ->first();
-                if ($cartItem) {
-                    $cartItem->increment('quantity', $item['quantity']);
-                } else {
-                    CartItem::create([
-                        'user_id' => $user->id,
-                        'product_id' => $productId,
-                        'quantity' => $item['quantity']
-                    ]);
+        if ($user) {
+            $sessionCart = session()->get('cart', []);
+            if (!empty($sessionCart)) {
+                foreach ($sessionCart as $productId => $item) {
+                    $cartItem = CartItem::where('user_id', $user->id)
+                                        ->where('product_id', $productId)
+                                        ->first();
+                    if ($cartItem) {
+                        $cartItem->increment('quantity', $item['quantity']);
+                    } else {
+                        CartItem::create([
+                            'user_id' => $user->id,
+                            'product_id' => $productId,
+                            'quantity' => $item['quantity']
+                        ]);
+                    }
                 }
+                session()->forget('cart');
             }
-            session()->forget('cart');
+            $cartItems = CartItem::where('user_id', $user->id)->with('product')->get();
+        } else {
+            $cartItems = $this->getCurrentCartItems();
         }
-
-        $cartItems = CartItem::where('user_id', $user->id)->with('product')->get();
 
         if ($cartItems->isEmpty()) {
-            return back()->with('error', __('messages.cart.empty'));
+            return redirect('/cart')->with('error', __('messages.cart.empty'));
         }
 
-        // Verify stock availability before creating the order
+        // Si es invitado y no proporciona email de envío, redirigir a vista de checkout
+        if (!$user && !$request->filled('shipping_email')) {
+            return redirect()->route('checkout.page')->with('info', __('messages.cart.enter_shipping_details'));
+        }
+
+        $guestToken = null;
+        if (!$user) {
+            $validated = $request->validate([
+                'shipping_name' => 'required|string|max:255',
+                'shipping_email' => 'required|email|max:255',
+                'shipping_phone' => 'required|string|max:30',
+                'shipping_street' => 'required|string|max:255',
+                'shipping_city' => 'required|string|max:255',
+                'shipping_zip_code' => 'required|string|max:20',
+                'shipping_province' => 'nullable|string|max:100',
+                'shipping_service_type' => 'nullable|string|in:standard_48h,express_24h,pickup_point',
+            ]);
+
+            $guestToken = \Illuminate\Support\Str::random(40);
+            $shippingName = $validated['shipping_name'];
+            $shippingEmail = $validated['shipping_email'];
+            $shippingPhone = $validated['shipping_phone'];
+            $shippingStreet = $validated['shipping_street'];
+            $shippingCity = $validated['shipping_city'];
+            $shippingZip = $validated['shipping_zip_code'];
+            $shippingProvince = $validated['shipping_province'] ?? '';
+            $serviceType = $validated['shipping_service_type'] ?? 'standard_48h';
+        } else {
+            $mainAddress = $user->addresses()->where('is_main', true)->first() ?? $user->addresses()->first();
+            $shippingName = $user->name;
+            $shippingEmail = $user->email;
+            $shippingPhone = $user->profile?->phone ?? '';
+            $shippingStreet = $mainAddress?->street ?? 'Domicilio registrado';
+            $shippingCity = $mainAddress?->city ?? 'Ciudad';
+            $shippingZip = $mainAddress?->zip_code ?? '00000';
+            $shippingProvince = $mainAddress?->province ?? '';
+            $serviceType = $request->input('shipping_service_type', 'standard_48h');
+        }
+
+        $itemsTotal = $cartItems->sum(fn($i) => $i->product->price * $i->quantity);
+        $shippingCost = match ($serviceType) {
+            'express_24h' => 7.95,
+            'pickup_point' => 3.50,
+            default => ($itemsTotal >= 50.0 ? 0.00 : 4.95),
+        };
+        $total = $itemsTotal + $shippingCost;
+
         try {
-            $order = DB::transaction(function () use ($user, $cartItems) {
+            $order = DB::transaction(function () use (
+                $user, $guestToken, $total, $shippingCost, $serviceType,
+                $shippingName, $shippingEmail, $shippingPhone,
+                $shippingStreet, $shippingCity, $shippingZip, $shippingProvince,
+                $cartItems
+            ) {
                 foreach ($cartItems as $item) {
                     $product = Product::lockForUpdate()->find($item->product_id);
-
-                    if (! $product || $product->stock < $item->quantity) {
-                        $name = $product?->name ?? __('messages.admin.products.name') . ' #' . $item->product_id;
+                    if (!$product || $product->stock < $item->quantity) {
+                        $name = $product?->name ?? 'Producto #' . $item->product_id;
                         $available = $product?->stock ?? 0;
-                        throw new \Exception(
-                            __('messages.cart.stock_insufficient', ['name' => $name, 'available' => $available, 'requested' => $item->quantity])
-                        );
+                        throw new \Exception(__('messages.cart.stock_insufficient', ['name' => $name, 'available' => $available, 'requested' => $item->quantity]));
                     }
                 }
 
                 $order = Order::create([
-                    'user_id' => $user->id,
-                    'total_amount' => $cartItems->sum(fn($item) => $item->product->price * $item->quantity),
+                    'user_id' => $user?->id,
+                    'guest_token' => $guestToken,
+                    'shipping_name' => $shippingName,
+                    'shipping_email' => $shippingEmail,
+                    'shipping_phone' => $shippingPhone,
+                    'shipping_street' => $shippingStreet,
+                    'shipping_city' => $shippingCity,
+                    'shipping_zip_code' => $shippingZip,
+                    'shipping_province' => $shippingProvince,
+                    'shipping_country' => 'ES',
+                    'shipping_service_type' => $serviceType,
+                    'shipping_cost' => $shippingCost,
+                    'total_amount' => $total,
                     'status' => 'pending',
                 ]);
 
@@ -318,7 +525,25 @@ class CartController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
-        // Construir line items para Stripe Checkout
+        // Crear expedición en mock paquetería
+        try {
+            $shippingService->createShipment($order, [
+                'name' => $shippingName,
+                'email' => $shippingEmail,
+                'phone' => $shippingPhone,
+                'street' => $shippingStreet,
+                'city' => $shippingCity,
+                'zip_code' => $shippingZip,
+                'province' => $shippingProvince,
+            ], $serviceType);
+        } catch (\Exception $e) {
+            // Ignorar error de paquetería en checkout
+        }
+
+        if ($guestToken) {
+            session(['guest_order_token' => $guestToken]);
+        }
+
         $lineItems = $order->orderItems->map(function ($item) {
             return [
                 'price_data' => [
@@ -332,19 +557,39 @@ class CartController extends Controller
             ];
         })->toArray();
 
-        // Crear cliente Stripe si no existe
-        $stripeCustomer = $user->createOrGetStripeCustomer();
+        if ($shippingCost > 0) {
+            $lineItems[] = [
+                'price_data' => [
+                    'currency' => 'eur',
+                    'unit_amount' => (int) ($shippingCost * 100),
+                    'product_data' => [
+                        'name' => __('messages.cart.shipping') . ' (' . $serviceType . ')',
+                    ],
+                ],
+                'quantity' => 1,
+            ];
+        }
 
-        // Crear sesión de Checkout usando la API de Stripe directamente
-        $session = $user->stripe()->checkout->sessions->create([
-            'customer' => $stripeCustomer->id,
+        $sessionParams = [
             'line_items' => $lineItems,
             'mode' => 'payment',
             'success_url' => route('stripe.success') . '?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('stripe.cancel'),
-            'metadata' => ['order_id' => $order->id],
+            'metadata' => [
+                'order_id' => $order->id,
+                'guest_token' => $order->guest_token,
+            ],
             'managed_payments' => ['enabled' => false],
-        ]);
+        ];
+
+        if ($user) {
+            $stripeCustomer = $user->createOrGetStripeCustomer();
+            $sessionParams['customer'] = $stripeCustomer->id;
+            $session = $user->stripe()->checkout->sessions->create($sessionParams);
+        } else {
+            $sessionParams['customer_email'] = $shippingEmail;
+            $session = Cashier::stripe()->checkout->sessions->create($sessionParams);
+        }
 
         $order->update([
             'stripe_session_id' => $session->id,
@@ -365,34 +610,48 @@ class CartController extends Controller
         $session = Cashier::stripe()->checkout->sessions->retrieve($sessionId);
 
         if ($session->payment_status !== 'paid') {
-            return redirect('/profile#orders')->with('error', __('messages.cart.payment_not_completed'));
+            return redirect('/cart')->with('error', __('messages.cart.payment_not_completed'));
         }
 
         $orderId = $session->metadata['order_id'] ?? null;
         $order = Order::findOrFail($orderId);
 
-        if ($order->user_id !== auth()->id()) {
-            abort(403);
+        if ($order->user_id) {
+            if (!auth()->check() || $order->user_id !== auth()->id()) {
+                abort(403);
+            }
         }
 
         if ($order->status === 'pending') {
             DB::transaction(function () use ($order) {
                 foreach ($order->orderItems as $item) {
                     $product = Product::lockForUpdate()->find($item->product_id);
-                    $product->decrement('stock', $item->quantity);
+                    if ($product) {
+                        $product->decrement('stock', $item->quantity);
+                    }
                 }
                 $order->update(['status' => 'completed']);
             });
 
-            // Vaciar carrito solo después de confirmar el pago
-            CartItem::where('user_id', auth()->id())->delete();
+            // Vaciar carrito
+            if ($order->user_id) {
+                CartItem::where('user_id', $order->user_id)->delete();
+            } else {
+                session()->forget('cart');
+            }
 
             // Enviar correo de confirmación
             try {
-                Mail::to($order->user->email)->send(new OrderConfirmed($order));
+                Mail::to($order->customer_email)->send(new OrderConfirmed($order));
             } catch (\Exception $e) {
                 // El pago ya está registrado aunque falle el correo
             }
+        }
+
+        if ($order->guest_token) {
+            session(['guest_order_token' => $order->guest_token]);
+            return redirect()->route('orders.show', ['order' => $order->id, 'token' => $order->guest_token])
+                ->with('success', __('messages.cart.payment_success'));
         }
 
         return redirect('/profile#orders')->with('success', __('messages.cart.payment_success'));
@@ -400,12 +659,16 @@ class CartController extends Controller
 
     public function stripeCancel()
     {
-        // Cancelar la orden pending más reciente del usuario
-        $order = Order::where('user_id', auth()->id())
-            ->where('status', 'pending')
-            ->whereNotNull('stripe_session_id')
-            ->latest()
-            ->first();
+        if (Auth::check()) {
+            $order = Order::where('user_id', auth()->id())
+                ->where('status', 'pending')
+                ->whereNotNull('stripe_session_id')
+                ->latest()
+                ->first();
+        } else {
+            $token = session('guest_order_token');
+            $order = $token ? Order::where('guest_token', $token)->where('status', 'pending')->first() : null;
+        }
 
         if ($order) {
             $order->update(['status' => 'cancelled']);
@@ -416,11 +679,18 @@ class CartController extends Controller
 
     public function downloadInvoice(Order $order)
     {
-        if ($order->user_id !== auth()->id()) {
-            abort(403);
+        if ($order->user_id) {
+            if (!auth()->check() || $order->user_id !== auth()->id()) {
+                abort(403);
+            }
+        } else {
+            $token = request('token') ?? session('guest_order_token');
+            if (!$token || $order->guest_token !== $token) {
+                abort(403);
+            }
         }
 
-        $order->load(['orderItems.product', 'user.addresses']);
+        $order->load(['orderItems.product', 'shipment', 'user.addresses']);
 
         $options = new Options();
         $options->set('isRemoteEnabled', true);
@@ -440,5 +710,57 @@ class CartController extends Controller
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
             'Content-Length' => strlen($pdf),
         ]);
+    }
+
+    public function claimAccount(Request $request, Order $order)
+    {
+        if ($order->user_id !== null) {
+            return back()->with('error', __('messages.orders.account_already_claimed'));
+        }
+
+        $token = $request->input('token') ?? session('guest_order_token');
+        if (!$token || $order->guest_token !== $token) {
+            abort(403);
+        }
+
+        $request->validate([
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        if (\App\Models\User::where('email', $order->customer_email)->exists()) {
+            return back()->with('error', __('messages.orders.email_already_registered'));
+        }
+
+        $newUser = DB::transaction(function () use ($order, $request) {
+            $user = \App\Models\User::create([
+                'name' => $order->customer_name,
+                'email' => $order->customer_email,
+                'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+            ]);
+
+            $order->update(['user_id' => $user->id]);
+
+            if ($order->shipping_street) {
+                $user->addresses()->create([
+                    'street' => $order->shipping_street,
+                    'city' => $order->shipping_city ?? '',
+                    'zip_code' => $order->shipping_zip_code ?? '',
+                    'is_main' => true,
+                ]);
+            }
+
+            if ($order->shipping_phone) {
+                $user->profile()->create([
+                    'full_name' => $order->customer_name,
+                    'phone' => $order->shipping_phone,
+                ]);
+            }
+
+            return $user;
+        });
+
+        Auth::login($newUser);
+
+        return redirect()->route('profile')->with('success', __('messages.orders.account_created_success'));
     }
 }
