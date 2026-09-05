@@ -62,8 +62,16 @@
   - `6.3`: Vinculación automática de cuenta existente por email.
   - `6.4`: Autenticación Google desde checkout adaptativo con fusión automática del carrito (`MergeCartOnLogin`).
 
-### 2.7 Memoria Persistente de Engram
-- Registradas 6 observaciones (`#276` a `#281`) cubriendo la investigación previa, las decisiones de arquitectura de las Fases 1 a 4 y el acta de la sesión, sincronizadas en el chunk `00ce85b8` en `.engram/`.
+### 2.8 Automatización y Certificación E2E con Playwright (Fase 5 ✅)
+- **Suite E2E Playwright:** Creada especificación [`Reposa+/e2e/casos-1-to-5.spec.js`](../Reposa+/e2e/casos-1-to-5.spec.js) y configuración [`Reposa+/playwright.config.js`](../Reposa+/playwright.config.js).
+- **Cobertura de Casos 1 al 6:**
+  - *Caso 1:* Registro con dirección obligatoria en Madrid y validación de errores.
+  - *Caso 2:* Flujo de compra completo como invitado en Barcelona con envío Correos Express (`express_24h`).
+  - *Caso 3:* Verificación de seguridad de acceso a pedidos y facturas por token (HTTP 403 vs 200 PDF).
+  - *Caso 4:* Conversión en 1 clic (*Claim Account*) y vinculación de dirección y pedido al perfil.
+  - *Caso 5:* Operativa administrativa de paquetería, avance a *En tránsito* y validación visual de etiqueta A6.
+  - *Caso 6:* Verificación de iniciación de flujo Google OAuth 2.0 y parámetros de consentimiento.
+- **Resultado:** **6/6 tests E2E pasados al 100% en 5.7s**.
 
 ---
 
@@ -89,7 +97,7 @@ f213ee6 docs: formalizar protocolo de pruebas manuales para Google OAuth 2.0 en 
 | **Fase 2** | Mock de servicio de paquetería estándar y seguimiento | ✅ Completada |
 | **Fase 3** | Compra como invitado (*Guest Checkout*) y conversión 1-clic | ✅ Completada |
 | **Fase 4** | Autenticación y registro con Google OAuth 2.0 y Onboarding 2 pasos | ✅ Completada |
-| **Fase 5** | Protocolo de pruebas manuales (6 casos de prueba en navegador) | 📋 Lista para Ejecución |
+| **Fase 5** | Protocolo de pruebas y certificación E2E con Playwright (Casos 1 al 6) | ✅ Automatizada y Certificada (6/6 passing) |
 
 ---
 
@@ -121,6 +129,9 @@ Al retomar el trabajo en la próxima sesión, se cuenta con las siguientes accio
 ```bash
 # Ejecutar suite de pruebas completa en Docker (87 tests)
 docker exec reposaplus-dev-app php artisan test --testsuite=Feature,Unit
+
+# Ejecutar suite de pruebas E2E en Playwright (6 tests)
+cd Reposa+ && npm run test:playwright
 
 # Ejecutar únicamente los tests de Google OAuth y Checkout
 docker exec reposaplus-dev-app php artisan test tests/Feature/GoogleOAuthTest.php

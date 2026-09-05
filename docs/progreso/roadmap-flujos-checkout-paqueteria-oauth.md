@@ -26,7 +26,7 @@ Este documento establece la planificación integral, trazabilidad técnica y pro
 | **2** | Servicio Mock de Paquetería Estándar y Trazabilidad | Contrato `ShippingServiceInterface`, servicio `MockStandardCourierService`, tracking timeline en `orders/show`, gestión de envíos y etiqueta A6 en admin. | ✅ Completada |
 | **3** | Compra como Invitado (*Guest Checkout*) y Conversión 1-Clic | Vista unificada `/checkout`, migración de `orders` (`guest_token`, snapshots de envío), seguridad por token en facturas, claim account en confirmación. | ✅ Completada |
 | **4** | Autenticación y Registro con Google OAuth 2.0 | Integración de `laravel/socialite`, migración `google_id`, flujo de onboarding en 2 pasos para dirección obligatoria, botones visuales Midnight Sanctuary. | ✅ Completada |
-| **5** | Protocolo de Pruebas Manuales y Verificación E2E de Usuario | Checklist operativa paso a paso de los 6 escenarios críticos para validación manual por el desarrollador/usuario en navegador. | 📋 Planificada / Para Validación |
+| **5** | Protocolo de Pruebas y Certificación E2E (Playwright) | Suite automatizada en Playwright para Casos 1 al 6 (E2E browser testing, guest checkout, tracking, claim account, albarán térmico y OAuth initiation). | ✅ Automatizada y Certificada |
 
 ---
 
@@ -453,6 +453,23 @@ URL base del e-commerce: `http://localhost:8000` (o el puerto mapeado en Docker)
   - La sesión de Google se inicia y el listener `MergeCartOnLogin` traslada automáticamente los artículos del carrito de la sesión al usuario en base de datos.
   - El usuario vuelve al flujo de `/checkout` como usuario registrado, mostrando sus direcciones guardadas para seleccionar en un solo clic.
 
+### 5.3 Automatización y Certificación E2E con Playwright
+
+Para garantizar la reproducibilidad y ejecución en pipelines de CI/CD, los flujos descritos en los Casos de Prueba 1 al 6 se han automatizado mediante una suite end-to-end completa con **Playwright** (`@playwright/test`):
+
+- **Archivo de especificación:** [`Reposa+/e2e/casos-1-to-5.spec.js`](../../Reposa+/e2e/casos-1-to-5.spec.js)
+- **Configuración:** [`Reposa+/playwright.config.js`](../../Reposa+/playwright.config.js) (headless Chromium contra `http://localhost:8000`)
+- **Comandos de ejecución:**
+  ```bash
+  # Ejecución de la suite E2E completa
+  npm run test:playwright
+  # Equivalente: npx playwright test
+
+  # Ejecución en modo visible (headed) para inspección visual
+  npm run test:playwright:headed
+  ```
+- **Resultados de certificación:** **6/6 tests pasados con éxito (100% de aserciones cumplidas en ~8s)**.
+
 ---
 
 ## Registro de Cambios y Trazabilidad
@@ -461,3 +478,4 @@ URL base del e-commerce: `http://localhost:8000` (o el puerto mapeado en Docker)
 |---|---|:---:|---|
 | **05/09/2026** | Jonathan Quispe | `v1.0.0` | Creación del roadmap integral de checkout adaptativo, paquetería estándar mock, integración Google OAuth 2.0 y protocolo de pruebas manuales. |
 | **05/09/2026** | Jonathan Quispe | `v1.1.0` | Implementación completa de Fase 4 (Google OAuth 2.0, Socialite, onboarding en 2 pasos) y formalización detallada de los 4 sub-escenarios de prueba manual en el Caso de Prueba 6. |
+| **05/09/2026** | Jonathan Quispe | `v1.2.0` | Automatización y certificación de la Fase 5 con suite E2E en Playwright (`Reposa+/e2e/casos-1-to-5.spec.js`) pasando 6/6 tests al 100%. |
