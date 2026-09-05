@@ -96,8 +96,18 @@ f213ee6 docs: formalizar protocolo de pruebas manuales para Google OAuth 2.0 en 
 ## 5. Siguiente Sesión (*Next Steps*)
 
 Al retomar el trabajo en la próxima sesión, se cuenta con las siguientes acciones inmediatas:
-1. **Ejecutar Pruebas Manuales (Fase 5):** Seguir la guía paso a paso de los Casos de Prueba 1 al 6 descritos en [`docs/progreso/roadmap-flujos-checkout-paqueteria-oauth.md`](./progreso/roadmap-flujos-checkout-paqueteria-oauth.md) directamente en el navegador (`http://localhost:8000`).
-2. **Merge de la Característica a `develop`:** Tras verificar manualmente los flujos:
+1. **Ejecución y Verificación de Casos de Prueba (Fase 5):**
+   - **Casos 1 al 5 Automatizados con Playwright (CLI / Pest Browser):**
+     - Instalar/verificar Playwright (`npx playwright install`).
+     - Ejecutar scripts o pruebas de navegador para los 5 flujos internos:
+       - *Caso 1:* Registro de usuario con dirección obligatoria.
+       - *Caso 2:* Compra completa como invitado en `/checkout`.
+       - *Caso 3:* Verificación de seguridad de facturas y pedidos por token (HTTP 403).
+       - *Caso 4:* Conversión 1-clic (*Claim Account*) post-pago.
+       - *Caso 5:* Operativa de paquetería y albarán térmico A6 en panel admin.
+   - **Caso 6 (Google OAuth 2.0):**
+     - Verificación en navegador real de la pantalla de consentimiento de Google (`accounts.google.com`) con las credenciales GCP ya configuradas en `.env`, o mediante prueba manual asistida.
+2. **Merge de la Característica a `develop`:** Tras verificar y certificar los flujos:
    ```bash
    git checkout develop
    git merge --no-ff feature/guest-checkout-and-shipping
