@@ -4,11 +4,12 @@
 
 - **Rama actual:** `feature/guest-checkout-and-shipping`
 - **Base de partida:** `develop` (commit `f321c00`)
-- **Último commit:** `f213ee6` — *docs: formalizar protocolo de pruebas manuales para Google OAuth 2.0 en Caso de Prueba 6*
+- **Último commit:** `bc746f6` — *fix(oauth): anadir soporte para ruta /api/auth/callback/google*
 - **Estado de Git:** Árbol de trabajo completamente limpio (*working tree clean*)
-- **Estado de Tests:** **87 tests pasados con éxito (267 aserciones, 0 fallos, 0 errores)**
+- **Estado de Tests Unit/Feature:** **87 tests pasados con éxito (267 aserciones, 0 fallos, 0 errores)**
+- **Estado de Tests E2E Playwright:** **6/6 tests pasados con éxito (100% de aserciones en ~8s)**
 - **Entorno Docker:** Contenedor `reposaplus-dev-app` y `reposaplus-dev-mysql` activos y saludables (PHP 8.3 / Laravel 13, MySQL 8).
-- **Memoria de Engram:** 6 observaciones registradas (`#276` a `#281`) y sincronizadas en chunk `00ce85b8` en `.engram/`.
+- **Memoria de Engram:** 7 observaciones registradas (`#276` a `#282`) en proyecto `reposaplus-tfg`.
 
 ---
 
@@ -73,6 +74,12 @@
   - *Caso 6:* Verificación de iniciación de flujo Google OAuth 2.0 y parámetros de consentimiento.
 - **Resultado:** **6/6 tests E2E pasados al 100% en 5.7s**.
 
+### 2.9 Verificación en Vivo de Google OAuth 2.0 y Alineación de Callback URI
+- **Alineación con GCP:** Se detectó que la consola de Google Cloud tenía configurada la URI `http://localhost:8000/api/auth/callback/google`.
+- **Ruta de compatibilidad:** En [`routes/web.php`](../Reposa+/routes/web.php) se registraron las rutas de callback para ambas variantes (`/auth/google/callback` y `/api/auth/callback/google`).
+- **Configuración de entorno:** En `Reposa+/.env` se definió `GOOGLE_REDIRECT_URI=http://localhost:8000/api/auth/callback/google`.
+- **Validación en navegador real:** El usuario probó el flujo en vivo contra `accounts.google.com`, confirmando el inicio de sesión exitoso sin error `400: redirect_uri_mismatch`.
+
 ---
 
 ## 3. Historial de Commits de la Rama
@@ -80,6 +87,12 @@
 Rama: `feature/guest-checkout-and-shipping`
 
 ```
+bc746f6 fix(oauth): anadir soporte para ruta /api/auth/callback/google
+4c7de3e fix(oauth): agregar ruta alias de callback para compatibilidad con URI de consola GCP
+1bf6dff docs: certificar automatizacion E2E de Fase 5 con Playwright en roadmap y handoff
+5619db2 test(e2e): implementar y certificar suite de pruebas con Playwright para flujos de Fase 5
+b23b358 docs: registrar estrategia de verificacion con Playwright para casos 1 al 5 en handoff
+bac8ccd docs: actualizar acta de handoff con finalizacion de Fase 4, credenciales y Engram
 f213ee6 docs: formalizar protocolo de pruebas manuales para Google OAuth 2.0 en Caso de Prueba 6
 3c3e17e feat: implementar autenticacion y registro con Google OAuth 2.0 y onboarding de direccion obligatoria
 584a359 docs: formalizar acta de handoff de la sesión 05/09/2026
@@ -97,28 +110,19 @@ f213ee6 docs: formalizar protocolo de pruebas manuales para Google OAuth 2.0 en 
 | **Fase 2** | Mock de servicio de paquetería estándar y seguimiento | ✅ Completada |
 | **Fase 3** | Compra como invitado (*Guest Checkout*) y conversión 1-clic | ✅ Completada |
 | **Fase 4** | Autenticación y registro con Google OAuth 2.0 y Onboarding 2 pasos | ✅ Completada |
-| **Fase 5** | Protocolo de pruebas y certificación E2E con Playwright (Casos 1 al 6) | ✅ Automatizada y Certificada (6/6 passing) |
+| **Fase 5** | Protocolo de pruebas y certificación E2E con Playwright (Casos 1 al 6) y verificación en vivo OAuth | ✅ Completada y Verificada |
 
 ---
 
 ## 5. Siguiente Sesión (*Next Steps*)
 
-Al retomar el trabajo en la próxima sesión, se cuenta con las siguientes acciones inmediatas:
-1. **Ejecución y Verificación de Casos de Prueba (Fase 5):**
-   - **Casos 1 al 5 Automatizados con Playwright (CLI / Pest Browser):**
-     - Instalar/verificar Playwright (`npx playwright install`).
-     - Ejecutar scripts o pruebas de navegador para los 5 flujos internos:
-       - *Caso 1:* Registro de usuario con dirección obligatoria.
-       - *Caso 2:* Compra completa como invitado en `/checkout`.
-       - *Caso 3:* Verificación de seguridad de facturas y pedidos por token (HTTP 403).
-       - *Caso 4:* Conversión 1-clic (*Claim Account*) post-pago.
-       - *Caso 5:* Operativa de paquetería y albarán térmico A6 en panel admin.
-   - **Caso 6 (Google OAuth 2.0):**
-     - Verificación en navegador real de la pantalla de consentimiento de Google (`accounts.google.com`) con las credenciales GCP ya configuradas en `.env`, o mediante prueba manual asistida.
-2. **Merge de la Característica a `develop`:** Tras verificar y certificar los flujos:
+Al retomar el trabajo en la próxima sesión:
+1. **Completar validaciones manuales personales del usuario** (Casos 1 al 5 en navegador si desea repasarlas adicionalmente a la suite Playwright).
+2. **Merge de la Característica a `develop`:**
    ```bash
    git checkout develop
    git merge --no-ff feature/guest-checkout-and-shipping
+   git push origin develop  # si aplica
    ```
 3. **Continuar con los entregables restantes del TFG.**
 
