@@ -41,6 +41,7 @@ Route::post('/orders/{order}/claim-account', [CartController::class, 'claimAccou
 // Google OAuth 2.0 (Social Sign-On)
 Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('auth.google');
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('auth.google.callback');
+Route::get('/api/auth/callback/google', [GoogleAuthController::class, 'callback']);
 Route::get('/auth/google/callback/google', [GoogleAuthController::class, 'callback']);
 
 // Onboarding obligatorio de Dirección de Envío para usuarios de Google
