@@ -11,7 +11,9 @@
         "test:e2e:filter": "npx pest --testsuite=Browser --filter",
         "test:e2e:install": "npx playwright install --with-deps chromium",
         "test:e2e:serve": "php artisan serve --port=8080",
-        "test:e2e:full": "concurrently -k \"npm run test:e2e:serve\" \"sleep 3 && npm run test:e2e\""
+        "test:e2e:full": "concurrently -k \"npm run test:e2e:serve\" \"sleep 3 && npm run test:e2e\"",
+        "test:playwright": "playwright test",
+        "test:playwright:headed": "playwright test --headed"
     },
     "devDependencies": {
         "@playwright/test": "^1.62.1",
