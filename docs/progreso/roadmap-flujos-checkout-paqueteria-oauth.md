@@ -380,15 +380,78 @@ URL base del e-commerce: `http://localhost:8000` (o el puerto mapeado en Docker)
 
 ---
 
-#### Caso de Prueba 6: Registro con Google OAuth 2.0 (Una vez implementada la Fase 4)
-- **Objetivo:** Validar el inicio de sesión con Google y el flujo de captura de dirección obligatoria.
+#### Caso de Prueba 6: Registro e Inicio de Sesión con Google OAuth 2.0 y Onboarding de Dirección de Envío
+- **Objetivo:** Validar la autenticación delegada con Google (*Social Sign-On*), el intercambio seguro de tokens, la protección por middleware de nuevos usuarios y la captura obligatoria de dirección postal y teléfono en el paso 2 de onboarding.
+
+##### Escenario 6.1: Registro de Nuevo Usuario vía Google y Onboarding Obligatorio
+- **Pre-requisitos:** Abrir una ventana de navegador en modo incógnito (`http://localhost:8000`), sin sesión previa en la plataforma Reposa+.
 - **Pasos a ejecutar:**
-  1. Ir a `http://localhost:8000/register`.
-  2. Pulsar en **"Continuar con Google"**.
-  3. Seleccionar cuenta en la pantalla de consentimiento de Google.
-  4. Tras autorizar, verificar que la aplicación redirige a `/onboarding/shipping-address` si es un usuario nuevo.
-  5. Completar la dirección de entrega y guardar.
-  6. Verificar que la sesión queda establecida y la cuenta creada con avatar y datos verificados.
+  1. Acceder a `http://localhost:8000/register` o `http://localhost:8000/login`.
+  2. Comprobar que en la parte superior del formulario se muestra el botón oficial **"Continuar con Google"** con el imagotipo oficial SVG de 4 colores de Google y el divisor estético *"o bien con correo electrónico"*.
+  3. Pulsar en el botón **"Continuar con Google"**.
+  4. En la pantalla de autenticación y consentimiento de Google (`accounts.google.com`), seleccionar o iniciar sesión con la cuenta de Google deseada y autorizar el acceso al perfil público y correo.
+  5. Tras la autorización, verificar que Google redirige a `http://localhost:8000/auth/google/callback` y la aplicación procesa la respuesta sin errores de sesión ni `redirect_uri_mismatch`.
+  6. Al tratarse de un usuario recién registrado (sin dirección de entrega física registrada en la base de datos), comprobar que el sistema lo redirige de inmediato a la pantalla de onboarding:
+     `http://localhost:8000/onboarding/shipping-address`
+  7. En la pantalla de onboarding, verificar los siguientes elementos visuales del diseño *Midnight Sanctuary*:
+     - Cabecera en azul noche con icono de ubicación y título *"Dirección de Entrega"*.
+     - Insignia de usuario verificado con la foto de avatar de Google, nombre y correo electrónico.
+     - Indicador de progreso: *"Paso 2 / 2"*.
+     - Alerta informativa: *"¡Bienvenido a Reposa+! Para gestionar el envío de tus almohadas, completa tu dirección."*
+  8. **Verificación de Seguridad del Middleware (`EnsureHasShippingAddress`):**
+     - Sin rellenar el formulario, intentar navegar manualmente a cualquier otra ruta de la aplicación (por ejemplo `http://localhost:8000/catalog` o `http://localhost:8000/profile`).
+     - Comprobar que el middleware intercepta la navegación y redirige de vuelta forzosamente a `/onboarding/shipping-address` mostrando la advertencia: *"Para garantizar la correcta entrega de tus pedidos, completa tu dirección de envío."*
+  9. **Validación de Campos Obligatorios:**
+     - Pulsar el botón **"Completar registro y empezar a descansar"** dejando los campos vacíos.
+     - Comprobar que el sistema resalta los errores de validación en calle, ciudad, código postal y teléfono de contacto.
+  10. **Completar Datos de Envío Reales/Prueba:**
+      - Dirección: `Calle Princesa 18, 2º B`
+      - Ciudad: `Madrid`
+      - Código Postal: `28008`
+      - Provincia: `Madrid`
+      - Teléfono: `+34 655 443 322`
+  11. Pulsar en **"Completar registro y empezar a descansar"**.
+- **Resultado Esperado:**
+  - Redirección con éxito al catálogo (`http://localhost:8000/catalog`) con el mensaje flash: *"¡Dirección configurada con éxito! Tu cuenta está lista para disfrutar del descanso."*
+  - La navegación por todo el sitio queda completamente desbloqueada.
+  - En la esquina superior derecha, la barra de navegación muestra el avatar y nombre del usuario de Google.
+  - Al ingresar a `http://localhost:8000/profile`, la dirección `Calle Princesa 18, 2º B` figura guardada como principal y el teléfono en el perfil.
+
+---
+
+##### Escenario 6.2: Inicio de Sesión Recurrente con Cuenta de Google ya Registrada
+- **Pre-requisitos:** Haber completado el Escenario 6.1 y cerrar la sesión actual (`POST /logout` o desde el menú de usuario).
+- **Pasos a ejecutar:**
+  1. Ir a `http://localhost:8000/login`.
+  2. Pulsar sobre **"Continuar con Google"**.
+  3. Seleccionar la misma cuenta de Google utilizada previamente.
+- **Resultado Esperado:**
+  - Acceso instantáneo en 1 solo clic sin solicitar contraseñas.
+  - Al tener ya su dirección postal guardada, **no pasa por el onboarding** y redirige directamente al catálogo o a la página prevista con el mensaje: *"¡Sesión iniciada con Google correctamente!"*.
+
+---
+
+##### Escenario 6.3: Vinculación Automática de Cuenta Tradicional Existente
+- **Pre-requisitos:** Existencia previa de un usuario registrado por formulario tradicional (email y contraseña) cuyo correo coincida con una cuenta de Google (ej: `usuario@gmail.com`).
+- **Pasos a ejecutar:**
+  1. Ir a `http://localhost:8000/login`.
+  2. Pulsar en **"Continuar con Google"** seleccionando la cuenta de Gmail coincidente.
+- **Resultado Esperado:**
+  - El sistema detecta el correo electrónico ya verificado por Google y vincula de forma transparente el `google_id` y avatar sin duplicar el registro en la tabla `users`.
+  - Inicia la sesión y notifica: *"¡Tu cuenta de Google ha sido vinculada con éxito!"*.
+
+---
+
+##### Escenario 6.4: Autenticación con Google desde el Checkout Adaptativo y Fusión de Carrito
+- **Pre-requisitos:** Navegador sin sesión iniciada.
+- **Pasos a ejecutar:**
+  1. Navegar a `http://localhost:8000/catalog` y añadir 2 productos al carrito.
+  2. Ir a `http://localhost:8000/checkout`.
+  3. En la tarjeta superior de aviso para invitados, pulsar el botón de acceso rápido **"Google"**.
+  4. Autorizar la cuenta de Google.
+- **Resultado Esperado:**
+  - La sesión de Google se inicia y el listener `MergeCartOnLogin` traslada automáticamente los artículos del carrito de la sesión al usuario en base de datos.
+  - El usuario vuelve al flujo de `/checkout` como usuario registrado, mostrando sus direcciones guardadas para seleccionar en un solo clic.
 
 ---
 
@@ -397,3 +460,4 @@ URL base del e-commerce: `http://localhost:8000` (o el puerto mapeado en Docker)
 | Fecha | Autor | Versión | Resumen de Cambios |
 |---|---|:---:|---|
 | **05/09/2026** | Jonathan Quispe | `v1.0.0` | Creación del roadmap integral de checkout adaptativo, paquetería estándar mock, integración Google OAuth 2.0 y protocolo de pruebas manuales. |
+| **05/09/2026** | Jonathan Quispe | `v1.1.0` | Implementación completa de Fase 4 (Google OAuth 2.0, Socialite, onboarding en 2 pasos) y formalización detallada de los 4 sub-escenarios de prueba manual en el Caso de Prueba 6. |
