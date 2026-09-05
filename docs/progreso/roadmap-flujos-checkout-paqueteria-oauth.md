@@ -25,7 +25,7 @@ Este documento establece la planificación integral, trazabilidad técnica y pro
 | **1** | Captura de Dirección de Envío en el Registro | Validación estricta en Fortify, transacción atómica `User`+`Address`+`Profile`, rediseño de `register.blade.php`. | ✅ Completada |
 | **2** | Servicio Mock de Paquetería Estándar y Trazabilidad | Contrato `ShippingServiceInterface`, servicio `MockStandardCourierService`, tracking timeline en `orders/show`, gestión de envíos y etiqueta A6 en admin. | ✅ Completada |
 | **3** | Compra como Invitado (*Guest Checkout*) y Conversión 1-Clic | Vista unificada `/checkout`, migración de `orders` (`guest_token`, snapshots de envío), seguridad por token en facturas, claim account en confirmación. | ✅ Completada |
-| **4** | Autenticación y Registro con Google OAuth 2.0 | Integración de `laravel/socialite`, migración `google_id`, flujo de onboarding en 2 pasos para dirección obligatoria, botones visuales Midnight Sanctuary. | ⏳ Planificada / Siguiente |
+| **4** | Autenticación y Registro con Google OAuth 2.0 | Integración de `laravel/socialite`, migración `google_id`, flujo de onboarding en 2 pasos para dirección obligatoria, botones visuales Midnight Sanctuary. | ✅ Completada |
 | **5** | Protocolo de Pruebas Manuales y Verificación E2E de Usuario | Checklist operativa paso a paso de los 6 escenarios críticos para validación manual por el desarrollador/usuario en navegador. | 📋 Planificada / Para Validación |
 
 ---
@@ -190,7 +190,7 @@ Este documento establece la planificación integral, trazabilidad técnica y pro
 
 ---
 
-## Fase 4: Autenticación y Registro con Google OAuth 2.0 (PLANIFICADA)
+## Fase 4: Autenticación y Registro con Google OAuth 2.0 (COMPLETADA)
 
 **Objetivo:** Incorporar el registro y login en un solo clic mediante **Google Identity** (*Social Sign-On*), eliminando la fricción de inventar y recordar contraseñas, e implementando una solución elegante para la captura de la dirección de entrega que Google no provee.
 
@@ -199,8 +199,8 @@ Este documento establece la planificación integral, trazabilidad técnica y pro
 > [`docs/artefactos/analisis-google-oauth-registro.md`](../artefactos/analisis-google-oauth-registro.md).
 
 ### 4.1 Dependencias y Configuración de Proveedor
-- [ ] Instalar el paquete oficial: `composer require laravel/socialite`.
-- [ ] Configurar el proveedor en `config/services.php`:
+- [x] Instalar el paquete oficial: `composer require laravel/socialite`.
+- [x] Configurar el proveedor en `config/services.php`:
   ```php
   'google' => [
       'client_id' => env('GOOGLE_CLIENT_ID'),
@@ -208,20 +208,20 @@ Este documento establece la planificación integral, trazabilidad técnica y pro
       'redirect' => env('GOOGLE_REDIRECT_URI', '/auth/google/callback'),
   ],
   ```
-- [ ] Variables de entorno en `.env.example` y `.env`: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`.
+- [x] Variables de entorno en `.env.example` y `.env`: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`.
 
 ### 4.2 Migración de Esquema de Usuarios (`users`)
-- [ ] Crear migración `add_google_fields_to_users_table`:
+- [x] Crear migración `add_google_fields_to_users_table`:
   - `google_id` (string, nullable, unique, indexado).
   - `avatar` (string, nullable).
-  - Hacer `password` nullable o generar hash aleatorio criptográfico para usuarios OAuth.
+  - Hacer `password` nullable para usuarios OAuth.
 
 ### 4.3 Controlador de Autenticación Social (`GoogleAuthController`)
-- [ ] Crear controlador `app/Http/Controllers/Auth/GoogleAuthController.php`:
-  - `redirectToGoogle()`: Redirige a Google con los scopes `openid`, `profile`, `email`.
-  - `handleGoogleCallback()`:
+- [x] Crear controlador `app/Http/Controllers/Auth/GoogleAuthController.php`:
+  - `redirect()`: Redirige a Google con los scopes estándar `openid`, `profile`, `email`.
+  - `callback()`:
     - Recupera el usuario con `Socialite::driver('google')->user()`.
-    - **Escenario A (Usuario con `google_id`):** Inicia sesión directamente (`Auth::login($user)`) y redirige al destino previsto (`intended` o `/catalog`).
+    - **Escenario A (Usuario con `google_id`):** Inicia sesión directamente (`Auth::login($user, true)`) y redirige al destino previsto (`intended` o `/catalog`).
     - **Escenario B (Usuario con email existente sin `google_id`):** Vincula el `google_id` y avatar a la cuenta existente, inicia sesión y notifica al usuario.
     - **Escenario C (Usuario nuevo):**
       - Crea el `User` (`name`, `email`, `google_id`, `avatar`, `email_verified_at = now()`).
@@ -229,29 +229,33 @@ Este documento establece la planificación integral, trazabilidad técnica y pro
       - Al no disponer de dirección de entrega obligatoria, redirige inmediatamente a la pantalla de **Onboarding de Dirección de Envío** (`/onboarding/shipping-address`).
 
 ### 4.4 Flujo de Onboarding de Dirección de Envío
-- [ ] Vista `resources/views/auth/onboarding-shipping.blade.php`:
-  - Mensaje cálido: *"¡Bienvenido a Reposa+, [Nombre]! Para enviar tus almohadas viscoelásticas necesitamos tu dirección de entrega y teléfono."*
+- [x] Vista `resources/views/auth/onboarding-shipping.blade.php`:
+  - Mensaje cálido personalizado con el nombre y avatar del usuario de Google.
   - Formulario con campos obligatorios: `street`, `city`, `zip_code`, `province`, `phone`.
-- [ ] Middleware `EnsureHasShippingAddress` para redirigir al onboarding si el usuario autenticado intenta comprar o acceder al catálogo sin haber configurado su dirección inicial.
-- [ ] Controlador `OnboardingController@store`:
+- [x] Middleware `EnsureHasShippingAddress` para redirigir al onboarding si un usuario recién autenticado vía Google intenta navegar sin haber configurado su dirección inicial.
+- [x] Controlador `OnboardingController@storeShipping`:
   - Guarda la dirección con `is_main = true`.
   - Guarda el teléfono en `profiles`.
   - Redirige al checkout pendiente o al catálogo.
 
 ### 4.5 Componentes Visuales y Vistas
-- [ ] Botón *"Continuar con Google"* diseñado según las guías de identidad de Google y adaptado a la estética *Midnight Sanctuary*:
+- [x] Botón *"Continuar con Google"* diseñado según las guías de identidad de Google y adaptado a la estética *Midnight Sanctuary*:
   - Integración en `resources/views/auth/login.blade.php`.
   - Integración en `resources/views/auth/register.blade.php`.
-  - Integración opcional en el bloque lateral de `resources/views/checkout/index.blade.php`.
-- [ ] Traducciones correspondientes en `lang/es/messages.php` y `lang/en/messages.php`.
+  - Integración en el banner de invitados de `resources/views/checkout/index.blade.php`.
+- [x] Traducciones correspondientes al 100% en `lang/es/messages.php` y `lang/en/messages.php`.
 
 ### 4.6 Pruebas Automatizadas
-- [ ] Suite de pruebas [`tests/Feature/GoogleOAuthTest.php`](../../Reposa+/tests/Feature/GoogleOAuthTest.php):
+- [x] Suite de pruebas [`tests/Feature/GoogleOAuthTest.php`](../../Reposa+/tests/Feature/GoogleOAuthTest.php):
   - Mock del driver de Socialite (`Socialite::shouldReceive('driver->user')...`).
   - Prueba de redirección a Google.
-  - Prueba de login de usuario existente con `google_id`.
-  - Prueba de vinculación de cuenta existente por email.
-  - Prueba de registro de nuevo usuario y redirección obligatoria a onboarding de dirección.
+  - Prueba de login de usuario existente con `google_id` (Escenario A).
+  - Prueba de vinculación de cuenta existente por email (Escenario B).
+  - Prueba de registro de nuevo usuario y redirección obligatoria a onboarding (Escenario C).
+  - Prueba del middleware `EnsureHasShippingAddress`.
+  - Prueba del guardado de dirección en onboarding.
+  - Prueba de validación de campos obligatorios en onboarding.
+  - Prueba de captura elegante de excepciones en callback OAuth.
 
 ---
 

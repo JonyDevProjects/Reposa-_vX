@@ -8,9 +8,11 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\Auth\OnboardingController;
 
 Route::get('/', [HomeController::class, 'index']);
-Route::get('/catalog', [ProductController::class, 'index']);
+Route::get('/catalog', [ProductController::class, 'index'])->name('catalog');
 Route::get('/catalog/{product}', [ProductController::class, 'show'])->name('products.show');
 
 Route::get('/lang/{locale}', [LanguageController::class, 'switchLang'])->name('lang.switch');
@@ -35,6 +37,16 @@ Route::get('/checkout/stripe/cancel', [CartController::class, 'stripeCancel'])->
 Route::get('/orders/{order}', [CartController::class, 'showOrder'])->name('orders.show');
 Route::get('/orders/{order}/invoice', [CartController::class, 'downloadInvoice'])->name('orders.invoice');
 Route::post('/orders/{order}/claim-account', [CartController::class, 'claimAccount'])->name('orders.claim_account');
+
+// Google OAuth 2.0 (Social Sign-On)
+Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('auth.google');
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('auth.google.callback');
+
+// Onboarding obligatorio de Dirección de Envío para usuarios de Google
+Route::middleware(['auth'])->group(function () {
+    Route::get('/onboarding/shipping-address', [OnboardingController::class, 'showShippingForm'])->name('onboarding.shipping');
+    Route::post('/onboarding/shipping-address', [OnboardingController::class, 'storeShipping'])->name('onboarding.shipping.store');
+});
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
