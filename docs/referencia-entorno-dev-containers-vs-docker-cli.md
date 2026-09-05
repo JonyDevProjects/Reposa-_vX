@@ -140,4 +140,57 @@ engram save "<Título>" "<Detalle>" --project reposaplus-tfg
 
 ---
 
+## 6. Caso Práctico y Lección de Red: Conexión a MySQL desde Extensiones del IDE
+
+Durante las sesiones de desarrollo se exploró la visualización gráfica de los registros de la base de datos (alternativa tipo phpMyAdmin integrada en el editor). Este caso práctico aportó una valiosa lección de topología de red Docker que queda registrada a continuación:
+
+### A. El Problema Observado
+Al intentar conectar la extensión de base de datos de VS Code/Cursor (**Database Client** — `cweijan.vscode-database-client2`) configurando:
+* **Host:** `127.0.0.1` *(o localhost)*
+* **Port:** `3306`
+* **Username:** `root`
+* **Password:** `secret`
+* **Database:** `reposaplus_dev`
+
+**La conexión no era posible y era rechazada.**
+
+### B. Causa Raíz: Topología de Red Host vs. Dev Container
+La causa residía en el contexto de ejecución de la extensión:
+* Al tener VS Code/Cursor abierto en modo **Dev Container** (*Reopen in Container*), todas las extensiones instaladas se ejecutan **dentro del contenedor de la aplicación** (`reposaplus-dev-app`), no en el sistema operativo anfitrión (macOS).
+* Dentro del contenedor `reposaplus-dev-app`, la dirección loopback `127.0.0.1` apunta a sí mismo (al entorno PHP), donde no se está ejecutando el servicio de base de datos.
+* El servicio MySQL reside en un contenedor hermano (`reposaplus-dev-mysql`) conectado a través de la red bridge de Docker (`reposa_default`).
+
+### C. La Solución Confirmada y en Funcionamiento
+Para conectar extensiones de base de datos **desde dentro de Dev Containers**, se debe emplear la resolución DNS interna de Docker:
+* **Host:** `mysql-dev` *(o `reposaplus-dev-mysql`)* ✅ **(Opción que funciona con Dev Containers)**
+* **Port:** `3306`
+* **Username:** `root`
+* **Password:** `secret`
+* **Database:** `reposaplus_dev`
+
+> **Regla nemotécnica de conexión:**
+> * **Desde dentro de Dev Containers (extensiones de VS Code/Cursor):** Usar `Host: mysql-dev`.
+> * **Desde fuera de Dev Containers (aplicaciones de escritorio en macOS como TablePlus, DBeaver):** Usar `Host: 127.0.0.1`.
+
+### D. Ajuste de Compatibilidad de Autenticación (MySQL 8)
+MySQL 8.0 utiliza por defecto el plugin `caching_sha2_password`. Muchos drivers de extensiones basados en Node.js presentan problemas de compatibilidad al negociar este protocolo sin certificados RSA.  
+Para garantizar compatibilidad universal e inmediata, se configuró el usuario `root` con el plugin clásico:
+```sql
+ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'secret';
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'secret';
+FLUSH PRIVILEGES;
+```
+Este ajuste permite la conexión inmediata desde cualquier cliente o extensión sin alterar el comportamiento de Laravel ni la suite de tests (verificado al 100% con 86 tests Feature pasando).
+
+### E. Matriz de Alternativas Contempladas para Visualización de Datos
+
+| Alternativa | Descripción | Configuración de Host | Evaluación |
+|---|---|:---:|---|
+| **1. Extensión IDE en Dev Container (Database Client)** | Inspección y edición visual directa en pestañas de VS Code/Cursor sin salir del entorno. | `mysql-dev:3306` | **Adoptada y funcionando con éxito**. La más integrada para desarrollo. |
+| **2. phpMyAdmin oficial en contenedor Docker** | Despliegue de un contenedor ligero (`phpmyadmin/phpmyadmin`) en la red `reposa_default` expuesto en el puerto 8080. | Web: `http://localhost:8080` (PMA_HOST=`reposaplus-dev-mysql`) | Excelente alternativa web sin instalar extensiones en el IDE. Comando: `docker run -d --name reposaplus-pma --network reposa_default -p 8080:80 -e PMA_HOST=reposaplus-dev-mysql -e PMA_PORT=3306 phpmyadmin/phpmyadmin`. |
+| **3. Clientes GUI de Escritorio en Mac (TablePlus / DBeaver / Beekeeper)** | Clientes nativos de macOS conectándose a través del puerto publicado `3306:3306`. | `127.0.0.1:3306` | Muy potente y rápida para gestión avanzada de bases de datos desde el host. |
+| **4. Herramientas CLI nativas de Laravel (Artisan / Tinker)** | `docker exec -it reposaplus-dev-app php artisan db:table <tabla>` y `php artisan tinker`. | Interno Laravel | Ideal para consultas rápidas o scripts de verificación sin interfaz gráfica. |
+
+---
+
 *Documento aprobado y archivado como referencia técnica para el Trabajo de Fin de Grado (TFG 2026) Reposa+.*
