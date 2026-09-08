@@ -37,7 +37,7 @@
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-2">
-                                <a href="{{ route('auth.google') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3 bg-white d-flex align-items-center gap-1 border-light-subtle shadow-2xs">
+                                <a href="{{ route('auth.google', ['redirect' => 'checkout']) }}" class="btn btn-outline-dark btn-sm rounded-pill px-3 bg-white d-flex align-items-center gap-1 border-light-subtle shadow-2xs">
                                     <svg width="14" height="14" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
                                         <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.616z"/>
                                         <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>

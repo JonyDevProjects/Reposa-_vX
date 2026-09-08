@@ -16,10 +16,19 @@ class GoogleAuthController extends Controller
     /**
      * Redirige al usuario al portal de autenticación OAuth 2.0 de Google.
      */
-    public function redirect(): RedirectResponse
+    public function redirect(Request $request): RedirectResponse
     {
         if (Auth::check()) {
             return redirect()->route('profile');
+        }
+
+        $previous = url()->previous();
+        if ($request->get('redirect') === 'checkout'
+            || ($previous && (str_contains($previous, '/checkout') || $previous === route('checkout.page')))) {
+            session()->put('url.intended', route('checkout.page'));
+            session()->put('from_checkout', true);
+        } elseif ($request->filled('redirect')) {
+            session()->put('url.intended', $request->get('redirect'));
         }
 
         return Socialite::driver('google')->redirect();
@@ -44,10 +53,17 @@ class GoogleAuthController extends Controller
         $name = $googleUser->getName() ?: (explode('@', $email)[0] ?? 'Usuario');
         $avatar = $googleUser->getAvatar();
 
+        $isFromCheckout = session('from_checkout', false)
+            || str_contains(session('url.intended', ''), '/checkout');
+
+        $defaultRedirect = $isFromCheckout ? route('checkout.page') : route('catalog');
+
         // Escenario A: Usuario ya registrado previamente con google_id
         $user = User::where('google_id', $googleId)->first();
 
         if ($user) {
+            session()->forget('from_checkout');
+
             if ($avatar && $user->avatar !== $avatar) {
                 $user->update(['avatar' => $avatar]);
             }
@@ -60,13 +76,15 @@ class GoogleAuthController extends Controller
                     ->with('info', __('messages.auth.google_welcome_complete_address'));
             }
 
-            return redirect()->intended(route('catalog'))->with('success', __('messages.auth.google_login_success'));
+            return redirect()->intended($defaultRedirect)->with('success', __('messages.auth.google_login_success'));
         }
 
         // Escenario B: Usuario registrado previamente por email tradicional
         $user = User::where('email', $email)->first();
 
         if ($user) {
+            session()->forget('from_checkout');
+
             $user->update([
                 'google_id' => $googleId,
                 'avatar' => $user->avatar ?: $avatar,
@@ -80,7 +98,7 @@ class GoogleAuthController extends Controller
                     ->with('info', __('messages.auth.google_linked_complete_address'));
             }
 
-            return redirect()->intended(route('catalog'))->with('success', __('messages.auth.google_linked_success'));
+            return redirect()->intended($defaultRedirect)->with('success', __('messages.auth.google_linked_success'));
         }
 
         // Escenario C: Nuevo usuario registrado vía Google OAuth

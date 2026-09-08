@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Address;
+use App\Models\CartItem;
+use App\Models\Product;
 use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -233,5 +235,128 @@ class GoogleOAuthTest extends TestCase
         $response->assertRedirect(route('login'));
         $response->assertSessionHas('error');
         $this->assertGuest();
+    }
+
+    public function test_google_redirect_from_checkout_sets_intended_and_from_checkout(): void
+    {
+        $provider = Mockery::mock(GoogleProvider::class);
+        $provider->shouldReceive('redirect')
+            ->once()
+            ->andReturn(new RedirectResponse('https://accounts.google.com/o/oauth2/auth'));
+
+        Socialite::shouldReceive('driver')
+            ->with('google')
+            ->andReturn($provider);
+
+        $response = $this->get('/auth/google?redirect=checkout');
+        $response->assertRedirect('https://accounts.google.com/o/oauth2/auth');
+        $response->assertSessionHas('from_checkout', true);
+        $response->assertSessionHas('url.intended', route('checkout.page'));
+    }
+
+    public function test_scenario_6_4_google_auth_from_checkout_merges_cart_and_redirects_to_checkout(): void
+    {
+        $product1 = Product::factory()->create(['price' => 45.00, 'stock' => 10]);
+        $product2 = Product::factory()->create(['price' => 55.00, 'stock' => 5]);
+
+        $user = User::factory()->create([
+            'email' => 'carlos@example.com',
+            'google_id' => 'google-uid-7007',
+        ]);
+
+        Address::create([
+            'user_id' => $user->id,
+            'street' => 'Gran Vía 12',
+            'city' => 'Madrid',
+            'zip_code' => '28013',
+            'is_main' => true,
+        ]);
+
+        // Simular carrito de sesión previo de invitado con 2 productos y navegación por checkout
+        session([
+            'cart' => [
+                $product1->id => ['quantity' => 1, 'price' => 45.00],
+                $product2->id => ['quantity' => 2, 'price' => 55.00],
+            ],
+            'from_checkout' => true,
+            'url.intended' => route('checkout.page'),
+        ]);
+
+        $googleUser = Mockery::mock(\Laravel\Socialite\Two\User::class);
+        $googleUser->shouldReceive('getId')->andReturn('google-uid-7007');
+        $googleUser->shouldReceive('getName')->andReturn('Carlos Almodóvar');
+        $googleUser->shouldReceive('getEmail')->andReturn('carlos@example.com');
+        $googleUser->shouldReceive('getAvatar')->andReturn('https://example.com/carlos.jpg');
+
+        $provider = Mockery::mock(GoogleProvider::class);
+        $provider->shouldReceive('user')->once()->andReturn($googleUser);
+
+        Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
+
+        $response = $this->get('/auth/google/callback');
+
+        // Redirige al checkout, no al catálogo ni a la pantalla de inicio
+        $response->assertRedirect(route('checkout.page'));
+        $this->assertAuthenticatedAs($user);
+
+        // Fusión de carrito verificada en base de datos mediante MergeCartOnLogin
+        $this->assertDatabaseHas('cart_items', [
+            'user_id' => $user->id,
+            'product_id' => $product1->id,
+            'quantity' => 1,
+        ]);
+        $this->assertDatabaseHas('cart_items', [
+            'user_id' => $user->id,
+            'product_id' => $product2->id,
+            'quantity' => 2,
+        ]);
+
+        // El usuario accede al checkout y ve sus datos autenticados y dirección guardada
+        $checkoutResponse = $this->actingAs($user)->get(route('checkout.page'));
+        $checkoutResponse->assertStatus(200);
+        $checkoutResponse->assertSee('Gran Vía 12');
+        $checkoutResponse->assertSee('28013 Madrid');
+    }
+
+    public function test_google_auth_from_checkout_for_new_user_redirects_to_checkout_after_onboarding(): void
+    {
+        $product = Product::factory()->create(['price' => 50.00, 'stock' => 10]);
+
+        session([
+            'cart' => [
+                $product->id => ['quantity' => 1, 'price' => 50.00],
+            ],
+            'from_checkout' => true,
+            'url.intended' => route('checkout.page'),
+        ]);
+
+        $googleUser = Mockery::mock(\Laravel\Socialite\Two\User::class);
+        $googleUser->shouldReceive('getId')->andReturn('google-uid-8008');
+        $googleUser->shouldReceive('getName')->andReturn('Lucía Gómez');
+        $googleUser->shouldReceive('getEmail')->andReturn('lucia@example.com');
+        $googleUser->shouldReceive('getAvatar')->andReturn('https://example.com/lucia.jpg');
+
+        $provider = Mockery::mock(GoogleProvider::class);
+        $provider->shouldReceive('user')->once()->andReturn($googleUser);
+
+        Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
+
+        // Al ser nuevo usuario sin dirección, callback lo manda a onboarding
+        $response = $this->get('/auth/google/callback');
+        $response->assertRedirect(route('onboarding.shipping'));
+
+        $newUser = User::where('email', 'lucia@example.com')->first();
+        $this->assertNotNull($newUser);
+
+        // Al completar onboarding con carrito / desde checkout, debe redirigir a checkout
+        $onboardingResponse = $this->actingAs($newUser)->post('/onboarding/shipping-address', [
+            'street' => 'Calle Betis 15',
+            'city' => 'Sevilla',
+            'zip_code' => '41010',
+            'province' => 'Sevilla',
+            'phone' => '+34 655 443 322',
+        ]);
+
+        $onboardingResponse->assertRedirect(route('checkout.page'));
     }
 }

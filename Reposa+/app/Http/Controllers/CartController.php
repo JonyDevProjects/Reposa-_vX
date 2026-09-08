@@ -159,6 +159,11 @@ class CartController extends Controller
             return redirect()->route('cart.index')->with('error', __('messages.cart.empty'));
         }
 
+        if (! Auth::check()) {
+            session()->put('url.intended', route('checkout.page'));
+            session()->put('from_checkout', true);
+        }
+
         $total = $cartItems->sum(fn($i) => $i->product->price * $i->quantity);
         $shippingRates = $shippingService->calculateRates($total);
 

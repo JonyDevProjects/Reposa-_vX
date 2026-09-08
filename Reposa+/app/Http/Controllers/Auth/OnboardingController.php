@@ -20,7 +20,10 @@ class OnboardingController extends Controller
 
         // Si ya completó la dirección, redirigir al catálogo o destino
         if ($user->addresses()->exists()) {
-            return redirect()->route('catalog');
+            $isFromCheckout = session()->pull('from_checkout', false)
+                || str_contains(session()->get('url.intended', ''), '/checkout');
+
+            return redirect()->intended($isFromCheckout ? route('checkout.page') : route('catalog'));
         }
 
         return view('auth.onboarding-shipping', compact('user'));
@@ -58,8 +61,11 @@ class OnboardingController extends Controller
             );
         });
 
-        // Si tiene carrito pendiente, enviarlo a checkout directamente
-        if ($user->cartItems()->exists() || ! empty(session()->get('cart', []))) {
+        $isFromCheckout = session()->pull('from_checkout', false)
+            || str_contains(session()->get('url.intended', ''), '/checkout');
+
+        // Si tiene carrito pendiente o viene del checkout, enviarlo a checkout directamente
+        if ($isFromCheckout || $user->cartItems()->exists() || ! empty(session()->get('cart', []))) {
             return redirect()->route('checkout.page')->with('success', __('messages.auth.onboarding_success'));
         }
 

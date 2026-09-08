@@ -276,4 +276,36 @@ test.describe('Certificación Fase 5: Casos de Prueba 1 al 5 — Reposa+ E2E', (
     expect(googleUrl.searchParams.get('response_type')).toBe('code');
     expect(googleUrl.searchParams.get('state')).toBeTruthy();
   });
+
+  test('Caso 6.4: Iniciación de Google OAuth desde el Checkout adaptativo con parámetro redirect=checkout', async ({ browser }) => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+
+    // 1. Añadir producto al carrito
+    await page.goto('/catalog');
+    const addToCartBtn = page.locator('.btn-cart-add').first();
+    await expect(addToCartBtn).toBeVisible();
+    await addToCartBtn.click();
+
+    // 2. Navegar a /checkout
+    await page.goto('/checkout');
+    await expect(page).toHaveURL(/\/checkout/);
+
+    // 3. Localizar el botón de Google en el aviso de compra como invitado
+    const checkoutGoogleBtn = page.locator('.card a[href*="/auth/google"]');
+    await expect(checkoutGoogleBtn).toBeVisible();
+    await expect(checkoutGoogleBtn).toHaveAttribute('href', /redirect=checkout/);
+
+    // 4. Interceptar navegación hacia Google OAuth
+    const [request] = await Promise.all([
+      page.waitForRequest(req => req.url().startsWith('https://accounts.google.com/o/oauth2/auth')),
+      checkoutGoogleBtn.click()
+    ]);
+
+    const googleUrl = new URL(request.url());
+    expect(googleUrl.searchParams.get('client_id')).toBe('932690824736-4q6h6ajtauj6suulp1bgdkhgvam2dv1l.apps.googleusercontent.com');
+    expect(googleUrl.searchParams.get('redirect_uri')).toMatch(/^http:\/\/localhost:8000\/(api\/)?auth\//);
+
+    await context.close();
+  });
 });
