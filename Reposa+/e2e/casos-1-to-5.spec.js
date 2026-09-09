@@ -15,10 +15,8 @@ test.describe('Certificación Fase 5: Casos de Prueba 1 al 5 — Reposa+ E2E', (
     // 2. Validar que al enviar vacío fallan los campos requeridos
     await page.click('button[type="submit"]');
 
-    // Comprobar que existen campos con validación requerida o clase is-invalid
-    const invalidInputs = page.locator('.is-invalid, input:invalid');
-    const invalidCount = await invalidInputs.count();
-    expect(invalidCount).toBeGreaterThan(0);
+    // Comprobar que existen campos con validación requerida o alerta de error
+    await expect(page.locator('.is-invalid, .alert-danger').first()).toBeVisible();
 
     // 3. Rellenar formulario con dirección de Madrid
     const timestamp = Date.now();
@@ -67,7 +65,10 @@ test.describe('Certificación Fase 5: Casos de Prueba 1 al 5 — Reposa+ E2E', (
     await page.goto('/catalog');
     const addToCartBtn = page.locator('.btn-cart-add').first();
     await expect(addToCartBtn).toBeVisible();
-    await addToCartBtn.click();
+    await Promise.all([
+      page.waitForResponse(resp => resp.url().includes('/cart/add/') && resp.status() === 200),
+      addToCartBtn.click()
+    ]);
 
     // 2. Navegar a /checkout
     await page.goto('/checkout');
@@ -91,6 +92,12 @@ test.describe('Certificación Fase 5: Casos de Prueba 1 al 5 — Reposa+ E2E', (
 
     // Verificar que el desglose refleja el método express (7.95€)
     await expect(page.locator('#summary-shipping-cost')).toContainText('7.95');
+
+    // 4.5. Seleccionar método de pago directo para prueba de tracking y albarán
+    const directRadio = page.locator('input[value="direct"]');
+    if (await directRadio.count() > 0) {
+      await directRadio.check();
+    }
 
     // 5. Confirmar pedido directo
     await Promise.all([
@@ -271,7 +278,7 @@ test.describe('Certificación Fase 5: Casos de Prueba 1 al 5 — Reposa+ E2E', (
 
     const googleUrl = new URL(request.url());
     expect(googleUrl.searchParams.get('client_id')).toBe('932690824736-4q6h6ajtauj6suulp1bgdkhgvam2dv1l.apps.googleusercontent.com');
-    expect(googleUrl.searchParams.get('redirect_uri')).toMatch(/^http:\/\/localhost:8000\/(api\/)?auth\//);
+    expect(googleUrl.searchParams.get('redirect_uri')).toMatch(/^http:\/\/localhost(:8000)?\/(api\/)?auth\//);
     expect(googleUrl.searchParams.get('scope')).toBe('openid profile email');
     expect(googleUrl.searchParams.get('response_type')).toBe('code');
     expect(googleUrl.searchParams.get('state')).toBeTruthy();
@@ -285,7 +292,10 @@ test.describe('Certificación Fase 5: Casos de Prueba 1 al 5 — Reposa+ E2E', (
     await page.goto('/catalog');
     const addToCartBtn = page.locator('.btn-cart-add').first();
     await expect(addToCartBtn).toBeVisible();
-    await addToCartBtn.click();
+    await Promise.all([
+      page.waitForResponse(resp => resp.url().includes('/cart/add/') && resp.status() === 200),
+      addToCartBtn.click()
+    ]);
 
     // 2. Navegar a /checkout
     await page.goto('/checkout');
@@ -304,7 +314,47 @@ test.describe('Certificación Fase 5: Casos de Prueba 1 al 5 — Reposa+ E2E', (
 
     const googleUrl = new URL(request.url());
     expect(googleUrl.searchParams.get('client_id')).toBe('932690824736-4q6h6ajtauj6suulp1bgdkhgvam2dv1l.apps.googleusercontent.com');
-    expect(googleUrl.searchParams.get('redirect_uri')).toMatch(/^http:\/\/localhost:8000\/(api\/)?auth\//);
+    expect(googleUrl.searchParams.get('redirect_uri')).toMatch(/^http:\/\/localhost(:8000)?\/(api\/)?auth\//);
+
+    await context.close();
+  });
+
+  test('Caso 6.5: Verificación de iniciación de pasarela Stripe Checkout desde el formulario de compra', async ({ browser }) => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+
+    // 1. Añadir producto al carrito
+    await page.goto('/catalog');
+    const addToCartBtn = page.locator('.btn-cart-add').first();
+    await expect(addToCartBtn).toBeVisible();
+    await Promise.all([
+      page.waitForResponse(resp => resp.url().includes('/cart/add/') && resp.status() === 200),
+      addToCartBtn.click()
+    ]);
+
+    // 2. Navegar a /checkout
+    await page.goto('/checkout');
+    await expect(page).toHaveURL(/\/checkout/);
+
+    // 3. Rellenar datos de envío obligatorios
+    await page.fill('#shipping_name', 'Stripe Test User');
+    await page.fill('#shipping_email', 'stripe.tester@example.com');
+    await page.fill('#shipping_phone', '+34 622 111 333');
+    await page.fill('#shipping_street', 'Gran Vía 28');
+    await page.fill('#shipping_city', 'Madrid');
+    await page.fill('#shipping_zip_code', '28013');
+
+    // 4. Verificar que Stripe es el método de pago seleccionado por defecto
+    const stripeRadio = page.locator('input[value="stripe"]');
+    await expect(stripeRadio).toBeChecked();
+
+    // 5. Interceptar navegación hacia Stripe Checkout (checkout.stripe.com)
+    const [request] = await Promise.all([
+      page.waitForRequest(req => req.url().startsWith('https://checkout.stripe.com/')),
+      page.click('#checkout-form button[type="submit"]')
+    ]);
+
+    expect(request.url()).toMatch(/^https:\/\/checkout\.stripe\.com\//);
 
     await context.close();
   });

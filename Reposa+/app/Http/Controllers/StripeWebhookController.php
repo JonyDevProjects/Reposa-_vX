@@ -62,12 +62,14 @@ class StripeWebhookController extends CashierController
             $order->update(['status' => 'completed']);
         });
 
-        // Vaciar carrito del usuario (safety net — por si stripeSuccess no lo hizo)
-        CartItem::where('user_id', $order->user_id)->delete();
+        // Vaciar carrito del usuario si está registrado (safety net — por si stripeSuccess no lo hizo)
+        if ($order->user_id) {
+            CartItem::where('user_id', $order->user_id)->delete();
+        }
 
         // Send confirmation email if not already sent
         try {
-            Mail::to($order->user->email)->send(new OrderConfirmed($order));
+            Mail::to($order->customer_email)->send(new OrderConfirmed($order));
         } catch (\Exception $e) {
             Log::error("Stripe webhook: failed to send confirmation email for order {$order->id}", [
                 'error' => $e->getMessage(),

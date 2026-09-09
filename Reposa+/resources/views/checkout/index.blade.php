@@ -217,17 +217,56 @@
                             <span>{{ __('messages.checkout.payment_method') }}</span>
                         </h2>
 
-                        <div class="p-3 rounded-3 border border-primary-subtle bg-indigo-subtle d-flex align-items-center gap-3 mb-3">
-                            <div class="rounded-circle bg-white text-primary p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                <i class="bi bi-shield-lock-fill fs-5"></i>
+                        <div class="d-flex flex-column gap-3">
+                            {{-- Opción 1: Tarjeta Bancaria / Stripe (Por defecto) --}}
+                            <div class="p-3 rounded-3 border bg-light d-flex align-items-center justify-content-between gap-3 payment-method-card" id="card-payment-stripe">
+                                <div class="form-check flex-grow-1">
+                                    <input class="form-check-input mt-1" type="radio" 
+                                           name="payment_method" 
+                                           id="payment_stripe" 
+                                           value="stripe" 
+                                           checked
+                                           onchange="updatePaymentMethod('stripe')">
+                                    <label class="form-check-label w-100" for="payment_stripe">
+                                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                            <div>
+                                                <strong class="text-navy">{{ __('messages.checkout.pay_with_stripe') }}</strong>
+                                                <span class="badge bg-primary-subtle text-primary border ms-1 small">Recomendado</span>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2 text-muted">
+                                                <i class="bi bi-credit-card fs-5 text-primary"></i>
+                                                <i class="bi bi-shield-lock-fill text-success ms-1"></i>
+                                                <span class="small fw-semibold text-secondary">SSL 256-bit</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-muted small mt-1">Tarjeta de crédito o débito (Visa, Mastercard), Apple Pay y Google Pay procesados de forma segura con Stripe.</div>
+                                    </label>
+                                </div>
                             </div>
-                            <div class="small">
-                                <span class="fw-bold text-navy d-block">{{ __('messages.checkout.pay_with_stripe') }}</span>
-                                <span class="text-muted">Tarjeta de crédito / débito, Apple Pay, Google Pay con cifrado de grado bancario SSL.</span>
+
+                            {{-- Opción 2: Pago Contra Reembolso / Pedido Directo --}}
+                            <div class="p-3 rounded-3 border bg-light d-flex align-items-center justify-content-between gap-3 payment-method-card" id="card-payment-direct">
+                                <div class="form-check flex-grow-1">
+                                    <input class="form-check-input mt-1" type="radio" 
+                                           name="payment_method" 
+                                           id="payment_direct" 
+                                           value="direct"
+                                           onchange="updatePaymentMethod('direct')">
+                                    <label class="form-check-label w-100" for="payment_direct">
+                                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                            <div>
+                                                <strong class="text-navy">Pago contra reembolso / Pedido directo</strong>
+                                                <span class="badge bg-light text-secondary border ms-1 small">Sin tarjeta</span>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-1 text-muted">
+                                                <i class="bi bi-cash-stack fs-5 text-success"></i>
+                                            </div>
+                                        </div>
+                                        <div class="text-muted small mt-1">Confirmación directa del pedido sin necesidad de tarjeta bancaria (ideal para pruebas y entrega contra reembolso).</div>
+                                    </label>
+                                </div>
                             </div>
                         </div>
-
-                        <input type="hidden" name="payment_method" value="stripe">
                     </div>
                 </div>
             </div>
@@ -299,8 +338,8 @@
                             </span>
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-lg w-100 py-3 fw-bold rounded-pill shadow-sm mb-3">
-                            <i class="bi bi-shield-lock-fill me-2"></i>{{ __('messages.checkout.btn_place_order') }}
+                        <button type="submit" id="btn-submit-order" class="btn btn-primary btn-lg w-100 py-3 fw-bold rounded-pill shadow-sm mb-3">
+                            <i id="btn-submit-icon" class="bi bi-credit-card me-2"></i><span id="btn-submit-text">{{ __('messages.checkout.btn_place_order') }}</span>
                         </button>
 
                         <p class="text-center text-muted small mb-3" style="font-size: 0.78rem;">
@@ -326,6 +365,18 @@
             costEl.textContent = shippingCost == 0 ? 'Gratis' : shippingCost.toFixed(2) + '€';
             costEl.className = 'tabular-nums fw-semibold ' + (shippingCost == 0 ? 'text-success' : 'text-dark');
             totalEl.textContent = grandTotal.toFixed(2) + '€';
+        }
+    }
+
+    function updatePaymentMethod(method) {
+        const btnText = document.getElementById('btn-submit-text');
+        const btnIcon = document.getElementById('btn-submit-icon');
+        if (method === 'stripe') {
+            if (btnText) btnText.textContent = "{{ __('messages.checkout.btn_place_order') }}";
+            if (btnIcon) btnIcon.className = 'bi bi-credit-card me-2';
+        } else {
+            if (btnText) btnText.textContent = "{{ __('messages.checkout.direct_order') }}";
+            if (btnIcon) btnIcon.className = 'bi bi-shield-lock-fill me-2';
         }
     }
 </script>
