@@ -768,7 +768,7 @@ class CartController extends Controller
             }
         }
 
-        if ($order->status === 'pending') {
+        if ($order->status === Order::STATUS_PENDING) {
             DB::transaction(function () use ($order, $session) {
                 foreach ($order->orderItems as $item) {
                     $product = Product::lockForUpdate()->find($item->product_id);
@@ -777,17 +777,10 @@ class CartController extends Controller
                     }
                 }
                 $order->update([
-                    'status' => 'completed',
+                    'status' => Order::STATUS_PROCESSING,
                     'payment_intent_id' => $session->payment_intent,
                 ]);
             });
-
-            // Vaciar carrito
-            if ($order->user_id) {
-                CartItem::where('user_id', $order->user_id)->delete();
-            } else {
-                session()->forget('cart');
-            }
 
             // Enviar correo de confirmación
             try {
@@ -795,6 +788,17 @@ class CartController extends Controller
             } catch (\Exception $e) {
                 // El pago ya está registrado aunque falle el correo
             }
+        }
+
+        if (! $order->payment_intent_id && isset($session->payment_intent)) {
+            $order->update(['payment_intent_id' => $session->payment_intent]);
+        }
+
+        // Vaciar carrito
+        if ($order->user_id) {
+            CartItem::where('user_id', $order->user_id)->delete();
+        } else {
+            session()->forget('cart');
         }
 
         if ($order->guest_token) {

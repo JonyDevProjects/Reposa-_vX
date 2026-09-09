@@ -139,8 +139,8 @@
                                             <td>{{ $order->created_at->format('d/m/Y') }}</td>
                                             <td class="tabular-nums">{{ number_format($order->total_amount, 2) }}€</td>
                                             <td>
-                                                <span class="badge bg-{{ $order->status == 'delivered' ? 'success' : 'warning' }} px-3 py-2">
-                                                    {{ ucfirst($order->status) }}
+                                                <span class="badge bg-{{ \App\Models\Order::getStatusColor($order->status) }} px-3 py-2">
+                                                    {{ \App\Models\Order::getStatusLabel($order->status) }}
                                                 </span>
                                             </td>
                                             <td class="text-end">

@@ -21,7 +21,8 @@ class AdminController extends Controller
     public function dashboard()
     {
         $totalOrders = Order::count();
-        $totalRevenue = Order::where('status', 'completed')->sum('total_amount');
+        $paidStatuses = [Order::STATUS_PROCESSING, Order::STATUS_SHIPPED, Order::STATUS_DELIVERED, Order::STATUS_COMPLETED];
+        $totalRevenue = Order::whereIn('status', $paidStatuses)->sum('total_amount');
         $totalProducts = Product::count();
         $recentOrders = Order::with('user')->latest()->take(5)->get();
 
@@ -31,7 +32,7 @@ class AdminController extends Controller
             ->pluck('total', 'status');
 
         // Monthly sales for the last 6 months (Chart.js)
-        $monthlySales = Order::where('status', 'completed')
+        $monthlySales = Order::whereIn('status', $paidStatuses)
             ->where('created_at', '>=', now()->subMonths(5)->startOfMonth())
             ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month, SUM(total_amount) as total")
             ->groupBy('month')
@@ -48,7 +49,7 @@ class AdminController extends Controller
 
         // Top selling products
         $topSellingProducts = \App\Models\OrderItem::select('product_id', \Illuminate\Support\Facades\DB::raw('SUM(quantity) as total_sold'))
-            ->whereHas('order', fn($q) => $q->where('status', 'completed'))
+            ->whereHas('order', fn($q) => $q->whereIn('status', $paidStatuses))
             ->groupBy('product_id')
             ->orderByDesc('total_sold')
             ->with('product')

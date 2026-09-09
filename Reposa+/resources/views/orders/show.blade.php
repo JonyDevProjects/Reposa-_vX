@@ -20,7 +20,7 @@
                     </p>
                     <div class="d-flex flex-wrap align-items-center gap-2">
                         <span class="badge badge-sanctuary-status {{ in_array($order->status, ['delivered', 'completed']) ? 'status-success' : ($order->status === 'cancelled' ? 'status-danger' : 'status-processing') }}">
-                            <i class="bi bi-circle-fill me-1 small" aria-hidden="true"></i>{{ ucfirst($order->status) }}
+                            <i class="bi bi-circle-fill me-1 small" aria-hidden="true"></i>{{ \App\Models\Order::getStatusLabel($order->status) }}
                         </span>
                         <span class="badge badge-sanctuary-meta">
                             <i class="bi bi-receipt me-1" aria-hidden="true"></i>#{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}
@@ -157,7 +157,7 @@
             </div>
             @if(!$isCancelled && !$isRefunded)
                 <span class="badge bg-light text-primary border px-3 py-2 fw-semibold">
-                    <i class="bi bi-clock-history me-1" aria-hidden="true"></i>{{ __('messages.orders.show.status') }}: {{ ucfirst($order->status) }}
+                    <i class="bi bi-clock-history me-1" aria-hidden="true"></i>{{ __('messages.orders.show.status') }}: {{ \App\Models\Order::getStatusLabel($order->status) }}
                 </span>
             @endif
         </div>
