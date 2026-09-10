@@ -7,6 +7,8 @@ use App\Models\Product;
 use App\Models\Order;
 use App\Models\Refund;
 use App\Models\Category;
+use App\Models\Shipment;
+use App\Services\Shipping\ShippingServiceInterface;
 use App\Mail\OrderRefunded;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -19,7 +21,8 @@ class AdminController extends Controller
     public function dashboard()
     {
         $totalOrders = Order::count();
-        $totalRevenue = Order::where('status', 'completed')->sum('total_amount');
+        $paidStatuses = [Order::STATUS_PROCESSING, Order::STATUS_SHIPPED, Order::STATUS_DELIVERED, Order::STATUS_COMPLETED];
+        $totalRevenue = Order::whereIn('status', $paidStatuses)->sum('total_amount');
         $totalProducts = Product::count();
         $recentOrders = Order::with('user')->latest()->take(5)->get();
 
@@ -29,7 +32,7 @@ class AdminController extends Controller
             ->pluck('total', 'status');
 
         // Monthly sales for the last 6 months (Chart.js)
-        $monthlySales = Order::where('status', 'completed')
+        $monthlySales = Order::whereIn('status', $paidStatuses)
             ->where('created_at', '>=', now()->subMonths(5)->startOfMonth())
             ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month, SUM(total_amount) as total")
             ->groupBy('month')
@@ -46,7 +49,7 @@ class AdminController extends Controller
 
         // Top selling products
         $topSellingProducts = \App\Models\OrderItem::select('product_id', \Illuminate\Support\Facades\DB::raw('SUM(quantity) as total_sold'))
-            ->whereHas('order', fn($q) => $q->where('status', 'completed'))
+            ->whereHas('order', fn($q) => $q->whereIn('status', $paidStatuses))
             ->groupBy('product_id')
             ->orderByDesc('total_sold')
             ->with('product')
@@ -155,7 +158,7 @@ class AdminController extends Controller
 
     public function orders(Request $request)
     {
-        $query = Order::with('user', 'orderItems.product')->latest();
+        $query = Order::with(['user', 'orderItems.product', 'shipment'])->latest();
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -170,6 +173,11 @@ class AdminController extends Controller
                     $sub->whereHas('user', function ($u) use ($q) {
                         $u->where('name', 'like', "%{$q}%")
                           ->orWhere('email', 'like', "%{$q}%");
+                    })
+                    ->orWhere('shipping_name', 'like', "%{$q}%")
+                    ->orWhere('shipping_email', 'like', "%{$q}%")
+                    ->orWhereHas('shipment', function ($s) use ($q) {
+                        $s->where('tracking_number', 'like', "%{$q}%");
                     });
                 }
             });
@@ -296,7 +304,7 @@ class AdminController extends Controller
             }
 
             try {
-                Mail::to($order->user->email)->send(new OrderRefunded($order, $refund));
+                Mail::to($order->customer_email)->send(new OrderRefunded($order, $refund));
             } catch (\Exception $e) {
                 Log::error("Failed to send refund email for order {$order->id}", [
                     'error' => $e->getMessage(),
@@ -310,5 +318,28 @@ class AdminController extends Controller
             ]);
             return back()->with('error', __('messages.admin.refund_error', ['error' => $e->getMessage()]));
         }
+    }
+
+    public function advanceShipment(Shipment $shipment, ShippingServiceInterface $shippingService)
+    {
+        $oldStatus = $shipment->status;
+        $updatedShipment = $shippingService->advanceTrackingStatus($shipment);
+
+        if ($oldStatus === $updatedShipment->status) {
+            return back()->with('info', 'El envío ya se encuentra en su estado final (' . $updatedShipment->status_label . ').');
+        }
+
+        return back()->with('success', __('messages.admin.shipment_advanced', [
+            'tracking' => $updatedShipment->tracking_number,
+            'status' => $updatedShipment->status_label,
+        ]));
+    }
+
+    public function viewShipmentLabel(Shipment $shipment, ShippingServiceInterface $shippingService)
+    {
+        $labelData = $shippingService->generateLabel($shipment);
+        $order = $shipment->order;
+
+        return view('admin.shipments.label', compact('shipment', 'labelData', 'order'));
     }
 }

@@ -95,15 +95,15 @@ it('handles checkout.session.completed webhook', function (): void {
 
     $response = $controller->handleWebhook($request);
 
-    // Assert — Pedido completado
+    // Assert — Pedido en procesamiento
     $order->refresh();
-    expect($order->status)->toBe('completed');
+    expect($order->status)->toBe('processing');
 
     // Assert — Stock decrementado
     expect($product->fresh()->stock)->toBe(9);
 });
 
-it('ignores checkout.session.completed for already completed order', function (): void {
+it('ignores checkout.session.completed for already processed order', function (): void {
     // Arrange
     Mail::fake();
     Http::fake();
@@ -111,9 +111,10 @@ it('ignores checkout.session.completed for already completed order', function ()
     $user = createTestUser();
     $product = createTestProduct(['price' => 49.99, 'stock' => 5]);
 
-    $order = Order::factory()->completed()->create([
+    $order = Order::factory()->create([
         'user_id' => $user->id,
         'total_amount' => 49.99,
+        'status' => 'processing',
     ]);
 
     $initialStock = $product->fresh()->stock;

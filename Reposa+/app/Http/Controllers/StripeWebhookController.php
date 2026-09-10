@@ -38,8 +38,8 @@ class StripeWebhookController extends CashierController
             return $this->successMethod();
         }
 
-        if ($order->status === 'completed') {
-            Log::info("Stripe webhook: order {$orderId} already completed, skipping");
+        if ($order->status !== Order::STATUS_PENDING) {
+            Log::info("Stripe webhook: order {$orderId} not in pending status ({$order->status}), skipping");
             return $this->successMethod();
         }
 
@@ -48,7 +48,7 @@ class StripeWebhookController extends CashierController
             return $this->successMethod();
         }
 
-        DB::transaction(function () use ($order) {
+        DB::transaction(function () use ($order, $session) {
             foreach ($order->orderItems as $item) {
                 $product = Product::lockForUpdate()->find($item->product_id);
 
@@ -59,15 +59,21 @@ class StripeWebhookController extends CashierController
                 }
             }
 
-            $order->update(['status' => 'completed']);
+            $updateData = ['status' => Order::STATUS_PROCESSING];
+            if (!empty($session['payment_intent']) && !$order->payment_intent_id) {
+                $updateData['payment_intent_id'] = $session['payment_intent'];
+            }
+            $order->update($updateData);
         });
 
-        // Vaciar carrito del usuario (safety net — por si stripeSuccess no lo hizo)
-        CartItem::where('user_id', $order->user_id)->delete();
+        // Vaciar carrito del usuario si está registrado (safety net — por si stripeSuccess no lo hizo)
+        if ($order->user_id) {
+            CartItem::where('user_id', $order->user_id)->delete();
+        }
 
         // Send confirmation email if not already sent
         try {
-            Mail::to($order->user->email)->send(new OrderConfirmed($order));
+            Mail::to($order->customer_email)->send(new OrderConfirmed($order));
         } catch (\Exception $e) {
             Log::error("Stripe webhook: failed to send confirmation email for order {$order->id}", [
                 'error' => $e->getMessage(),
@@ -173,7 +179,7 @@ class StripeWebhookController extends CashierController
             try {
                 $refund = $order->refunds()->latest()->first();
                 if ($refund) {
-                    Mail::to($order->user->email)->send(new OrderRefunded($order, $refund));
+                    Mail::to($order->customer_email)->send(new OrderRefunded($order, $refund));
                 }
             } catch (\Exception $e) {
                 Log::error("Stripe webhook: failed to send refund email for order {$order->id}", [

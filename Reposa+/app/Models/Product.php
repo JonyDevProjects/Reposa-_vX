@@ -23,6 +23,34 @@ class Product extends Model
         'image_url',
     ];
 
+    /**
+     * Determina si el producto tiene existencias disponibles en almacén.
+     */
+    public function isInStock(): bool
+    {
+        return ((int) $this->stock) > 0;
+    }
+
+    /**
+     * Comprueba si el inventario disponible cubre una cantidad solicitada.
+     */
+    public function hasStock(int $quantity = 1): bool
+    {
+        return $quantity > 0 && ((int) $this->stock) >= $quantity;
+    }
+
+    /**
+     * Calcula el subtotal para una cantidad dada garantizando precisión decimal monetaria.
+     */
+    public function calculateSubtotal(int $quantity): float
+    {
+        if ($quantity <= 0) {
+            return 0.0;
+        }
+
+        return round(((float) $this->price) * $quantity, 2);
+    }
+
     public function categories()
     {
         return $this->belongsToMany(Category::class);

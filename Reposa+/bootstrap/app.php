@@ -11,11 +11,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
         $middleware->web(append: [
             \App\Http\Middleware\SetLocaleMiddleware::class,
+            \App\Http\Middleware\EnsureHasShippingAddress::class,
         ]);
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'shipping.required' => \App\Http\Middleware\EnsureHasShippingAddress::class,
         ]);
         $middleware->preventRequestForgery(except: [
             'stripe/*',

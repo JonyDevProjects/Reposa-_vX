@@ -183,10 +183,16 @@ docker compose -f docker-compose.dev.yml down
 
 ### Ventajas frente al stack completo
 
-- Arranque rapido (~10s vs ~60s)
+- Arranque rápido (~10s vs ~60s)
 - Solo 2 contenedores (app + mysql)
-- Codigo montado desde host (ediciones en tiempo real)
-- Extensions del IDE funcionando dentro del contenedor
+- Código montado desde host (ediciones en tiempo real)
+- Extensiones del IDE funcionando dentro del contenedor
+
+### Conexión a MySQL desde Extensiones del IDE (Database Client / TablePlus)
+
+- **Dentro de Dev Containers (extensiones de VS Code/Cursor):** El Host debe ser `mysql-dev` (o `reposaplus-dev-mysql`), **NO** `127.0.0.1`. Esto se debe a que la extensión corre dentro del contenedor `reposaplus-dev-app` y debe resolver el servicio MySQL vía DNS interno de Docker.
+  * Host: `mysql-dev` | Puerto: `3306` | Usuario: `root` | Contraseña: `secret` | BD: `reposaplus_dev`
+- **Desde fuera de Dev Containers (aplicaciones de escritorio en macOS):** El Host sí es `127.0.0.1`.
 
 ---
 

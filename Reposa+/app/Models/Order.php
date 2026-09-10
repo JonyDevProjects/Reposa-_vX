@@ -12,12 +12,54 @@ class Order extends Model
     use HasFactory;
     protected $fillable = [
         'user_id',
+        'guest_token',
+        'shipping_name',
+        'shipping_email',
+        'shipping_phone',
+        'shipping_street',
+        'shipping_city',
+        'shipping_zip_code',
+        'shipping_province',
+        'shipping_country',
+        'shipping_service_type',
+        'shipping_cost',
         'total_amount',
         'status',
         'order_date',
         'stripe_session_id',
         'payment_intent_id',
     ];
+
+    public function isGuest(): bool
+    {
+        return $this->user_id === null;
+    }
+
+    public function getCustomerNameAttribute(): string
+    {
+        if (! empty($this->shipping_name)) {
+            return $this->shipping_name;
+        }
+
+        if ($this->relationLoaded('user') || ! empty($this->user_id)) {
+            return $this->user?->name ?? 'Cliente Reposa+';
+        }
+
+        return 'Cliente Reposa+';
+    }
+
+    public function getCustomerEmailAttribute(): string
+    {
+        if (! empty($this->shipping_email)) {
+            return $this->shipping_email;
+        }
+
+        if ($this->relationLoaded('user') || ! empty($this->user_id)) {
+            return $this->user?->email ?? '';
+        }
+
+        return '';
+    }
 
     const STATUS_PENDING = 'pending';
     const STATUS_PROCESSING = 'processing';
@@ -93,5 +135,10 @@ class Order extends Model
     public function refunds(): HasMany
     {
         return $this->hasMany(Refund::class);
+    }
+
+    public function shipment(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Shipment::class);
     }
 }
