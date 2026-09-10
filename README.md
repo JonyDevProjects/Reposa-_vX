@@ -16,6 +16,7 @@ A continuación, puedes acceder a todos los documentos clave del proyecto:
 - 📖 [**Memoria Oficial del TFG**](./docs/Memoria_Proyecto.md): Memoria académica completa con diseño, arquitectura, desarrollo y capítulo de Calidad, Arquitectura y Pruebas del Software.
 - 🧪 [**Roadmap de Estrategia de Testing y Pruebas Unitarias**](./docs/progreso/roadmap-estrategia-testing-y-pruebas-unitarias.md): Trofeo de pruebas (*Testing Trophy*), fundamentación frente a la pirámide de Cohn y suite tripartita (119 tests).
 - 📦 [**Roadmap de Checkout, Paquetería y Google OAuth 2.0**](./docs/progreso/roadmap-flujos-checkout-paqueteria-oauth.md): Especificación y certificación de flujos de invitado, paquetería estándar y autenticación federada.
+- 🚀 [**Roadmap de CI/CD, Releases y Defensa del TFG**](./docs/progreso/roadmap-release-cicd-y-defensa-tfg.md): Pipeline en GitHub Actions, ciclo de versiones v1.0.0 & v1.1.0 (UI/UX) y guion de defensa académica.
 - 🛒 [**Informe de E-Commerce**](./docs/Inf-E-Comerce.md): Estrategia de producto (almohadas de descanso), marca, colores y planificación del negocio.
 - 🗄️ [**Esquema de la Base de Datos**](./docs/EsquemaBBDD.md): Arquitectura, tablas y relaciones de la base de datos del sistema.
 - 🎯 [**Informe de Objetivos y Fases**](./docs/Informe_Objetivos_Fases.md): Detalle de las fases de desarrollo del proyecto, hitos alcanzados y evolución del sistema.
