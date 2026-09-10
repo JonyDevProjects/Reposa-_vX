@@ -45,10 +45,10 @@ main ───────────────────────┴─
 
 | Fase | Denominación / Objetivo | Entregables Clave | Estado |
 |:---:|---|---|:---:|
-| **1** | **Verificación del Repositorio y Estado de Integración** | Chequeo de árbol limpio en `develop` y comprobación rápida de salud de suites Unit y Feature en contenedor. | ⏳ Planificada |
-| **2** | **Automatización CI/CD en GitHub Actions** | Creación y ajuste de `.github/workflows/ci.yml` ejecutando secuencialmente Pint, Unit tests, Feature tests (MySQL+Redis), Vite build y Playwright E2E. | ⏳ Planificada |
-| **3** | **Consolidación del Hito Base v1.0.0 (Core Transaccional)** | Etiquetado semántico inicial `v1.0.0` en `develop`/`main` documentando el blindaje del checkout, paquetería y testing tripartito. | ⏳ Planificada |
-| **4** | **Ciclo de Refinamiento UI/UX — Tienda y Admin (Propuesta 1)** | Apertura de rama `release/v1.1.0`, implementación de mejoras de microinteracciones, ergonomía visual, tablas admin y certificación de no-regresión. | ⏳ Planificada |
+| **1** | **Verificación del Repositorio y Estado de Integración** | Chequeo de árbol limpio en `develop` y comprobación rápida de salud de suites Unit y Feature en contenedor. | ✅ Completada |
+| **2** | **Automatización CI/CD en GitHub Actions** | Creación y ajuste de `.github/workflows/ci.yml` ejecutando secuencialmente Pint, Unit tests, Feature tests (MySQL+Redis), Vite build y Playwright E2E. | ✅ Completada |
+| **3** | **Consolidación del Hito Base v1.0.0 (Core Transaccional)** | Etiquetado semántico oficial `v1.0.0` certificando el backend transaccional y la pirámide de 119 pruebas automatizadas. | ✅ Completada |
+| **4** | **Ciclo de Refinamiento UI/UX — Tienda y Admin (Propuesta 1)** | Apertura de rama `release/v1.1.0`, microinteracciones storefront, realce de envío gratis, densidad `/admin/orders`, acceso 1 clic A6 y testing 100%. | ✅ Implementada (En Validación) |
 | **5** | **Promoción de Release Final v1.1.0 a `main` (GitFlow)** | Fusión `--no-ff` a `main`, etiquetado oficial `v1.1.0-tfg-final` y back-merge hacia `develop`. | ⏳ Planificada |
 | **6** | **Preparación del Material de Soporte para la Defensa del TFG** | Confección de `docs/defensa-tfg/` con guion temporalizado (15 min), catálogo de diapositivas y argumentario defensivo. | ⏳ Planificada |
 
