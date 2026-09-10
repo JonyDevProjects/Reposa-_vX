@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Address;
-use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\Profile;
 use App\Models\User;

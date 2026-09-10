@@ -28,7 +28,7 @@ class ProductDomainUnitTest extends TestCase
         $productNegativeStock = new Product(['stock' => -5]);
         $this->assertFalse($productNegativeStock->isInStock());
 
-        $productNullStock = new Product();
+        $productNullStock = new Product;
         $this->assertFalse($productNullStock->isInStock());
     }
 

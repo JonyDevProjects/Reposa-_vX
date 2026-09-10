@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Address;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -11,7 +12,7 @@ class ProfileController extends Controller
     {
         $user = auth()->user();
         $user->load(['profile', 'addresses', 'orders', 'orderSummary', 'favorites.categories']);
-        
+
         $recommendedProducts = Product::where('stock', '>', 0)
             ->whereNotIn('id', $user->favorites->pluck('id')->toArray())
             ->take(3)
@@ -66,7 +67,7 @@ class ProfileController extends Controller
         return back()->with('success', __('messages.profile.address_added'));
     }
 
-    public function destroyAddress(\App\Models\Address $address)
+    public function destroyAddress(Address $address)
     {
         if ($address->user_id !== auth()->id()) {
             abort(403);
@@ -77,7 +78,7 @@ class ProfileController extends Controller
         return back()->with('success', __('messages.profile.address_deleted'));
     }
 
-    public function updateAddress(Request $request, \App\Models\Address $address)
+    public function updateAddress(Request $request, Address $address)
     {
         if ($address->user_id !== auth()->id()) {
             abort(403);

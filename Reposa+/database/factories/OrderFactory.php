@@ -43,8 +43,8 @@ class OrderFactory extends Factory
     public function withPaymentIntent(): static
     {
         return $this->state(fn () => [
-            'payment_intent_id' => 'pi_' . $this->faker->bothify('##############'),
-            'stripe_session_id' => 'cs_test_' . $this->faker->bothify('##############'),
+            'payment_intent_id' => 'pi_'.$this->faker->bothify('##############'),
+            'stripe_session_id' => 'cs_test_'.$this->faker->bothify('##############'),
         ]);
     }
 }

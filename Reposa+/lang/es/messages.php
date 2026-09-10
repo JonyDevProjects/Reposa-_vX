@@ -745,4 +745,3 @@ return [
     'shipment.label_title' => 'Etiqueta de Transporte',
     'shipment.label_print' => 'Imprimir Etiqueta',
 ];
-

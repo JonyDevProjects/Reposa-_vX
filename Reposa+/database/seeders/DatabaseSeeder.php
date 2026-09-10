@@ -2,16 +2,17 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Models\Category;
-use App\Models\Product;
-use App\Models\Profile;
 use App\Models\Address;
+use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\Profile;
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -36,8 +37,8 @@ class DatabaseSeeder extends Seeder
 
         $categories = collect();
         foreach ($categoryList as $nameEs => $nameEn) {
-            $cat = new Category();
-            $cat->slug = \Illuminate\Support\Str::slug($nameEs);
+            $cat = new Category;
+            $cat->slug = Str::slug($nameEs);
             $cat->setTranslation('name', 'es', $nameEs);
             $cat->setTranslation('name', 'en', $nameEn);
             $cat->save();
@@ -48,7 +49,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'Admin Reposa+',
             'email' => 'admin@reposaplus.com',
-            'password' => \Illuminate\Support\Facades\Hash::make('admin123'),
+            'password' => Hash::make('admin123'),
             'role' => 'admin',
         ]);
 
@@ -56,14 +57,14 @@ class DatabaseSeeder extends Seeder
         $user = User::factory()->create([
             'name' => 'Usuario Invitado',
             'email' => 'user@reposaplus.com',
-            'password' => \Illuminate\Support\Facades\Hash::make('user123'),
+            'password' => Hash::make('user123'),
             'role' => 'user',
         ]);
 
         // Crear perfil para el usuario normal
         Profile::create([
             'user_id' => $user->id,
-            'phone' => '+34 600 123 456'
+            'phone' => '+34 600 123 456',
         ]);
 
         // Crear direcciones para el usuario normal
@@ -72,7 +73,7 @@ class DatabaseSeeder extends Seeder
             'street' => 'Calle Principal 123',
             'city' => 'Madrid',
             'zip_code' => '28001',
-            'is_main' => true
+            'is_main' => true,
         ]);
 
         // Crear productos específicos (Almohadas) con traducciones
@@ -85,7 +86,7 @@ class DatabaseSeeder extends Seeder
                 'material' => ['es' => 'Viscoelástica', 'en' => 'Viscoelastic'],
                 'firmness' => ['es' => 'Media-Alta', 'en' => 'Medium-High'],
                 'dimensions' => ['es' => '70x40 cm', 'en' => '70x40 cm'],
-                'image_url' => '/images/products/pillow_viscoelastica.png'
+                'image_url' => '/images/products/pillow_viscoelastica.png',
             ],
             [
                 'name' => ['es' => 'Almohada de Gel Refrescante', 'en' => 'Cooling Gel Pillow'],
@@ -95,7 +96,7 @@ class DatabaseSeeder extends Seeder
                 'material' => ['es' => 'Gel y Espuma', 'en' => 'Gel and Foam'],
                 'firmness' => ['es' => 'Media', 'en' => 'Medium'],
                 'dimensions' => ['es' => '70x40 cm', 'en' => '70x40 cm'],
-                'image_url' => '/images/products/pillow_gel.png'
+                'image_url' => '/images/products/pillow_gel.png',
             ],
             [
                 'name' => ['es' => 'Almohada Cervical Ergonómica', 'en' => 'Ergonomic Cervical Pillow'],
@@ -105,7 +106,7 @@ class DatabaseSeeder extends Seeder
                 'material' => ['es' => 'Látex', 'en' => 'Latex'],
                 'firmness' => ['es' => 'Alta', 'en' => 'High'],
                 'dimensions' => ['es' => '60x35 cm', 'en' => '60x35 cm'],
-                'image_url' => '/images/products/pillow_cervical.png'
+                'image_url' => '/images/products/pillow_cervical.png',
             ],
             [
                 'name' => ['es' => 'Almohada de Plumas Naturales', 'en' => 'Natural Feathers Pillow'],
@@ -115,7 +116,7 @@ class DatabaseSeeder extends Seeder
                 'material' => ['es' => 'Plumón de Oca', 'en' => 'Goose Down'],
                 'firmness' => ['es' => 'Suave', 'en' => 'Soft'],
                 'dimensions' => ['es' => '80x40 cm', 'en' => '80x40 cm'],
-                'image_url' => '/images/products/pillow_plumas.png'
+                'image_url' => '/images/products/pillow_plumas.png',
             ],
             [
                 'name' => ['es' => 'Almohada Antiácaros Hipoalergénica', 'en' => 'Hypoallergenic Anti-Dust Mite Pillow'],
@@ -125,7 +126,7 @@ class DatabaseSeeder extends Seeder
                 'material' => ['es' => 'Microfibra', 'en' => 'Microfiber'],
                 'firmness' => ['es' => 'Media', 'en' => 'Medium'],
                 'dimensions' => ['es' => '75x40 cm', 'en' => '75x40 cm'],
-                'image_url' => '/images/products/pillow_antiacaros.png'
+                'image_url' => '/images/products/pillow_antiacaros.png',
             ],
             [
                 'name' => ['es' => 'Almohada Viaje Cuello 360', 'en' => '360 Neck Travel Pillow'],
@@ -135,7 +136,7 @@ class DatabaseSeeder extends Seeder
                 'material' => ['es' => 'Espuma', 'en' => 'Foam'],
                 'firmness' => ['es' => 'Alta', 'en' => 'High'],
                 'dimensions' => ['es' => '30x30 cm', 'en' => '30x30 cm'],
-                'image_url' => '/images/products/pillow_viaje.png'
+                'image_url' => '/images/products/pillow_viaje.png',
             ],
             [
                 'name' => ['es' => 'Almohada de Bambú Ecológica', 'en' => 'Eco-Friendly Bamboo Pillow'],
@@ -145,7 +146,7 @@ class DatabaseSeeder extends Seeder
                 'material' => ['es' => 'Bambú y Fibras Recicladas', 'en' => 'Bamboo and Recycled Fibers'],
                 'firmness' => ['es' => 'Media-Suave', 'en' => 'Medium-Soft'],
                 'dimensions' => ['es' => '70x40 cm', 'en' => '70x40 cm'],
-                'image_url' => '/images/products/pillow_bambu.png'
+                'image_url' => '/images/products/pillow_bambu.png',
             ],
             [
                 'name' => ['es' => 'Almohada Terapéutica con Aloe Vera', 'en' => 'Aloe Vera Therapeutic Pillow'],
@@ -155,13 +156,13 @@ class DatabaseSeeder extends Seeder
                 'material' => ['es' => 'Algodón y Aloe Vera', 'en' => 'Cotton and Aloe Vera'],
                 'firmness' => ['es' => 'Media', 'en' => 'Medium'],
                 'dimensions' => ['es' => '70x40 cm', 'en' => '70x40 cm'],
-                'image_url' => '/images/products/pillow_aloevera.png'
-            ]
+                'image_url' => '/images/products/pillow_aloevera.png',
+            ],
         ];
 
         $createdProducts = [];
         foreach ($productsData as $pData) {
-            $product = new Product();
+            $product = new Product;
             foreach (['name', 'description', 'material', 'firmness', 'dimensions'] as $field) {
                 if (isset($pData[$field]) && is_array($pData[$field])) {
                     foreach ($pData[$field] as $locale => $value) {
@@ -186,21 +187,21 @@ class DatabaseSeeder extends Seeder
         $order1 = Order::create([
             'user_id' => $user->id,
             'total_amount' => $createdProducts[0]->price + $createdProducts[2]->price,
-            'status' => 'delivered'
+            'status' => 'delivered',
         ]);
 
         OrderItem::create([
             'order_id' => $order1->id,
             'product_id' => $createdProducts[0]->id,
             'quantity' => 1,
-            'price_at_purchase' => $createdProducts[0]->price
+            'price_at_purchase' => $createdProducts[0]->price,
         ]);
 
         OrderItem::create([
             'order_id' => $order1->id,
             'product_id' => $createdProducts[2]->id,
             'quantity' => 1,
-            'price_at_purchase' => $createdProducts[2]->price
+            'price_at_purchase' => $createdProducts[2]->price,
         ]);
 
         // Decrementar stock para reflejar los productos vendidos en order1
@@ -213,14 +214,14 @@ class DatabaseSeeder extends Seeder
         $order2 = Order::create([
             'user_id' => $user->id,
             'total_amount' => $createdProducts[4]->price * 2,
-            'status' => 'pending'
+            'status' => 'pending',
         ]);
 
         OrderItem::create([
             'order_id' => $order2->id,
             'product_id' => $createdProducts[4]->id,
             'quantity' => 2,
-            'price_at_purchase' => $createdProducts[4]->price
+            'price_at_purchase' => $createdProducts[4]->price,
         ]);
 
         // Decrementar stock para reflejar los productos vendidos en order2

@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Product;
-use App\Models\Order;
-use App\Models\Refund;
-use App\Models\Category;
-use App\Models\Shipment;
-use App\Services\Shipping\ShippingServiceInterface;
 use App\Mail\OrderRefunded;
+use App\Models\Category;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\Refund;
+use App\Models\Shipment;
+use App\Models\TopFavoritedProduct;
+use App\Services\Shipping\ShippingServiceInterface;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -27,7 +29,7 @@ class AdminController extends Controller
         $recentOrders = Order::with('user')->latest()->take(5)->get();
 
         // Orders by status
-        $ordersByStatus = Order::select('status', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+        $ordersByStatus = Order::select('status', DB::raw('count(*) as total'))
             ->groupBy('status')
             ->pluck('total', 'status');
 
@@ -48,8 +50,8 @@ class AdminController extends Controller
         }
 
         // Top selling products
-        $topSellingProducts = \App\Models\OrderItem::select('product_id', \Illuminate\Support\Facades\DB::raw('SUM(quantity) as total_sold'))
-            ->whereHas('order', fn($q) => $q->whereIn('status', $paidStatuses))
+        $topSellingProducts = OrderItem::select('product_id', DB::raw('SUM(quantity) as total_sold'))
+            ->whereHas('order', fn ($q) => $q->whereIn('status', $paidStatuses))
             ->groupBy('product_id')
             ->orderByDesc('total_sold')
             ->with('product')
@@ -57,7 +59,7 @@ class AdminController extends Controller
             ->get();
 
         // Top favorited products
-        $topExpectedProducts = \App\Models\TopFavoritedProduct::orderBy('favorited_by_count', 'desc')
+        $topExpectedProducts = TopFavoritedProduct::orderBy('favorited_by_count', 'desc')
             ->where('favorited_by_count', '>', 0)
             ->take(5)
             ->get();
@@ -97,6 +99,7 @@ class AdminController extends Controller
     public function createProduct()
     {
         $categories = Category::all();
+
         return view('admin.products.create', compact('categories'));
     }
 
@@ -109,11 +112,11 @@ class AdminController extends Controller
             'stock' => 'required|integer|min:0',
             'image_url' => 'nullable|url',
             'categories' => 'array',
-            'categories.*' => 'exists:categories,id'
+            'categories.*' => 'exists:categories,id',
         ]);
 
         $product = Product::create($request->except('categories'));
-        
+
         if ($request->has('categories')) {
             $product->categories()->attach($request->categories);
         }
@@ -124,6 +127,7 @@ class AdminController extends Controller
     public function editProduct(Product $product)
     {
         $categories = Category::all();
+
         return view('admin.products.edit', compact('product', 'categories'));
     }
 
@@ -136,11 +140,11 @@ class AdminController extends Controller
             'stock' => 'required|integer|min:0',
             'image_url' => 'nullable|url',
             'categories' => 'array',
-            'categories.*' => 'exists:categories,id'
+            'categories.*' => 'exists:categories,id',
         ]);
 
         $product->update($request->except('categories'));
-        
+
         if ($request->has('categories')) {
             $product->categories()->sync($request->categories);
         } else {
@@ -153,6 +157,7 @@ class AdminController extends Controller
     public function deleteProduct(Product $product)
     {
         $product->delete();
+
         return back()->with('success', __('messages.admin.product_deleted'));
     }
 
@@ -172,13 +177,13 @@ class AdminController extends Controller
                 } else {
                     $sub->whereHas('user', function ($u) use ($q) {
                         $u->where('name', 'like', "%{$q}%")
-                          ->orWhere('email', 'like', "%{$q}%");
+                            ->orWhere('email', 'like', "%{$q}%");
                     })
-                    ->orWhere('shipping_name', 'like', "%{$q}%")
-                    ->orWhere('shipping_email', 'like', "%{$q}%")
-                    ->orWhereHas('shipment', function ($s) use ($q) {
-                        $s->where('tracking_number', 'like', "%{$q}%");
-                    });
+                        ->orWhere('shipping_name', 'like', "%{$q}%")
+                        ->orWhere('shipping_email', 'like', "%{$q}%")
+                        ->orWhereHas('shipment', function ($s) use ($q) {
+                            $s->where('tracking_number', 'like', "%{$q}%");
+                        });
                 }
             });
         }
@@ -196,6 +201,7 @@ class AdminController extends Controller
     public function categories()
     {
         $categories = Category::withCount('products')->get();
+
         return view('admin.categories.index', compact('categories'));
     }
 
@@ -240,13 +246,14 @@ class AdminController extends Controller
     public function deleteCategory(Category $category)
     {
         $category->delete();
+
         return back()->with('success', __('messages.admin.category_deleted'));
     }
 
     public function updateOrderStatus(Request $request, Order $order)
     {
         $request->validate([
-            'status' => 'required|in:' . implode(',', array_keys(Order::STATUSES)),
+            'status' => 'required|in:'.implode(',', array_keys(Order::STATUSES)),
         ]);
 
         $newStatus = $request->status;
@@ -254,6 +261,7 @@ class AdminController extends Controller
         if (! Order::canTransition($order->status, $newStatus)) {
             $current = Order::getStatusLabel($order->status);
             $target = Order::getStatusLabel($newStatus);
+
             return back()->with('error', __('messages.admin.status_invalid_transition', ['current' => $current, 'target' => $target]));
         }
 
@@ -316,6 +324,7 @@ class AdminController extends Controller
             Log::error("Refund failed for order {$order->id}", [
                 'error' => $e->getMessage(),
             ]);
+
             return back()->with('error', __('messages.admin.refund_error', ['error' => $e->getMessage()]));
         }
     }
@@ -326,7 +335,7 @@ class AdminController extends Controller
         $updatedShipment = $shippingService->advanceTrackingStatus($shipment);
 
         if ($oldStatus === $updatedShipment->status) {
-            return back()->with('info', 'El envío ya se encuentra en su estado final (' . $updatedShipment->status_label . ').');
+            return back()->with('info', 'El envío ya se encuentra en su estado final ('.$updatedShipment->status_label.').');
         }
 
         return back()->with('success', __('messages.admin.shipment_advanced', [

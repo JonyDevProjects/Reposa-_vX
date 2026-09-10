@@ -11,16 +11,16 @@
 |
 */
 
-use App\Models\User;
-use App\Models\Product;
+use App\Models\Address;
+use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\CartItem;
-use App\Models\Address;
+use App\Models\Product;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Mail;
+use Symfony\Component\HttpFoundation\Response;
 
 /*
 |--------------------------------------------------------------------------
@@ -79,6 +79,7 @@ function createTestUser(array $overrides = []): User
 
     if ($existing) {
         $existing->update($data);
+
         return $existing->fresh();
     }
 
@@ -102,6 +103,7 @@ function createTestAdmin(array $overrides = []): User
 
     if ($existing) {
         $existing->update($data);
+
         return $existing->fresh();
     }
 
@@ -136,6 +138,7 @@ function createTestCategory(array $overrides = []): Category
 
     if ($existing) {
         $existing->update($data);
+
         return $existing->fresh();
     }
 
@@ -173,6 +176,7 @@ function createTestOrder(User $user, array $products, string $status = 'complete
     }
 
     $order->update(['total_amount' => $total]);
+
     return $order;
 }
 
@@ -213,7 +217,7 @@ function createTestAddress(User $user, array $overrides = []): Address
  */
 function loginAsUser($page): void
 {
-    $page->goto(APP_BASE_URL . '/login')
+    $page->goto(APP_BASE_URL.'/login')
         ->fill('#email', TEST_USER_EMAIL)
         ->fill('#password', TEST_USER_PASSWORD)
         ->press('button[type="submit"]');
@@ -224,7 +228,7 @@ function loginAsUser($page): void
  */
 function loginAsAdmin($page): void
 {
-    $page->goto(APP_BASE_URL . '/login')
+    $page->goto(APP_BASE_URL.'/login')
         ->fill('#email', TEST_ADMIN_EMAIL)
         ->fill('#password', TEST_ADMIN_PASSWORD)
         ->press('button[type="submit"]');
@@ -241,7 +245,7 @@ function loginAsAdmin($page): void
  */
 function addProductToCart($page, Product $product): void
 {
-    $page->goto(APP_BASE_URL . "/catalog/{$product->id}")
+    $page->goto(APP_BASE_URL."/catalog/{$product->id}")
         ->press('form[action*="/cart/add/"] button[type="submit"]')
         ->wait();
 }
@@ -261,10 +265,10 @@ function mockStripeResponses(): void
     Http::fake([
         // Mock checkout session creation
         'api.stripe.com/v1/checkout/sessions' => Http::response([
-            'id' => 'cs_test_' . Str::random(24),
-            'url' => APP_BASE_URL . '/checkout/stripe/success?session_id=cs_test_mock',
+            'id' => 'cs_test_'.Str::random(24),
+            'url' => APP_BASE_URL.'/checkout/stripe/success?session_id=cs_test_mock',
             'payment_status' => 'paid',
-            'payment_intent' => 'pi_test_' . Str::random(24),
+            'payment_intent' => 'pi_test_'.Str::random(24),
             'metadata' => ['order_id' => null], // Se setea dinámicamente
         ], 200),
 
@@ -277,7 +281,7 @@ function mockStripeResponses(): void
 
         // Mock customer creation
         'api.stripe.com/v1/customers' => Http::response([
-            'id' => 'cus_test_' . Str::random(14),
+            'id' => 'cus_test_'.Str::random(14),
         ], 200),
     ]);
 }
@@ -291,8 +295,8 @@ function mockStripeResponses(): void
 /**
  * Obtener el último correo enviado a MailHog.
  *
- * @param string $to Email del destinatario
- * @param int $timeoutSeconds Tiempo máximo de espera
+ * @param  string  $to  Email del destinatario
+ * @param  int  $timeoutSeconds  Tiempo máximo de espera
  * @return array|null Datos del correo o null si no se encontró
  */
 function getLatestMailhogEmail(string $to, int $timeoutSeconds = 5): ?array
@@ -366,10 +370,10 @@ function flushMailhog(): void
 /**
  * Enviar un webhook simulado de Stripe al endpoint de la aplicación.
  */
-function sendStripeWebhook(string $eventType, array $data): \Symfony\Component\HttpFoundation\Response
+function sendStripeWebhook(string $eventType, array $data): Response
 {
     $payload = [
-        'id' => 'evt_test_' . Str::random(24),
+        'id' => 'evt_test_'.Str::random(24),
         'type' => $eventType,
         'data' => [
             'object' => $data,
@@ -380,7 +384,7 @@ function sendStripeWebhook(string $eventType, array $data): \Symfony\Component\H
 
     $secret = env('STRIPE_WEBHOOK_SECRET', 'whsec_test_placeholder');
     $timestamp = (string) now()->timestamp;
-    $signedPayload = $timestamp . '.' . json_encode($payload);
+    $signedPayload = $timestamp.'.'.json_encode($payload);
     $signature = hash_hmac('sha256', $signedPayload, $secret);
 
     return test()->post('/stripe/webhook', $payload, [

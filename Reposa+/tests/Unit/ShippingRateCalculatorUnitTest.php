@@ -17,7 +17,7 @@ class ShippingRateCalculatorUnitTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->courier = new MockStandardCourierService();
+        $this->courier = new MockStandardCourierService;
     }
 
     /**
@@ -92,14 +92,14 @@ class ShippingRateCalculatorUnitTest extends TestCase
     public function test_tracking_number_format_compliance(): void
     {
         $currentYear = date('Y');
-        $expectedRegex = '/^RPX' . $currentYear . '\d{6}ES$/';
+        $expectedRegex = '/^RPX'.$currentYear.'\d{6}ES$/';
 
         for ($i = 0; $i < 25; $i++) {
             $tracking = $this->courier->generateTrackingNumber();
 
             $this->assertEquals(15, strlen($tracking));
             $this->assertMatchesRegularExpression($expectedRegex, $tracking);
-            $this->assertStringStartsWith('RPX' . $currentYear, $tracking);
+            $this->assertStringStartsWith('RPX'.$currentYear, $tracking);
             $this->assertStringEndsWith('ES', $tracking);
         }
     }

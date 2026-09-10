@@ -15,6 +15,7 @@ class PaymentFailed extends Mailable implements ShouldQueue
     use Queueable, SerializesModels;
 
     public $order;
+
     public $errorMessage;
 
     public function __construct(Order $order, string $errorMessage)

@@ -2,21 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-use App\Models\Product;
+use App\Mail\OrderConfirmed;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Response;
-use App\Mail\OrderConfirmed;
-use Laravel\Cashier\Cashier;
+use App\Models\Product;
+use App\Models\User;
+use App\Services\Shipping\ShippingServiceInterface;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Laravel\Cashier\Cashier;
+use PHPUnit\Framework\TestCase;
 
 class CartController extends Controller
 {
@@ -31,12 +34,12 @@ class CartController extends Controller
                     'id' => $productId,
                     'product_id' => $productId,
                     'quantity' => $item['quantity'],
-                    'product' => Product::find($productId)
+                    'product' => Product::find($productId),
                 ];
             });
         }
 
-        $total = $cartItems->sum(function($item) {
+        $total = $cartItems->sum(function ($item) {
             return $item->product->price * $item->quantity;
         });
 
@@ -51,13 +54,14 @@ class CartController extends Controller
             if (request()->wantsJson()) {
                 return response()->json(['success' => false, 'message' => __('messages.cart.stock_unavailable')], 422);
             }
+
             return back()->with('error', __('messages.cart.stock_unavailable'));
         }
 
         if (Auth::check()) {
             $cartItem = CartItem::where('user_id', Auth::id())
-                                ->where('product_id', $product->id)
-                                ->first();
+                ->where('product_id', $product->id)
+                ->first();
 
             $currentQty = $cartItem ? $cartItem->quantity : 0;
             if ($currentQty + $quantity > $product->stock) {
@@ -65,6 +69,7 @@ class CartController extends Controller
                 if (request()->wantsJson()) {
                     return response()->json(['success' => false, 'message' => $msg], 422);
                 }
+
                 return back()->with('error', $msg);
             }
 
@@ -74,7 +79,7 @@ class CartController extends Controller
                 CartItem::create([
                     'user_id' => Auth::id(),
                     'product_id' => $product->id,
-                    'quantity' => $quantity
+                    'quantity' => $quantity,
                 ]);
             }
         } else {
@@ -82,27 +87,28 @@ class CartController extends Controller
             $currentQty = isset($cart[$product->id]) ? $cart[$product->id]['quantity'] : 0;
             if ($currentQty + $quantity > $product->stock) {
                 $msg = __('messages.cart.insufficient_stock', ['available' => $product->stock, 'cart_qty' => $currentQty]);
+
                 return back()->with('error', $msg);
             }
             if (isset($cart[$product->id])) {
                 $cart[$product->id]['quantity'] += $quantity;
             } else {
                 $cart[$product->id] = [
-                    'quantity' => $quantity
+                    'quantity' => $quantity,
                 ];
             }
             session()->put('cart', $cart);
         }
 
         if (request()->wantsJson()) {
-            $cartCount = Auth::check() 
-                ? \App\Models\CartItem::where('user_id', Auth::id())->sum('quantity')
+            $cartCount = Auth::check()
+                ? CartItem::where('user_id', Auth::id())->sum('quantity')
                 : collect(session()->get('cart', []))->sum('quantity');
 
             return response()->json([
                 'success' => true,
                 'message' => __('messages.cart.added'),
-                'cartCount' => $cartCount
+                'cartCount' => $cartCount,
             ]);
         }
 
@@ -149,10 +155,11 @@ class CartController extends Controller
                 session()->put('cart', $cart);
             }
         }
+
         return back()->with('success', __('messages.cart.removed'));
     }
 
-    public function checkoutPage(\App\Services\Shipping\ShippingServiceInterface $shippingService)
+    public function checkoutPage(ShippingServiceInterface $shippingService)
     {
         $cartItems = $this->getCurrentCartItems();
 
@@ -165,7 +172,7 @@ class CartController extends Controller
             session()->put('from_checkout', true);
         }
 
-        $total = $cartItems->sum(fn($i) => $i->product->price * $i->quantity);
+        $total = $cartItems->sum(fn ($i) => $i->product->price * $i->quantity);
         $shippingRates = $shippingService->calculateRates($total);
 
         $user = Auth::user();
@@ -182,9 +189,13 @@ class CartController extends Controller
         }
 
         $sessionCart = session()->get('cart', []);
+
         return collect($sessionCart)->map(function ($item, $productId) {
             $product = Product::find($productId);
-            if (!$product) return null;
+            if (! $product) {
+                return null;
+            }
+
             return (object) [
                 'id' => $productId,
                 'product_id' => $productId,
@@ -194,25 +205,25 @@ class CartController extends Controller
         })->filter();
     }
 
-    public function checkout(Request $request, \App\Services\Shipping\ShippingServiceInterface $shippingService)
+    public function checkout(Request $request, ShippingServiceInterface $shippingService)
     {
         $user = Auth::user();
 
         // Sincronizar carrito de sesión si existe para usuario autenticado
         if ($user) {
             $sessionCart = session()->get('cart', []);
-            if (!empty($sessionCart)) {
+            if (! empty($sessionCart)) {
                 foreach ($sessionCart as $productId => $item) {
                     $cartItem = CartItem::where('user_id', $user->id)
-                                        ->where('product_id', $productId)
-                                        ->first();
+                        ->where('product_id', $productId)
+                        ->first();
                     if ($cartItem) {
                         $cartItem->increment('quantity', $item['quantity']);
                     } else {
                         CartItem::create([
                             'user_id' => $user->id,
                             'product_id' => $productId,
-                            'quantity' => $item['quantity']
+                            'quantity' => $item['quantity'],
                         ]);
                     }
                 }
@@ -228,7 +239,7 @@ class CartController extends Controller
         }
 
         $guestToken = null;
-        if (!$user) {
+        if (! $user) {
             $request->validate([
                 'shipping_name' => 'required|string|max:255',
                 'shipping_email' => 'required|email|max:255',
@@ -239,7 +250,7 @@ class CartController extends Controller
                 'shipping_province' => 'nullable|string|max:100',
             ]);
 
-            $guestToken = \Illuminate\Support\Str::random(40);
+            $guestToken = Str::random(40);
             $shippingName = $request->shipping_name;
             $shippingEmail = $request->shipping_email;
             $shippingPhone = $request->shipping_phone;
@@ -274,7 +285,7 @@ class CartController extends Controller
             $serviceType = $request->input('shipping_service_type', 'standard_48h');
         }
 
-        $itemsTotal = $cartItems->sum(fn($item) => $item->product->price * $item->quantity);
+        $itemsTotal = $cartItems->sum(fn ($item) => $item->product->price * $item->quantity);
         $shippingCost = match ($serviceType) {
             'express_24h' => 7.95,
             'pickup_point' => 3.50,
@@ -282,9 +293,9 @@ class CartController extends Controller
         };
         $total = $itemsTotal + $shippingCost;
 
-        $isTestRun = class_exists(\PHPUnit\Framework\TestCase::class, false) || app()->runningUnitTests();
+        $isTestRun = class_exists(TestCase::class, false) || app()->runningUnitTests();
         $paymentMethod = $request->input('payment_method');
-        if (!$paymentMethod) {
+        if (! $paymentMethod) {
             $paymentMethod = $isTestRun ? 'direct' : 'stripe';
         }
 
@@ -292,9 +303,10 @@ class CartController extends Controller
             // Verificar stock antes de crear sesión de Stripe
             foreach ($cartItems as $item) {
                 $product = Product::find($item->product_id);
-                if (!$product || $product->stock < $item->quantity) {
-                    $name = $product?->name ?? 'Producto #' . $item->product_id;
+                if (! $product || $product->stock < $item->quantity) {
+                    $name = $product?->name ?? 'Producto #'.$item->product_id;
                     $available = $product?->stock ?? 0;
+
                     return back()->with('error', __('messages.cart.stock_insufficient', [
                         'name' => $name,
                         'available' => $available,
@@ -381,7 +393,7 @@ class CartController extends Controller
                         'currency' => 'eur',
                         'unit_amount' => (int) round($shippingCost * 100),
                         'product_data' => [
-                            'name' => __('messages.cart.shipping') . ' (' . $serviceType . ')',
+                            'name' => __('messages.cart.shipping').' ('.$serviceType.')',
                         ],
                     ],
                     'quantity' => 1,
@@ -391,7 +403,7 @@ class CartController extends Controller
             $sessionParams = [
                 'line_items' => $lineItems,
                 'mode' => 'payment',
-                'success_url' => route('stripe.success') . '?session_id={CHECKOUT_SESSION_ID}',
+                'success_url' => route('stripe.success').'?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' => route('stripe.cancel'),
                 'metadata' => [
                     'order_id' => (string) $order->id,
@@ -417,8 +429,9 @@ class CartController extends Controller
 
                 return redirect($session->url);
             } catch (\Exception $e) {
-                Log::error('Stripe checkout session error: ' . $e->getMessage());
-                return back()->with('error', 'Error al conectar con la pasarela de pago Stripe: ' . $e->getMessage());
+                Log::error('Stripe checkout session error: '.$e->getMessage());
+
+                return back()->with('error', 'Error al conectar con la pasarela de pago Stripe: '.$e->getMessage());
             }
         }
 
@@ -443,7 +456,7 @@ class CartController extends Controller
                     'shipping_service_type' => $serviceType,
                     'shipping_cost' => $shippingCost,
                     'total_amount' => $total,
-                    'status' => 'pending'
+                    'status' => 'pending',
                 ]);
 
                 foreach ($cartItems as $item) {
@@ -453,7 +466,7 @@ class CartController extends Controller
                         throw new \Exception(__('messages.cart.stock_insufficient', [
                             'name' => $product->name,
                             'available' => $product->stock,
-                            'requested' => $item->quantity
+                            'requested' => $item->quantity,
                         ]));
                     }
 
@@ -463,7 +476,7 @@ class CartController extends Controller
                         'order_id' => $order->id,
                         'product_id' => $item->product_id,
                         'quantity' => $item->quantity,
-                        'price_at_purchase' => $item->product->price
+                        'price_at_purchase' => $item->product->price,
                     ]);
 
                     if ($user) {
@@ -471,7 +484,7 @@ class CartController extends Controller
                     }
                 }
 
-                if (!$user) {
+                if (! $user) {
                     session()->forget('cart');
                 }
 
@@ -523,18 +536,19 @@ class CartController extends Controller
     public function requireLogin()
     {
         session()->put('url.intended', route('cart.index'));
+
         return redirect()->route('login');
     }
 
     public function showOrder(Order $order)
     {
         if ($order->user_id) {
-            if (!auth()->check() || $order->user_id !== auth()->id()) {
+            if (! auth()->check() || $order->user_id !== auth()->id()) {
                 abort(403);
             }
         } else {
             $token = request('token') ?? session('guest_order_token');
-            if (!$token || $order->guest_token !== $token) {
+            if (! $token || $order->guest_token !== $token) {
                 abort(403);
             }
         }
@@ -544,24 +558,24 @@ class CartController extends Controller
         return view('orders.show', compact('order'));
     }
 
-    public function stripeCheckout(Request $request, \App\Services\Shipping\ShippingServiceInterface $shippingService)
+    public function stripeCheckout(Request $request, ShippingServiceInterface $shippingService)
     {
         $user = Auth::user();
 
         if ($user) {
             $sessionCart = session()->get('cart', []);
-            if (!empty($sessionCart)) {
+            if (! empty($sessionCart)) {
                 foreach ($sessionCart as $productId => $item) {
                     $cartItem = CartItem::where('user_id', $user->id)
-                                        ->where('product_id', $productId)
-                                        ->first();
+                        ->where('product_id', $productId)
+                        ->first();
                     if ($cartItem) {
                         $cartItem->increment('quantity', $item['quantity']);
                     } else {
                         CartItem::create([
                             'user_id' => $user->id,
                             'product_id' => $productId,
-                            'quantity' => $item['quantity']
+                            'quantity' => $item['quantity'],
                         ]);
                     }
                 }
@@ -577,12 +591,12 @@ class CartController extends Controller
         }
 
         // Si es invitado y no proporciona email de envío, redirigir a vista de checkout
-        if (!$user && !$request->filled('shipping_email')) {
+        if (! $user && ! $request->filled('shipping_email')) {
             return redirect()->route('checkout.page')->with('info', __('messages.cart.enter_shipping_details'));
         }
 
         $guestToken = null;
-        if (!$user) {
+        if (! $user) {
             $validated = $request->validate([
                 'shipping_name' => 'required|string|max:255',
                 'shipping_email' => 'required|email|max:255',
@@ -594,7 +608,7 @@ class CartController extends Controller
                 'shipping_service_type' => 'nullable|string|in:standard_48h,express_24h,pickup_point',
             ]);
 
-            $guestToken = \Illuminate\Support\Str::random(40);
+            $guestToken = Str::random(40);
             $shippingName = $validated['shipping_name'];
             $shippingEmail = $validated['shipping_email'];
             $shippingPhone = $validated['shipping_phone'];
@@ -615,7 +629,7 @@ class CartController extends Controller
             $serviceType = $request->input('shipping_service_type', 'standard_48h');
         }
 
-        $itemsTotal = $cartItems->sum(fn($i) => $i->product->price * $i->quantity);
+        $itemsTotal = $cartItems->sum(fn ($i) => $i->product->price * $i->quantity);
         $shippingCost = match ($serviceType) {
             'express_24h' => 7.95,
             'pickup_point' => 3.50,
@@ -632,8 +646,8 @@ class CartController extends Controller
             ) {
                 foreach ($cartItems as $item) {
                     $product = Product::lockForUpdate()->find($item->product_id);
-                    if (!$product || $product->stock < $item->quantity) {
-                        $name = $product?->name ?? 'Producto #' . $item->product_id;
+                    if (! $product || $product->stock < $item->quantity) {
+                        $name = $product?->name ?? 'Producto #'.$item->product_id;
                         $available = $product?->stock ?? 0;
                         throw new \Exception(__('messages.cart.stock_insufficient', ['name' => $name, 'available' => $available, 'requested' => $item->quantity]));
                     }
@@ -709,7 +723,7 @@ class CartController extends Controller
                     'currency' => 'eur',
                     'unit_amount' => (int) ($shippingCost * 100),
                     'product_data' => [
-                        'name' => __('messages.cart.shipping') . ' (' . $serviceType . ')',
+                        'name' => __('messages.cart.shipping').' ('.$serviceType.')',
                     ],
                 ],
                 'quantity' => 1,
@@ -719,7 +733,7 @@ class CartController extends Controller
         $sessionParams = [
             'line_items' => $lineItems,
             'mode' => 'payment',
-            'success_url' => route('stripe.success') . '?session_id={CHECKOUT_SESSION_ID}',
+            'success_url' => route('stripe.success').'?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('stripe.cancel'),
             'metadata' => [
                 'order_id' => $order->id,
@@ -763,7 +777,7 @@ class CartController extends Controller
         $order = Order::findOrFail($orderId);
 
         if ($order->user_id) {
-            if (!auth()->check() || $order->user_id !== auth()->id()) {
+            if (! auth()->check() || $order->user_id !== auth()->id()) {
                 abort(403);
             }
         }
@@ -803,6 +817,7 @@ class CartController extends Controller
 
         if ($order->guest_token) {
             session(['guest_order_token' => $order->guest_token]);
+
             return redirect()->route('orders.show', ['order' => $order->id, 'token' => $order->guest_token])
                 ->with('success', __('messages.cart.payment_success'));
         }
@@ -833,19 +848,19 @@ class CartController extends Controller
     public function downloadInvoice(Order $order)
     {
         if ($order->user_id) {
-            if (!auth()->check() || $order->user_id !== auth()->id()) {
+            if (! auth()->check() || $order->user_id !== auth()->id()) {
                 abort(403);
             }
         } else {
             $token = request('token') ?? session('guest_order_token');
-            if (!$token || $order->guest_token !== $token) {
+            if (! $token || $order->guest_token !== $token) {
                 abort(403);
             }
         }
 
         $order->load(['orderItems.product', 'shipment', 'user.addresses']);
 
-        $options = new Options();
+        $options = new Options;
         $options->set('isRemoteEnabled', true);
         $options->set('isHtml5ParserEnabled', true);
 
@@ -854,13 +869,13 @@ class CartController extends Controller
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
-        $filename = __('messages.invoice.title') . '_Reposa+' . '_' . str_pad($order->id, 6, '0', STR_PAD_LEFT) . '.pdf';
+        $filename = __('messages.invoice.title').'_Reposa+'.'_'.str_pad($order->id, 6, '0', STR_PAD_LEFT).'.pdf';
 
         $pdf = $dompdf->output();
 
         return response($pdf, 200, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             'Content-Length' => strlen($pdf),
         ]);
     }
@@ -872,7 +887,7 @@ class CartController extends Controller
         }
 
         $token = $request->input('token') ?? session('guest_order_token');
-        if (!$token || $order->guest_token !== $token) {
+        if (! $token || $order->guest_token !== $token) {
             abort(403);
         }
 
@@ -880,15 +895,15 @@ class CartController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        if (\App\Models\User::where('email', $order->customer_email)->exists()) {
+        if (User::where('email', $order->customer_email)->exists()) {
             return back()->with('error', __('messages.orders.email_already_registered'));
         }
 
         $newUser = DB::transaction(function () use ($order, $request) {
-            $user = \App\Models\User::create([
+            $user = User::create([
                 'name' => $order->customer_name,
                 'email' => $order->customer_email,
-                'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+                'password' => Hash::make($request->password),
             ]);
 
             $order->update(['user_id' => $user->id]);

@@ -6,26 +6,28 @@
 |--------------------------------------------------------------------------
 */
 
-use App\Models\Product;
+use App\Models\CartItem;
 use App\Models\Order;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Tests\TestCase;
 
-uses(\Tests\TestCase::class);
+uses(TestCase::class);
 
 beforeEach(function (): void {
-    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0');
-    \Illuminate\Support\Facades\DB::table('cart_items')->truncate();
-    \Illuminate\Support\Facades\DB::table('order_items')->truncate();
-    \Illuminate\Support\Facades\DB::table('orders')->truncate();
-    \Illuminate\Support\Facades\DB::table('refunds')->truncate();
-    \Illuminate\Support\Facades\DB::table('favorite_product')->truncate();
-    \Illuminate\Support\Facades\DB::table('addresses')->truncate();
-    \Illuminate\Support\Facades\DB::table('profiles')->truncate();
-    \Illuminate\Support\Facades\DB::table('users')->where('email', 'like', '%@example.com')->delete();
-    \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Prueba%')->delete();
-    \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Almohada%')->delete();
-    \Illuminate\Support\Facades\DB::table('categories')->where('name', 'Cervical')->delete();
-    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1');
+    DB::statement('SET FOREIGN_KEY_CHECKS=0');
+    DB::table('cart_items')->truncate();
+    DB::table('order_items')->truncate();
+    DB::table('orders')->truncate();
+    DB::table('refunds')->truncate();
+    DB::table('favorite_product')->truncate();
+    DB::table('addresses')->truncate();
+    DB::table('profiles')->truncate();
+    DB::table('users')->where('email', 'like', '%@example.com')->delete();
+    DB::table('products')->where('name', 'like', '%Prueba%')->delete();
+    DB::table('products')->where('name', 'like', '%Almohada%')->delete();
+    DB::table('categories')->where('name', 'Cervical')->delete();
+    DB::statement('SET FOREIGN_KEY_CHECKS=1');
 });
 
 it('completes checkout successfully with cart items', function (): void {
@@ -46,7 +48,7 @@ it('completes checkout successfully with cart items', function (): void {
     expect($order)->not->toBeNull();
     expect($order->status)->toBe('pending');
     expect($product->fresh()->stock)->toBe(8);
-    expect(\App\Models\CartItem::where('user_id', $user->id)->count())->toBe(0);
+    expect(CartItem::where('user_id', $user->id)->count())->toBe(0);
 });
 
 it('prevents checkout with empty cart', function (): void {

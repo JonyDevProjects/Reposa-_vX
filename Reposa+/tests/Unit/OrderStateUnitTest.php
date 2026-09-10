@@ -102,13 +102,13 @@ class OrderStateUnitTest extends TestCase
     public function test_status_color_mapping_integrity(): void
     {
         $expectedColors = [
-            Order::STATUS_PENDING    => 'warning',
+            Order::STATUS_PENDING => 'warning',
             Order::STATUS_PROCESSING => 'info',
-            Order::STATUS_SHIPPED    => 'primary',
-            Order::STATUS_DELIVERED  => 'success',
-            Order::STATUS_COMPLETED  => 'success',
-            Order::STATUS_CANCELLED  => 'danger',
-            Order::STATUS_REFUNDED   => 'secondary',
+            Order::STATUS_SHIPPED => 'primary',
+            Order::STATUS_DELIVERED => 'success',
+            Order::STATUS_COMPLETED => 'success',
+            Order::STATUS_CANCELLED => 'danger',
+            Order::STATUS_REFUNDED => 'secondary',
         ];
 
         foreach (Order::STATUSES as $statusKey => $statusLabel) {

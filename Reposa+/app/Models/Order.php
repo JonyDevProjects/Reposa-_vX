@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Order extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'user_id',
         'guest_token',
@@ -62,11 +64,17 @@ class Order extends Model
     }
 
     const STATUS_PENDING = 'pending';
+
     const STATUS_PROCESSING = 'processing';
+
     const STATUS_SHIPPED = 'shipped';
+
     const STATUS_DELIVERED = 'delivered';
+
     const STATUS_COMPLETED = 'completed';
+
     const STATUS_CANCELLED = 'cancelled';
+
     const STATUS_REFUNDED = 'refunded';
 
     const STATUSES = [
@@ -80,23 +88,23 @@ class Order extends Model
     ];
 
     const ALLOWED_TRANSITIONS = [
-        self::STATUS_PENDING    => [self::STATUS_PROCESSING, self::STATUS_COMPLETED, self::STATUS_CANCELLED],
+        self::STATUS_PENDING => [self::STATUS_PROCESSING, self::STATUS_COMPLETED, self::STATUS_CANCELLED],
         self::STATUS_PROCESSING => [self::STATUS_SHIPPED, self::STATUS_CANCELLED],
-        self::STATUS_SHIPPED    => [self::STATUS_DELIVERED],
-        self::STATUS_DELIVERED  => [self::STATUS_COMPLETED, self::STATUS_REFUNDED],
-        self::STATUS_COMPLETED  => [self::STATUS_REFUNDED],
-        self::STATUS_CANCELLED  => [],
-        self::STATUS_REFUNDED   => [],
+        self::STATUS_SHIPPED => [self::STATUS_DELIVERED],
+        self::STATUS_DELIVERED => [self::STATUS_COMPLETED, self::STATUS_REFUNDED],
+        self::STATUS_COMPLETED => [self::STATUS_REFUNDED],
+        self::STATUS_CANCELLED => [],
+        self::STATUS_REFUNDED => [],
     ];
 
     const STATUS_COLORS = [
-        self::STATUS_PENDING    => 'warning',
+        self::STATUS_PENDING => 'warning',
         self::STATUS_PROCESSING => 'info',
-        self::STATUS_SHIPPED    => 'primary',
-        self::STATUS_DELIVERED  => 'success',
-        self::STATUS_COMPLETED  => 'success',
-        self::STATUS_CANCELLED  => 'danger',
-        self::STATUS_REFUNDED   => 'secondary',
+        self::STATUS_SHIPPED => 'primary',
+        self::STATUS_DELIVERED => 'success',
+        self::STATUS_COMPLETED => 'success',
+        self::STATUS_CANCELLED => 'danger',
+        self::STATUS_REFUNDED => 'secondary',
     ];
 
     public static function getAllowedTransitions(string $currentStatus): array
@@ -111,7 +119,7 @@ class Order extends Model
 
     public static function getStatusLabel(string $status): string
     {
-        $key = 'messages.order.status.' . $status;
+        $key = 'messages.order.status.'.$status;
         $translated = __($key);
 
         return $translated !== $key ? $translated : ucfirst($status);
@@ -137,7 +145,7 @@ class Order extends Model
         return $this->hasMany(Refund::class);
     }
 
-    public function shipment(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function shipment(): HasOne
     {
         return $this->hasOne(Shipment::class);
     }

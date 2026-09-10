@@ -16,6 +16,7 @@ class OrderRefunded extends Mailable implements ShouldQueue
     use Queueable, SerializesModels;
 
     public $order;
+
     public $refund;
 
     public function __construct(Order $order, Refund $refund)

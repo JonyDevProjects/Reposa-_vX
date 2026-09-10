@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<Category>
@@ -24,11 +25,11 @@ class CategoryFactory extends Factory
     public function definition(): array
     {
         $nameEs = $this->faker->unique(true)->randomElement(array_keys(self::$names));
-        $slug = \Illuminate\Support\Str::slug($nameEs);
+        $slug = Str::slug($nameEs);
 
         if (Category::where('slug', $slug)->exists()) {
-            $nameEs = $nameEs . ' ' . $this->faker->numberBetween(10, 999);
-            $slug = \Illuminate\Support\Str::slug($nameEs);
+            $nameEs = $nameEs.' '.$this->faker->numberBetween(10, 999);
+            $slug = Str::slug($nameEs);
         }
 
         return [

@@ -19,31 +19,33 @@
 |
 */
 
+use App\Mail\OrderConfirmed;
+use App\Mail\OrderRefunded;
+use App\Mail\PaymentFailed;
 use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Product;
-use App\Models\User;
+use App\Models\Refund;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use Tests\TestCase;
 
-uses(\Tests\TestCase::class);
+uses(TestCase::class);
 
 beforeEach(function (): void {
-    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0');
-    \Illuminate\Support\Facades\DB::table('cart_items')->truncate();
-    \Illuminate\Support\Facades\DB::table('order_items')->truncate();
-    \Illuminate\Support\Facades\DB::table('orders')->truncate();
-    \Illuminate\Support\Facades\DB::table('refunds')->truncate();
-    \Illuminate\Support\Facades\DB::table('favorite_product')->truncate();
-    \Illuminate\Support\Facades\DB::table('addresses')->truncate();
-    \Illuminate\Support\Facades\DB::table('profiles')->truncate();
-    \Illuminate\Support\Facades\DB::table('users')->where('email', 'like', '%@example.com')->delete();
-    \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Prueba%')->delete();
-    \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Almohada%')->delete();
-    \Illuminate\Support\Facades\DB::table('categories')->where('name', 'Cervical')->delete();
-    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1');
+    DB::statement('SET FOREIGN_KEY_CHECKS=0');
+    DB::table('cart_items')->truncate();
+    DB::table('order_items')->truncate();
+    DB::table('orders')->truncate();
+    DB::table('refunds')->truncate();
+    DB::table('favorite_product')->truncate();
+    DB::table('addresses')->truncate();
+    DB::table('profiles')->truncate();
+    DB::table('users')->where('email', 'like', '%@example.com')->delete();
+    DB::table('products')->where('name', 'like', '%Prueba%')->delete();
+    DB::table('products')->where('name', 'like', '%Almohada%')->delete();
+    DB::table('categories')->where('name', 'Cervical')->delete();
+    DB::statement('SET FOREIGN_KEY_CHECKS=1');
 });
-
 
 it('sends order confirmation email via MailHog', function (): void {
     // Arrange
@@ -64,7 +66,7 @@ it('sends order confirmation email via MailHog', function (): void {
     $response->assertRedirect('/profile#orders');
 
     // Assert — Mail capturado (OrderConfirmed implements ShouldQueue)
-    Mail::assertQueued(\App\Mail\OrderConfirmed::class, function ($mail) use ($user) {
+    Mail::assertQueued(OrderConfirmed::class, function ($mail) use ($user) {
         return $mail->hasTo($user->email);
     });
 });
@@ -81,7 +83,7 @@ it('sends payment failed email via MailHog', function (): void {
     ]);
 
     // Act — Crear instancia de mailable directamente
-    $mailable = new \App\Mail\PaymentFailed($order, 'Card declined');
+    $mailable = new PaymentFailed($order, 'Card declined');
 
     // Assert — Verificar configuración del correo
     expect($mailable->envelope()->subject)->toBe('Pago no procesado — Reposa+');
@@ -101,7 +103,7 @@ it('sends order confirmed email with correct content', function (): void {
     ]);
 
     // Act
-    $mailable = new \App\Mail\OrderConfirmed($order);
+    $mailable = new OrderConfirmed($order);
 
     // Assert
     expect($mailable->envelope()->subject)->toContain("Tu pedido #{$order->id}");
@@ -120,7 +122,7 @@ it('sends refund notification email', function (): void {
         'total_amount' => 65.00,
     ]);
 
-    $refund = \App\Models\Refund::create([
+    $refund = Refund::create([
         'order_id' => $order->id,
         'amount' => 65.00,
         'reason' => 'Producto defectuoso',
@@ -129,7 +131,7 @@ it('sends refund notification email', function (): void {
     ]);
 
     // Act
-    $mailable = new \App\Mail\OrderRefunded($order, $refund);
+    $mailable = new OrderRefunded($order, $refund);
 
     // Assert
     expect($mailable->envelope()->subject)->toContain('Reembolso procesado');
@@ -160,7 +162,7 @@ function getMailhogMessages(string $recipient): array
         if ($response->successful()) {
             return $response->json('items', []);
         }
-    } catch (\Exception) {
+    } catch (Exception) {
         // MailHog no disponible — retornar array vacío
     }
 

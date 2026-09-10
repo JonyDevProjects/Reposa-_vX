@@ -69,7 +69,7 @@ class ShippingServiceTest extends TestCase
         $shipment = $this->shippingService->createShipment($order, $recipientData, 'standard_48h');
 
         $this->assertNotNull($shipment->id);
-        $this->assertStringStartsWith('RPX' . date('Y'), $shipment->tracking_number);
+        $this->assertStringStartsWith('RPX'.date('Y'), $shipment->tracking_number);
         $this->assertStringEndsWith('ES', $shipment->tracking_number);
         $this->assertEquals(Shipment::STATUS_PRE_REGISTERED, $shipment->status);
         $this->assertEquals(0.00, $shipment->shipping_cost); // Over 50€

@@ -16,33 +16,33 @@
 |
 */
 
+use App\Http\Controllers\StripeWebhookController;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Product;
-use App\Models\User;
-use App\Models\Refund;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Tests\TestCase;
 
-uses(\Tests\TestCase::class);
+uses(TestCase::class);
 
 beforeEach(function (): void {
-    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0');
-    \Illuminate\Support\Facades\DB::table('cart_items')->truncate();
-    \Illuminate\Support\Facades\DB::table('order_items')->truncate();
-    \Illuminate\Support\Facades\DB::table('orders')->truncate();
-    \Illuminate\Support\Facades\DB::table('refunds')->truncate();
-    \Illuminate\Support\Facades\DB::table('favorite_product')->truncate();
-    \Illuminate\Support\Facades\DB::table('addresses')->truncate();
-    \Illuminate\Support\Facades\DB::table('profiles')->truncate();
-    \Illuminate\Support\Facades\DB::table('users')->where('email', 'like', '%@example.com')->delete();
-    \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Prueba%')->delete();
-    \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Almohada%')->delete();
-    \Illuminate\Support\Facades\DB::table('categories')->where('name', 'Cervical')->delete();
-    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1');
+    DB::statement('SET FOREIGN_KEY_CHECKS=0');
+    DB::table('cart_items')->truncate();
+    DB::table('order_items')->truncate();
+    DB::table('orders')->truncate();
+    DB::table('refunds')->truncate();
+    DB::table('favorite_product')->truncate();
+    DB::table('addresses')->truncate();
+    DB::table('profiles')->truncate();
+    DB::table('users')->where('email', 'like', '%@example.com')->delete();
+    DB::table('products')->where('name', 'like', '%Prueba%')->delete();
+    DB::table('products')->where('name', 'like', '%Almohada%')->delete();
+    DB::table('categories')->where('name', 'Cervical')->delete();
+    DB::statement('SET FOREIGN_KEY_CHECKS=1');
 });
-
 
 it('handles checkout.session.completed webhook', function (): void {
     // Arrange
@@ -69,9 +69,9 @@ it('handles checkout.session.completed webhook', function (): void {
     expect($order->status)->toBe('pending');
 
     // Act — Enviar webhook directamente al controller
-    $controller = app(\App\Http\Controllers\StripeWebhookController::class);
+    $controller = app(StripeWebhookController::class);
     $payload = [
-        'id' => 'evt_test_' . Str::random(24),
+        'id' => 'evt_test_'.Str::random(24),
         'type' => 'checkout.session.completed',
         'data' => [
             'object' => [
@@ -83,7 +83,7 @@ it('handles checkout.session.completed webhook', function (): void {
     ];
 
     // Crear request mock
-    $request = \Illuminate\Http\Request::create(
+    $request = Request::create(
         '/stripe/webhook',
         'POST',
         [],
@@ -121,7 +121,7 @@ it('ignores checkout.session.completed for already processed order', function ()
 
     // Act — Enviar webhook duplicado
     $payload = [
-        'id' => 'evt_test_' . Str::random(24),
+        'id' => 'evt_test_'.Str::random(24),
         'type' => 'checkout.session.completed',
         'data' => [
             'object' => [
@@ -163,10 +163,10 @@ it('handles charge.refunded webhook', function (): void {
     $product->decrement('stock', 1);
 
     // Act — Enviar webhook directamente al controller
-    $controller = app(\App\Http\Controllers\StripeWebhookController::class);
-    $chargeId = 'ch_test_' . Str::random(14);
+    $controller = app(StripeWebhookController::class);
+    $chargeId = 'ch_test_'.Str::random(14);
     $payload = [
-        'id' => 'evt_test_' . Str::random(24),
+        'id' => 'evt_test_'.Str::random(24),
         'type' => 'charge.refunded',
         'data' => [
             'object' => [
@@ -177,7 +177,7 @@ it('handles charge.refunded webhook', function (): void {
         ],
     ];
 
-    $request = \Illuminate\Http\Request::create(
+    $request = Request::create(
         '/stripe/webhook',
         'POST',
         [],
@@ -226,7 +226,7 @@ it('handles payment_intent.payment_failed webhook', function (): void {
 
     // Act — Enviar webhook de pago fallido
     $payload = [
-        'id' => 'evt_test_' . Str::random(24),
+        'id' => 'evt_test_'.Str::random(24),
         'type' => 'payment_intent.payment_failed',
         'data' => [
             'object' => [

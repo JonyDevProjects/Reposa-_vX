@@ -20,7 +20,7 @@ class OrderDomainLogicUnitTest extends TestCase
         $order = new Order(['user_id' => null]);
         $this->assertTrue($order->isGuest());
 
-        $emptyOrder = new Order();
+        $emptyOrder = new Order;
         $this->assertTrue($emptyOrder->isGuest());
     }
 
@@ -114,7 +114,7 @@ class OrderDomainLogicUnitTest extends TestCase
      */
     public function test_customer_name_and_email_fallback_for_empty_data(): void
     {
-        $order = new Order();
+        $order = new Order;
 
         $this->assertEquals('Cliente Reposa+', $order->customer_name);
         $this->assertEquals('', $order->customer_email);

@@ -1,5 +1,16 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
+use Tests\Browser\AddToCartTest;
+use Tests\Browser\AdminOrderTest;
+use Tests\Browser\CheckoutTest;
+use Tests\Browser\DataSetupTest;
+use Tests\Browser\FailedPaymentTest;
+use Tests\Browser\MailHogTest;
+use Tests\Browser\StripeWebhookTest;
+use Tests\Browser\ViewOrderUserTest;
+use Tests\TestCase;
+
 /*
 |--------------------------------------------------------------------------
 | Pest Configuration
@@ -10,7 +21,7 @@
 |
 */
 
-uses(Tests\TestCase::class)->in('Feature', 'Unit');
+uses(TestCase::class)->in('Feature', 'Unit');
 
 /*
 |--------------------------------------------------------------------------
@@ -25,30 +36,30 @@ uses(Tests\TestCase::class)->in('Feature', 'Unit');
 
 afterEach(function (): void {
     $browserTestClasses = [
-        \Tests\Browser\AddToCartTest::class,
-        \Tests\Browser\CheckoutTest::class,
-        \Tests\Browser\AdminOrderTest::class,
-        \Tests\Browser\FailedPaymentTest::class,
-        \Tests\Browser\MailHogTest::class,
-        \Tests\Browser\StripeWebhookTest::class,
-        \Tests\Browser\ViewOrderUserTest::class,
-        \Tests\Browser\DataSetupTest::class,
+        AddToCartTest::class,
+        CheckoutTest::class,
+        AdminOrderTest::class,
+        FailedPaymentTest::class,
+        MailHogTest::class,
+        StripeWebhookTest::class,
+        ViewOrderUserTest::class,
+        DataSetupTest::class,
     ];
 
     $currentTest = get_class($this->test);
     if (in_array($currentTest, $browserTestClasses)) {
-        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0');
-        \Illuminate\Support\Facades\DB::table('cart_items')->truncate();
-        \Illuminate\Support\Facades\DB::table('order_items')->truncate();
-        \Illuminate\Support\Facades\DB::table('orders')->truncate();
-        \Illuminate\Support\Facades\DB::table('refunds')->truncate();
-        \Illuminate\Support\Facades\DB::table('favorite_product')->truncate();
-        \Illuminate\Support\Facades\DB::table('addresses')->truncate();
-        \Illuminate\Support\Facades\DB::table('profiles')->truncate();
-        \Illuminate\Support\Facades\DB::table('users')->where('email', 'like', '%@example.com')->delete();
-        \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Prueba%')->delete();
-        \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Almohada%')->delete();
-        \Illuminate\Support\Facades\DB::table('categories')->where('name', 'Cervical')->delete();
-        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        DB::table('cart_items')->truncate();
+        DB::table('order_items')->truncate();
+        DB::table('orders')->truncate();
+        DB::table('refunds')->truncate();
+        DB::table('favorite_product')->truncate();
+        DB::table('addresses')->truncate();
+        DB::table('profiles')->truncate();
+        DB::table('users')->where('email', 'like', '%@example.com')->delete();
+        DB::table('products')->where('name', 'like', '%Prueba%')->delete();
+        DB::table('products')->where('name', 'like', '%Almohada%')->delete();
+        DB::table('categories')->where('name', 'Cervical')->delete();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
     }
 });

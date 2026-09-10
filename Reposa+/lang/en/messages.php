@@ -745,4 +745,3 @@ return [
     'shipment.label_title' => 'Shipping Label',
     'shipment.label_print' => 'Print Label',
 ];
-

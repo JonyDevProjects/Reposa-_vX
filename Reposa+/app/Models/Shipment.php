@@ -46,10 +46,15 @@ class Shipment extends Model
     }
 
     const STATUS_PRE_REGISTERED = 'pre_registered';
+
     const STATUS_IN_TRANSIT = 'in_transit';
+
     const STATUS_AT_HUB = 'at_hub';
+
     const STATUS_OUT_FOR_DELIVERY = 'out_for_delivery';
+
     const STATUS_DELIVERED = 'delivered';
+
     const STATUS_INCIDENT = 'incident';
 
     const STATUS_LABELS = [

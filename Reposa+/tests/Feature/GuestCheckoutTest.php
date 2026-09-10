@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Shipment;
 use App\Models\User;
+use App\Services\Shipping\ShippingServiceInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,6 +16,7 @@ class GuestCheckoutTest extends TestCase
     use RefreshDatabase;
 
     private Product $product;
+
     private Category $category;
 
     protected function setUp(): void
@@ -143,13 +145,13 @@ class GuestCheckoutTest extends TestCase
         ]);
 
         // Access with valid token in query param
-        $response = $this->get('/orders/' . $order->id . '?token=' . $token);
+        $response = $this->get('/orders/'.$order->id.'?token='.$token);
         $response->assertStatus(200);
         $response->assertSee('Lucía Ramos');
         $response->assertSee('Guarda tu cuenta en 1 clic');
 
         // Invoice download with valid token
-        $invoiceResponse = $this->get('/orders/' . $order->id . '/invoice?token=' . $token);
+        $invoiceResponse = $this->get('/orders/'.$order->id.'/invoice?token='.$token);
         $invoiceResponse->assertStatus(200);
         $this->assertEquals('application/pdf', $invoiceResponse->headers->get('content-type'));
     }
@@ -170,15 +172,15 @@ class GuestCheckoutTest extends TestCase
         ]);
 
         // Access without token
-        $response = $this->get('/orders/' . $order->id);
+        $response = $this->get('/orders/'.$order->id);
         $response->assertStatus(403);
 
         // Access with wrong token
-        $responseWrong = $this->get('/orders/' . $order->id . '?token=wrong-token');
+        $responseWrong = $this->get('/orders/'.$order->id.'?token=wrong-token');
         $responseWrong->assertStatus(403);
 
         // Invoice without token
-        $responseInvoice = $this->get('/orders/' . $order->id . '/invoice');
+        $responseInvoice = $this->get('/orders/'.$order->id.'/invoice');
         $responseInvoice->assertStatus(403);
     }
 
@@ -200,7 +202,7 @@ class GuestCheckoutTest extends TestCase
             'status' => 'pending',
         ]);
 
-        $response = $this->post('/orders/' . $order->id . '/claim-account', [
+        $response = $this->post('/orders/'.$order->id.'/claim-account', [
             'token' => $token,
             'password' => 'SecurePass123!',
             'password_confirmation' => 'SecurePass123!',
@@ -254,7 +256,7 @@ class GuestCheckoutTest extends TestCase
             'status' => 'pending',
         ]);
 
-        $shippingService = app(\App\Services\Shipping\ShippingServiceInterface::class);
+        $shippingService = app(ShippingServiceInterface::class);
         $shipment = $shippingService->createShipment($order, [
             'name' => 'Cliente Envío',
             'email' => 'cliente@test.es',
@@ -266,12 +268,12 @@ class GuestCheckoutTest extends TestCase
         $this->assertEquals(Shipment::STATUS_PRE_REGISTERED, $shipment->status);
 
         // Advance shipment
-        $response = $this->actingAs($admin)->post('/admin/shipments/' . $shipment->id . '/advance');
+        $response = $this->actingAs($admin)->post('/admin/shipments/'.$shipment->id.'/advance');
         $response->assertRedirect();
         $this->assertEquals(Shipment::STATUS_IN_TRANSIT, $shipment->fresh()->status);
 
         // View thermal label
-        $labelResponse = $this->actingAs($admin)->get('/admin/shipments/' . $shipment->id . '/label');
+        $labelResponse = $this->actingAs($admin)->get('/admin/shipments/'.$shipment->id.'/label');
         $labelResponse->assertStatus(200);
         $labelResponse->assertViewIs('admin.shipments.label');
         $labelResponse->assertSee($shipment->tracking_number);

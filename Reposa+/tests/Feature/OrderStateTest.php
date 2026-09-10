@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Order;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -126,13 +127,13 @@ class OrderStateTest extends TestCase
     {
         $order = Order::factory()->create();
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $order->orderItems());
+        $this->assertInstanceOf(HasMany::class, $order->orderItems());
     }
 
     public function test_order_has_many_refunds(): void
     {
         $order = Order::factory()->create();
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $order->refunds());
+        $this->assertInstanceOf(HasMany::class, $order->refunds());
     }
 }

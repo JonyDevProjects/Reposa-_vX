@@ -11,31 +11,32 @@
 |
 */
 
-use App\Models\Category;
 use App\Models\CartItem;
+use App\Models\Category;
 use App\Models\Order;
-use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Tests\TestCase;
 
-uses(\Tests\TestCase::class);
+uses(TestCase::class);
 
 beforeEach(function (): void {
-    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0');
-    \Illuminate\Support\Facades\DB::table('cart_items')->truncate();
-    \Illuminate\Support\Facades\DB::table('order_items')->truncate();
-    \Illuminate\Support\Facades\DB::table('orders')->truncate();
-    \Illuminate\Support\Facades\DB::table('refunds')->truncate();
-    \Illuminate\Support\Facades\DB::table('favorite_product')->truncate();
-    \Illuminate\Support\Facades\DB::table('addresses')->truncate();
-    \Illuminate\Support\Facades\DB::table('profiles')->truncate();
-    \Illuminate\Support\Facades\DB::table('users')->where('email', 'like', '%@example.com')->delete();
-    \Illuminate\Support\Facades\DB::table('users')->where('email', 'like', '%@reposaplus.com')->delete();
-    \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Prueba%')->delete();
-    \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Almohada%')->delete();
-    \Illuminate\Support\Facades\DB::table('categories')->where('name', 'Cervical')->delete();
-    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1');
+    DB::statement('SET FOREIGN_KEY_CHECKS=0');
+    DB::table('cart_items')->truncate();
+    DB::table('order_items')->truncate();
+    DB::table('orders')->truncate();
+    DB::table('refunds')->truncate();
+    DB::table('favorite_product')->truncate();
+    DB::table('addresses')->truncate();
+    DB::table('profiles')->truncate();
+    DB::table('users')->where('email', 'like', '%@example.com')->delete();
+    DB::table('users')->where('email', 'like', '%@reposaplus.com')->delete();
+    DB::table('products')->where('name', 'like', '%Prueba%')->delete();
+    DB::table('products')->where('name', 'like', '%Almohada%')->delete();
+    DB::table('categories')->where('name', 'Cervical')->delete();
+    DB::statement('SET FOREIGN_KEY_CHECKS=1');
 });
 
 it('creates user with correct attributes', function (): void {
@@ -137,7 +138,7 @@ it('prepares complete cart scenario', function (): void {
     // Assert
     expect($scenario['user'])->toBeInstanceOf(User::class);
     expect($scenario['product'])->toBeInstanceOf(Product::class);
-    expect(\App\Models\CartItem::where('user_id', $scenario['user']->id)->count())->toBe(1);
+    expect(CartItem::where('user_id', $scenario['user']->id)->count())->toBe(1);
     expect($scenario['product']->price)->toBe(49.99);
 });
 
@@ -155,12 +156,12 @@ it('prepares complete order scenario', function (): void {
 
 it('seeds database correctly with artisan', function (): void {
     // Clean ALL data before seeding to avoid any duplicates
-    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0');
-    \Illuminate\Support\Facades\DB::table('category_product')->truncate();
-    \Illuminate\Support\Facades\DB::table('categories')->truncate();
-    \Illuminate\Support\Facades\DB::table('products')->truncate();
-    \Illuminate\Support\Facades\DB::table('users')->where('email', 'like', '%@reposaplus.com')->delete();
-    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1');
+    DB::statement('SET FOREIGN_KEY_CHECKS=0');
+    DB::table('category_product')->truncate();
+    DB::table('categories')->truncate();
+    DB::table('products')->truncate();
+    DB::table('users')->where('email', 'like', '%@reposaplus.com')->delete();
+    DB::statement('SET FOREIGN_KEY_CHECKS=1');
 
     // Act
     $this->artisan('db:seed', ['--class' => 'DatabaseSeeder']);

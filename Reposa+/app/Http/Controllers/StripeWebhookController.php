@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\OrderConfirmed;
 use App\Mail\OrderRefunded;
+use App\Mail\PaymentFailed;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\Product;
@@ -28,6 +29,7 @@ class StripeWebhookController extends CashierController
 
         if (! $orderId) {
             Log::warning('Stripe webhook: checkout.session.completed without order_id in metadata');
+
             return $this->successMethod();
         }
 
@@ -35,16 +37,19 @@ class StripeWebhookController extends CashierController
 
         if (! $order) {
             Log::warning("Stripe webhook: order {$orderId} not found");
+
             return $this->successMethod();
         }
 
         if ($order->status !== Order::STATUS_PENDING) {
             Log::info("Stripe webhook: order {$orderId} not in pending status ({$order->status}), skipping");
+
             return $this->successMethod();
         }
 
         if ($session['payment_status'] !== 'paid') {
             Log::info("Stripe webhook: order {$orderId} payment_status is '{$session['payment_status']}', skipping");
+
             return $this->successMethod();
         }
 
@@ -60,7 +65,7 @@ class StripeWebhookController extends CashierController
             }
 
             $updateData = ['status' => Order::STATUS_PROCESSING];
-            if (!empty($session['payment_intent']) && !$order->payment_intent_id) {
+            if (! empty($session['payment_intent']) && ! $order->payment_intent_id) {
                 $updateData['payment_intent_id'] = $session['payment_intent'];
             }
             $order->update($updateData);
@@ -115,7 +120,7 @@ class StripeWebhookController extends CashierController
 
                     try {
                         Mail::to($user->email)->send(
-                            new \App\Mail\PaymentFailed($order, $paymentIntent['last_payment_error']['message'] ?? __('messages.cart.payment_not_completed'))
+                            new PaymentFailed($order, $paymentIntent['last_payment_error']['message'] ?? __('messages.cart.payment_not_completed'))
                         );
                     } catch (\Exception $e) {
                         Log::error("Stripe webhook: failed to send payment failure email for order {$order->id}", [
@@ -141,6 +146,7 @@ class StripeWebhookController extends CashierController
 
         if (! $paymentIntentId) {
             Log::warning('Stripe webhook: charge.refunded without payment_intent');
+
             return $this->successMethod();
         }
 
@@ -148,11 +154,13 @@ class StripeWebhookController extends CashierController
 
         if (! $order) {
             Log::warning("Stripe webhook: charge.refunded — no order found for payment_intent {$paymentIntentId}");
+
             return $this->successMethod();
         }
 
         if ($order->status === Order::STATUS_REFUNDED) {
             Log::info("Stripe webhook: order {$order->id} already refunded, skipping");
+
             return $this->successMethod();
         }
 

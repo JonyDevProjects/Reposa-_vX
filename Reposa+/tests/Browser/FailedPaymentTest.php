@@ -6,27 +6,31 @@
 |--------------------------------------------------------------------------
 */
 
+use App\Models\CartItem;
 use App\Models\Order;
+use App\Models\OrderItem;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Tests\TestCase;
 
-uses(\Tests\TestCase::class);
+uses(TestCase::class);
 
 beforeEach(function (): void {
-    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0');
-    \Illuminate\Support\Facades\DB::table('cart_items')->truncate();
-    \Illuminate\Support\Facades\DB::table('order_items')->truncate();
-    \Illuminate\Support\Facades\DB::table('orders')->truncate();
-    \Illuminate\Support\Facades\DB::table('refunds')->truncate();
-    \Illuminate\Support\Facades\DB::table('favorite_product')->truncate();
-    \Illuminate\Support\Facades\DB::table('addresses')->truncate();
-    \Illuminate\Support\Facades\DB::table('profiles')->truncate();
-    \Illuminate\Support\Facades\DB::table('users')->where('email', 'like', '%@example.com')->delete();
-    \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Prueba%')->delete();
-    \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Almohada%')->delete();
-    \Illuminate\Support\Facades\DB::table('categories')->where('name', 'Cervical')->delete();
-    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1');
+    DB::statement('SET FOREIGN_KEY_CHECKS=0');
+    DB::table('cart_items')->truncate();
+    DB::table('order_items')->truncate();
+    DB::table('orders')->truncate();
+    DB::table('refunds')->truncate();
+    DB::table('favorite_product')->truncate();
+    DB::table('addresses')->truncate();
+    DB::table('profiles')->truncate();
+    DB::table('users')->where('email', 'like', '%@example.com')->delete();
+    DB::table('products')->where('name', 'like', '%Prueba%')->delete();
+    DB::table('products')->where('name', 'like', '%Almohada%')->delete();
+    DB::table('categories')->where('name', 'Cervical')->delete();
+    DB::statement('SET FOREIGN_KEY_CHECKS=1');
 });
 
 it('handles payment failure webhook correctly', function (): void {
@@ -39,10 +43,10 @@ it('handles payment failure webhook correctly', function (): void {
     $order = Order::factory()->pending()->create([
         'user_id' => $user->id,
         'total_amount' => 59.99,
-        'payment_intent_id' => 'pi_test_' . Str::random(14),
+        'payment_intent_id' => 'pi_test_'.Str::random(14),
     ]);
 
-    \App\Models\OrderItem::factory()->create([
+    OrderItem::factory()->create([
         'order_id' => $order->id,
         'product_id' => $product->id,
         'quantity' => 1,
@@ -50,7 +54,7 @@ it('handles payment failure webhook correctly', function (): void {
     ]);
 
     $payload = [
-        'id' => 'evt_test_' . Str::random(24),
+        'id' => 'evt_test_'.Str::random(24),
         'type' => 'payment_intent.payment_failed',
         'data' => [
             'object' => [
@@ -83,7 +87,7 @@ it('preserves cart when payment is cancelled', function (): void {
     $this->actingAs($user)->get('/checkout/stripe/cancel')
         ->assertRedirect('/cart');
 
-    expect(\App\Models\CartItem::where('user_id', $user->id)->count())->toBe(1);
+    expect(CartItem::where('user_id', $user->id)->count())->toBe(1);
     $this->assertDatabaseHas('cart_items', [
         'user_id' => $user->id,
         'product_id' => $product->id,

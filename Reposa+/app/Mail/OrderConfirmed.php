@@ -16,6 +16,7 @@ class OrderConfirmed extends Mailable implements ShouldQueue
     use Queueable, SerializesModels;
 
     public $order;
+
     public $invoiceUrl;
 
     public function __construct(Order $order)

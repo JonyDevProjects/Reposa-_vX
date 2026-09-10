@@ -18,7 +18,7 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => 'Almohada ' . $this->faker->words(2, true),
+            'name' => 'Almohada '.$this->faker->words(2, true),
             'material' => $this->faker->randomElement(['Viscoelástica', 'Látex', 'Pluma', 'Sintético']),
             'firmness' => $this->faker->randomElement(['Alta', 'Media', 'Baja']),
             'dimensions' => $this->faker->randomElement(['70x40 cm', '90x40 cm', '135x40 cm']),

@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Category;
+use App\Models\Product;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        $categories = \App\Models\Category::all();
-        $featuredProducts = \App\Models\Product::take(4)->get();
-        
+        $categories = Category::all();
+        $featuredProducts = Product::take(4)->get();
+
         return view('home', compact('categories', 'featuredProducts'));
     }
 }

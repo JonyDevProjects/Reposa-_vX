@@ -10,24 +10,26 @@
 |
 */
 
-use App\Models\Product;
+use App\Models\CartItem;
+use Illuminate\Support\Facades\DB;
+use Tests\TestCase;
 
-uses(\Tests\TestCase::class);
+uses(TestCase::class);
 
 beforeEach(function (): void {
-    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0');
-    \Illuminate\Support\Facades\DB::table('cart_items')->truncate();
-    \Illuminate\Support\Facades\DB::table('order_items')->truncate();
-    \Illuminate\Support\Facades\DB::table('orders')->truncate();
-    \Illuminate\Support\Facades\DB::table('refunds')->truncate();
-    \Illuminate\Support\Facades\DB::table('favorite_product')->truncate();
-    \Illuminate\Support\Facades\DB::table('addresses')->truncate();
-    \Illuminate\Support\Facades\DB::table('profiles')->truncate();
-    \Illuminate\Support\Facades\DB::table('users')->where('email', 'like', '%@example.com')->delete();
-    \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Prueba%')->delete();
-    \Illuminate\Support\Facades\DB::table('products')->where('name', 'like', '%Almohada%')->delete();
-    \Illuminate\Support\Facades\DB::table('categories')->where('name', 'Cervical')->delete();
-    \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1');
+    DB::statement('SET FOREIGN_KEY_CHECKS=0');
+    DB::table('cart_items')->truncate();
+    DB::table('order_items')->truncate();
+    DB::table('orders')->truncate();
+    DB::table('refunds')->truncate();
+    DB::table('favorite_product')->truncate();
+    DB::table('addresses')->truncate();
+    DB::table('profiles')->truncate();
+    DB::table('users')->where('email', 'like', '%@example.com')->delete();
+    DB::table('products')->where('name', 'like', '%Prueba%')->delete();
+    DB::table('products')->where('name', 'like', '%Almohada%')->delete();
+    DB::table('categories')->where('name', 'Cervical')->delete();
+    DB::statement('SET FOREIGN_KEY_CHECKS=1');
 });
 
 it('can add a product to cart from catalog page', function (): void {
@@ -56,7 +58,7 @@ it('increments quantity when adding same product twice', function (): void {
     $this->actingAs($user)->post("/cart/add/{$product->id}", ['quantity' => 1]);
     $this->actingAs($user)->post("/cart/add/{$product->id}", ['quantity' => 1]);
 
-    $cartCount = (int) \App\Models\CartItem::where('user_id', $user->id)->sum('quantity');
+    $cartCount = (int) CartItem::where('user_id', $user->id)->sum('quantity');
     expect($cartCount)->toBe(2);
 
     $this->assertDatabaseHas('cart_items', [
@@ -73,7 +75,7 @@ it('cannot add product with insufficient stock', function (): void {
     $this->actingAs($user)->post("/cart/add/{$product->id}", ['quantity' => 1]);
     $this->actingAs($user)->post("/cart/add/{$product->id}", ['quantity' => 1]);
 
-    $cartCount = \App\Models\CartItem::where('user_id', $user->id)->sum('quantity');
+    $cartCount = CartItem::where('user_id', $user->id)->sum('quantity');
     expect($cartCount)->toBeLessThanOrEqual(1);
 });
 
