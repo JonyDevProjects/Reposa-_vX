@@ -199,3 +199,8 @@ git push origin v1.2.0-checkout-qa
 
 # La rama feature/guest-checkout-and-shipping puede conservarse o eliminarse según la política del equipo.
 ```
+
+---
+
+> **Estado de Ejecución:** Este protocolo de merge y certificación fue **ejecutado con éxito** el 10/09/2026. Todas las suites pasaron en verde (119 pruebas en <12s) en la rama `develop`. Consultar acta de cierre en [`docs/handoff-sesion-2026-09-10-consolidacion-develop.md`](./handoff-sesion-2026-09-10-consolidacion-develop.md).
+

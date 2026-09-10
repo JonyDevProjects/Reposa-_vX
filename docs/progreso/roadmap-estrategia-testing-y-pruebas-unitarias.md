@@ -208,3 +208,4 @@ Reposa+/tests/Unit/
 |---|---|:---:|---|
 | **10/09/2026** | Jonathan Quispe | `v1.0.0` | Creación del roadmap integral de estrategia de testing, justificación epistemológica frente a la Pirámide de Cohn (Testing Trophy), especificación del catálogo de pruebas unitarias puras y guion de defensa para el TFG. |
 | **10/09/2026** | Jonathan Quispe | `v1.1.0` | Implementación y certificación de la suite de pruebas unitarias puras (`OrderStateUnitTest`, `ShippingRateCalculatorUnitTest`, `OrderDomainLogicUnitTest`, `ProductDomainUnitTest`). 22 tests ejecutados en 22ms. Pirámide tripartita 100% verificada. |
+| **10/09/2026** | Jonathan Quispe | `v1.2.0` | Consolidación de ramas (merge a `develop`), certificación de suite tripartita (119 pruebas en <12s) e incorporación formal del argumentario del Trofeo de Pruebas y guion de defensa en `docs/Memoria_Proyecto.md` (Capítulo 6). |

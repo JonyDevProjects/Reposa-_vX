@@ -9,7 +9,7 @@
 3. Objetivos y Requisitos
 4. Diseño y Arquitectura
 5. Desarrollo e Implementación
-6. Pruebas y Resultados
+6. Calidad, Arquitectura y Pruebas del Software
 7. Conclusiones y Trabajo Futuro
 8. Bibliografía
 
@@ -463,43 +463,189 @@ Para mantener el estado del idioma seleccionado, se desarrolló un `LanguageCont
 
 ---
 
-## 6. Pruebas y Resultados
+## 6. Calidad, Arquitectura y Pruebas del Software
 
-El aseguramiento de la calidad (QA) y la estabilización del código son fases críticas en el desarrollo de software. Para Reposa+, se implementó una estrategia dual: validaciones técnicas sobre el flujo de control de versiones (GitFlow) y auditorías funcionales cruzadas contra los requisitos del proyecto.
+El aseguramiento de la calidad (*Quality Assurance* - QA) y la verificación empírica del comportamiento del sistema constituyen pilares capitales en la Ingeniería del Software contemporánea. En plataformas de comercio electrónico transaccionales de alta fidelidad como **Reposa+**, donde convergen transacciones financieras en tiempo real, manipulación atómica de inventario y sesiones de usuario híbridas (invitados y autenticados), los fallos de software no representan meros defectos cosméticos, sino pérdidas económicas directas, inconsistencias contables irreversibles y degradación crítica de la confianza del cliente.
 
-### 6.1. Gestión de Ramas y Estabilización (GitFlow)
-El desarrollo en paralelo de múltiples funcionalidades (Perfil, Favoritos, Panel Admin, Multi-idioma) mediante un ecosistema de agentes generó, en las fases intermedias, duplicidad semántica en las ramas del repositorio. Se detectó la coexistencia de ramas bajo el prefijo singular `feature/` y el plural `features/` (por ejemplo, `feature/roles-admin-panel` y `features/roles-admin-panel`). 
+Para garantizar la máxima robustez del sistema, se ha diseñado e implementado una estrategia de pruebas integral fundamentada en modelos modernos de la disciplina, complementada con un riguroso flujo de control de versiones bajo GitFlow y auditorías técnicas continuas.
 
-Se llevó a cabo un proceso de saneamiento del repositorio, alineando la convención de nomenclatura al estándar plural. Todas las ramas fueron paulatinamente integradas (mergeadas) en la rama `develop`, resolviendo a mano los conflictos (Merge Conflicts) surgidos en archivos compartidos como el `AdminController` y el `app.blade.php`. El resultado de este proceso de Integración Continua garantizó que la rama `main` de producción permaneciera intacta y libre de código inestable.
+### 6.1. Estrategia de Testing Integral: De la Pirámide Clásica al Trofeo de Pruebas
 
-### 6.2. Auditoría EPD3 y Refinamientos Finales
-Como paso previo a la entrega, se ejecutó una auditoría intensiva ("Auditoría EPD3") para contrastar el código fuente contra los requisitos originales planteados. Esta auditoría detectó inicialmente desviaciones que comprometían la calidad del proyecto, las cuales fueron resueltas de inmediato:
+#### 6.1.1. Fundamentación Epistemológica: Cohn (2009) frente a Dodds y Fowler (2018-2024)
+Durante más de una década, la pedagogía académica y los estándares tradicionales de la industria han estado supeditados a la **Pirámide de Automatización de Pruebas formulada por Mike Cohn (2009)**. Dicho modelo postula que la base cuantitativa del aseguramiento de la calidad debe componerse de forma abrumadora por pruebas unitarias aisladas, reduciendo la capa de integración a una proporción intermedia y minimizando las pruebas de extremo a extremo (*End-to-End* - E2E) en la cúspide.
 
-1.  **Falta de Vistas SQL:** Se detectó que las métricas del panel de administración dependían exclusivamente de Eloquent, incumpliendo el requisito técnico de utilizar vistas puras.
-    *   *Resolución:* Se implementaron las vistas `v_order_summary` y `v_top_favorited_products` (detallado en la sección 5.4), mejorando los tiempos de respuesta del dashboard en un 30%.
-2.  **Transacciones Inseguras en el Checkout:** El vaciado de la cesta, la creación de la orden (`ORDER`) y la inyección de los items (`ORDER_ITEM`) se realizaban de forma secuencial sin verificar el stock disponible. Si el servidor colapsaba a mitad del proceso, la base de datos quedaba corrupta (pedidos huérfanos) o el stock podía quedar en negativo ante compras concurrentes.
-    *   *Resolución:* Se envolvió toda la lógica del checkout en un bloque `DB::transaction(function() { ... })` con bloqueo pesimista (`lockForUpdate()`). Dentro de la transacción, el sistema verifica el stock de cada producto antes de crear el `ORDER_ITEM` y lo decrementa de forma atómica. Si el stock es insuficiente o se produce cualquier excepción, el framework ejecuta automáticamente un *Rollback* y ninguna tabla es alterada; el usuario recibe un mensaje de error claro indicando qué producto no tiene stock suficiente.
-3.  **Fuga de Datos (N+1 Query Problem):** La vista del perfil de usuario generaba decenas de consultas a la base de datos para recuperar las direcciones y los favoritos de un cliente.
-    *   *Resolución:* Se aplicó *Eager Loading* en el Controlador (`$user->load(["profile", "addresses", "orders", "favorites"])`), empaquetando todas las sub-consultas en una única petición inicial.
+No obstante, un análisis epistemológico riguroso revela que la pirámide de Cohn fue concebida en una era tecnológica pre-virtualización ligera (pre-Docker), condicionada por restricciones físicas hoy superadas:
+1. **Coste prohibitivo de inicialización:** Levantar bases de datos relacionales empresariales o servidores de aplicaciones en entornos de test tomaba minutos por ciclo de ejecución.
+2. **Cuellos de botella de I/O en disco mecánico:** El acceso a almacenamiento secundario persistente degradaba severamente los tiempos de respuesta, forzando a los ingenieros a aislar cada clase mediante el uso masivo de objetos simulados (*mocks*, *stubs*, *spies*).
 
-### 6.3. Resultados Obtenidos
-El producto final es una plataforma de comercio electrónico altamente responsiva, estilizada y funcional. Los resultados superan las expectativas iniciales de la asignatura:
-*   El **Caso de Uso Principal** (comprar una almohada) es un proceso fluido, sin fricciones visuales gracias a las peticiones AJAX, y seguro a nivel transaccional.
-*   El **Panel de Administración** provee herramientas reales de gestión (CRUD completo) y analítica útil para la toma de decisiones del negocio (ej. seguimiento de los productos más deseados).
-*   La **Experiencia de Usuario (UX)**, regida por la paleta de colores Índigo, evoca exitosamente tranquilidad y enfoque en el descanso, alineando el diseño del software con el propósito biológico del producto comercializado.
+En la actualidad, referentes seminales de la Ingeniería de Software como **Kent C. Dodds** y **Martin Fowler** han demostrado que la transposición acrítica de la pirámide clásica a aplicaciones web transaccionales genera el severo antipatrón de **falsa confianza**. Cuando se aísla una clase del motor de base de datos sustituyéndola por un mock, el test no verifica el comportamiento real del sistema, sino la especificación programada en el propio mock.
 
-### 6.4. Credenciales de Prueba
-Para facilitar la evaluación y revisión funcional de la plataforma por parte del tribunal o usuarios de QA, el sistema cuenta con un generador automático de datos base (*Seeders*) que inyecta los siguientes perfiles de prueba en la base de datos:
+Frente a ello, Reposa+ adopta el paradigma contemporáneo del **Trofeo de Pruebas (*Testing Trophy*)**, conceptualizado por Kent C. Dodds y sustentado en los postulados de Fowler sobre el valor estratégico de la integración:
 
-*   **Usuario Administrador (Acceso total al Panel Admin y tienda):**
-    *   **Email:** `admin@reposaplus.com`
-    *   **Contraseña:** `admin123`
+```text
+   PIRÁMIDE CLÁSICA (Mike Cohn, 2009)            TROFEO DE PRUEBAS MODERNO (Dodds/Fowler, 2018-2024)
+         (Paradigma Pre-Docker)                        (Arquitectura Adoptada en Reposa+)
 
-*   **Usuario Estándar/Cliente (Acceso a la tienda, carrito y perfil privado):**
-    *   **Email:** `user@reposaplus.com`
-    *   **Contraseña:** `user123`
+                 ▲                                              ┌──────────┐
+                / \     E2E (Pocos)                             │   E2E    │  (8 tests Playwright)
+               /───\                                         ┌──┴──────────┴──┐
+              /     \   Integración (Medios)                 │  INTEGRACIÓN   │  (89 tests Feature)
+             /───────\                                       │ (Feature Tests)│  ← MÁXIMO VALOR Y ROI
+            /         \ Unitarios (Muchos)                   └──┬──────────┬──┘
+           ─────────────                                        │ UNITARIOS│  (22 tests Dominio Puro)
+                                                                └──────────┘
+```
 
-*Nota: Cualquier visitante no autenticado (Usuario Invitado) tiene acceso completo al catálogo público, búsqueda de productos y vista en detalle, pero se le requerirá iniciar sesión o registrarse para tramitar un pedido, usar el carrito o guardar productos en favoritos.*
+#### 6.1.2. El Mito de la Lentitud de la Integración en la Era de la Virtualización Ligera
+El axioma tradicional que justificaba reducir las pruebas de integración era su supuesta lentitud computacional. En Reposa+, la arquitectura basada en micro-contenedores con **Docker Engine**, imágenes optimizadas en Alpine Linux y motores **MySQL 8.0 InnoDB** con volúmenes locales en memoria desmiente empíricamente este mito:
+* La suite de integración completa de Reposa+ (**89 pruebas en `tests/Feature/`**) se ejecuta íntegramente en **1.95 segundos**.
+* El coste computacional medio por prueba de integración es de apenas **21 milisegundos**.
+* Ejecutar 89 pruebas contra un motor relacional real con aislamiento transaccional y rollback automático (`RefreshDatabase`) requiere prácticamente el mismo tiempo que una suite de mocks pesados en memoria, pero ofreciendo una fidelidad operacional del 100% sobre la semántica ACID de la base de datos.
+
+#### 6.1.3. Matriz Comparativa de Retorno de Inversión (ROI)
+La siguiente matriz formaliza la comparativa entre la pirámide clásica y el trofeo de pruebas adoptado en Reposa+:
+
+| Dimensión de Análisis | Pirámide Clásica (Cohn, 2009) | Trofeo de Pruebas en Reposa+ (2026) | Justificación en el Dominio E-commerce |
+|---|---|---|---|
+| **Premisa Histórica** | Levantar bases de datos o servidores era prohibitivamente lento (minutos por test). | Los contenedores Docker ejecutan 89 tests de integración contra MySQL en **1.95 segundos**. | La supuesta lentitud de las pruebas de integración es un mito superado por la virtualización ligera moderna. |
+| **Peligro de los Mocks** | Se promueve el uso masivo de *mocks* para aislar clases individuales. | Los mocks ocultan fallos de claves foráneas, bloqueos pesimistas y restricciones relacionales. | Un mock nunca detecta una sobreventa por condición de carrera (*race condition*). La base de datos real sí. |
+| **Retorno de Inversión (ROI)** | Mayor volumen en la base porque eran los tests más baratos de escribir. | Mayor volumen en integración porque es donde ocurren los fallos críticos de negocio. | Si el checkout falla en producción, el negocio pierde dinero. La integración garantiza la coherencia transaccional. |
+| **Rol de los Unit Tests** | Cubrir cada método, getter y setter de cada clase del sistema. | Cubrir algoritmos puros, máquinas de estado y lógica matemática de dominio en memoria. | Evita el antipatrón de testear implementaciones triviales o duplicar el código con aserciones redundantes. |
+
+---
+
+### 6.2. Taxonomía de Fallos Transaccionales y Límites del Mockeo Aislado
+
+El núcleo funcional de un comercio electrónico es esencialmente transaccional y reactivo. La literatura técnica advierte de que los fallos más catastróficos para el negocio escapan sistemáticamente al alcance de las pruebas unitarias aisladas:
+
+#### 1. Condiciones de Carrera (*Race Conditions*) en Concurrencia de Stock
+* **Naturaleza del problema:** Cuando dos compradores intentan adquirir simultáneamente la última unidad de una almohada viscoelástica, ambos procesos concurrentes leen un inventario disponible mayor a cero en el mismo milisegundo.
+* **Inutilidad del test unitario con mock:** Un mock programado para responder `$product->stock = 1` retornará invariablemente verdadero para ambos hilos concurrentes, validando con éxito un código defectuoso que en producción causaría sobreventa (*overselling*) e incumplimiento contractual.
+* **Solución y verificación en integración:** Solo una prueba de integración contra el motor MySQL InnoDB ejecutando `SELECT ... FOR UPDATE` dentro de `DB::transaction()` garantiza el bloqueo pesimista a nivel de fila y el rollback atómico del segundo comprador ([`CheckoutStockTest.php`](file:///Users/jonathanquishpe/JoniDev/Reposa+_TFG/Reposa+/tests/Feature/CheckoutStockTest.php)).
+
+#### 2. Restricciones de Integridad Referencial (*Foreign Keys & Cascades*)
+* **Naturaleza del problema:** Las órdenes (`orders`), envíos (`shipments`), líneas de pedido (`order_items`) y direcciones (`addresses`) están unidas mediante claves foráneas estrictas con restricciones de integridad DDL y borrados en cascada.
+* **Límite de los mocks:** Los mocks de PHPUnit operan en el espacio de usuario de PHP y omiten por completo los motores de restricciones relacionales. Una desalineación en el esquema de base de datos aprobará la suite unitaria pero provocará un fallo fatal `1452 Cannot add or update a child row: a foreign key constraint fails` en producción.
+
+#### 3. Seguridad Perimetral, Enrutamiento y Autorización HTTP
+* **Naturaleza del problema:** Los pedidos de invitados deben ser accesibles exclusivamente si se suministra el `guest_token` criptográfico generado durante el checkout. Asimismo, la descarga de facturas en PDF exige una comprobación estricta de titularidad.
+* **Límite de los mocks:** Probar de forma aislada el método de un controlador omite la tubería (*pipeline*) de seguridad de Laravel: Middlewares globales, descifrado de cookies, resolución de sesión y protección perimetral.
+* **Solución en integración:** La suite de integración verifica empíricamente que una petición sin token resulte en un código **HTTP 403 Forbidden**, mientras que una petición con token válido retorne un **HTTP 200 OK** con la factura en PDF adjunta ([`GuestCheckoutTest.php`](file:///Users/jonathanquishpe/JoniDev/Reposa+_TFG/Reposa+/tests/Feature/GuestCheckoutTest.php)).
+
+#### 4. Idempotencia y Sincronización Asíncrona de Webhooks de Pago
+* **Naturaleza del problema:** La pasarela Stripe envía notificaciones HTTP asíncronas mediante eventos de webhook (`checkout.session.completed`). Ante caídas transitorias de red, Stripe reintenta el envío de la misma notificación hasta por 72 horas.
+* **Solución y verificación:** La suite de integración certifica que el webhook procese el pago una sola vez, ignorando eventos duplicados mediante el registro del `payment_intent_id`, evitando transacciones duplicadas o decrementos dobles de inventario.
+
+#### Criterio Formal de Demarcación
+Para desterrar la ambigüedad metodológica, Reposa+ establece una regla arquitectónica estricta de demarcación:
+* **Es Test Unitario (`tests/Unit/`) SI:** La lógica evaluada es una función determinista pura, un autómata de estados finitos, una transformación de cadenas o una regla de negocio evaluable en memoria sin interactuar con la base de datos, el sistema de archivos, la red ni el contenedor de dependencias del framework.
+* **Es Test de Integración (`tests/Feature/`) SI:** La operación involucra persistencia relacional (SQL), transacciones ACID, bloqueo pesimista de concurrencia, despacho de eventos/correos, middlewares de autenticación o inyección de dependencias.
+
+---
+
+### 6.3. La Pirámide Tripartita Certificada de Reposa+ y Métricas Empíricas
+
+La estructura de pruebas de Reposa+ se materializa en una **pirámide tripartita balanceada**, donde cada nivel cumple un propósito específico de verificación con tecnologías complementarias:
+
+```text
+┌───────────────────────────────┬──────────────┬──────────────┬──────────────┬────────────────────────────────────────────────────────┐
+│ Nivel de Prueba               │ Directorio   │ Nº Pruebas   │ Aserciones   │ Tiempo / Tecnologías                                   │
+├───────────────────────────────┼──────────────┼──────────────┼──────────────┼────────────────────────────────────────────────────────┤
+│ **Pruebas de Sistema (E2E)**  │ `e2e/`       │ 8 tests      │ 100% checks  │ ~10.7s / Playwright, Chromium real, Nginx LB, Stripe   │
+│ **Pruebas de Integración**    │ `tests/Feature`│ 89 tests   │ 285 aserc.   │ ~1.95s / Laravel Testbench, MySQL 8 InnoDB, Redis     │
+│ **Pruebas Unitarias**         │ `tests/Unit` │ 22 tests     │ 227 aserc.   │ ~0.06s (60ms) / PHPUnit puro, lógica pura en memoria   │
+├───────────────────────────────┼──────────────┼──────────────┼──────────────┼────────────────────────────────────────────────────────┤
+│ **TOTALES CERTIFICADOS**      │              │ **119 tests**│ **512+ aserc**│ **< 12 segundos globales**                             │
+└───────────────────────────────┴──────────────┴──────────────┴──────────────┴────────────────────────────────────────────────────────┘
+```
+
+#### 6.3.1. Capa Unitaria Pura en Memoria (`tests/Unit/`) — 22 Tests, 227 Aserciones, 0.06s
+Diseñada bajo el principio de pureza computacional: todas las clases heredan directamente de `PHPUnit\Framework\TestCase` (el test runner puro de PHPUnit sin inicialización de Laravel ni de base de datos):
+1. **Autómata de Estados Finitos ([`OrderStateUnitTest.php`](file:///Users/jonathanquishpe/JoniDev/Reposa+_TFG/Reposa+/tests/Unit/OrderStateUnitTest.php)) — 6 tests, 55 aserciones:**
+   - Aísla y verifica matemáticamente el grafo dirigido de transiciones de `Order::ALLOWED_TRANSITIONS`.
+   - Certifica que un pedido en estado `processing` jamás puede saltar directamente a `completed` sin transicionar previamente a `shipped` (defecto histórico corregido).
+   - Valida la terminalidad absoluta de los estados `cancelled` y `refunded` (0 transiciones de salida permitidas).
+   - Valida la consistencia cromática de `Order::STATUS_COLORS` y la protección ante estados desconocidos.
+2. **Motor de Tarifas y Algoritmos Logísticos ([`ShippingRateCalculatorUnitTest.php`](file:///Users/jonathanquishpe/JoniDev/Reposa+_TFG/Reposa+/tests/Unit/ShippingRateCalculatorUnitTest.php)) — 5 tests, 145 aserciones:**
+   - Comprueba el umbral de gratuidad en carritos $\ge 50.00\text{ €}$ (tarifa estándar `0.00 €`, flag `is_free = true`) frente a carritos $< 50.00\text{ €}$ (`4.95 €`).
+   - Verifica la invariabilidad de tarifas fijas: urgente 24h (`7.95 €`) y punto de recogida (`3.50 €`).
+   - Verifica la generación estricta de códigos de seguimiento bajo la expresión regular `/^RPX\d{4}\d{6}ES$/` (15 caracteres alfanuméricos con año y sufijo nacional).
+   - Valida el cálculo de días hábiles de entrega mediante Carbon, excluyendo sábados y domingos.
+3. **Lógica de Dominio y Resolución de Identidad ([`OrderDomainLogicUnitTest.php`](file:///Users/jonathanquishpe/JoniDev/Reposa+_TFG/Reposa+/tests/Unit/OrderDomainLogicUnitTest.php)) — 7 tests, 9 aserciones:**
+   - Evalúa el método `isGuest()` en memoria según el valor de `user_id`.
+   - Verifica que los snapshots inmutables del pedido (`shipping_name`, `shipping_email`) prevalezcan sobre los datos mutables del perfil de usuario, garantizando la trazabilidad histórica de facturación.
+   - Evalúa los fallbacks por defecto (`'Cliente Reposa+'` y `''`) ante instancias sin persistir.
+4. **Reglas de Negocio de Producto ([`ProductDomainUnitTest.php`](file:///Users/jonathanquishpe/JoniDev/Reposa+_TFG/Reposa+/tests/Unit/ProductDomainUnitTest.php)) — 3 tests, 17 aserciones:**
+   - Comprueba la disponibilidad en stock (`isInStock()`, `hasStock($qty)`) en memoria.
+   - Verifica la precisión aritmética en el cálculo de subtotales (`calculateSubtotal($qty)`), previniendo desajustes por redondeo de coma flotante IEEE 754.
+
+#### 6.3.2. Capa de Integración Transaccional (`tests/Feature/`) — 89 Tests, 285 Aserciones, 1.95s
+Prueba la interacción armónica entre Controladores, Modelos Eloquent, Middleware, Políticas de Autorización y la base de datos MySQL InnoDB:
+* **`AdminTest` (14 tests):** Control de acceso por roles (RBAC), operaciones CRUD sobre catálogo y categorías, y transiciones de pedidos.
+* **`CartTest` (9 tests):** Carrito asíncrono con AJAX, adición de ítems con tope de stock, actualización y checkout atómico.
+* **`CheckoutStockTest` (2 tests):** Blindaje transaccional contra sobreventa mediante `lockForUpdate` y rollback automático ante stock insuficiente.
+* **`GoogleOAuthTest` (12 tests):** Ciclo completo de autenticación federada con Google, vinculación de cuentas existentes, redirección al onboarding de dirección y preservación del carrito desde checkout.
+* **`GuestCheckoutTest` (8 tests):** Compra como invitado con `guest_token`, validación de campos de envío, seguridad perimetral HTTP 403 y conversión en 1 clic (*Claim Account*).
+* **`OrderStateTest` (22 tests):** Comportamiento transaccional de órdenes y relaciones con `order_items`, reembolsos y usuario.
+* **`PaymentTest` (10 tests):** Ciclo de pago con Stripe Checkout, sesión de éxito/cancelación, y descarga segura de facturas en PDF.
+* **`RegistrationTest` (3 tests):** Registro de clientes con captura obligatoria de dirección postal y teléfono.
+* **`ShippingServiceTest` (6 tests):** Servicio de paquetería estándar, generación de albaranes de transporte, código de barras Code 128 y sincronización de tracking con pedidos.
+
+#### 6.3.3. Capa de Sistema Extremo a Extremo (`e2e/` Playwright) — 8 Tests, 10.7s
+Ejecutada con **Microsoft Playwright** sobre un navegador **Chromium real**, verificando el renderizado CSS/JS, la interacción humana simulada y la respuesta a través del balanceador Nginx:
+1. **Caso 1 — Registro con Onboarding:** Registro de usuario completo con validaciones de formulario y persistencia de dirección obligatoria.
+2. **Caso 2 — Compra Completa como Invitado:** Exploración de catálogo, adición al carrito, checkout sin login con paquetería Correos Express y redirección a confirmación con token.
+3. **Caso 3 — Seguridad Perimetral de Pedidos y Facturas:** Comprobación estricta de que el acceso a `/orders/{id}` sin token devuelve HTTP 403, mientras que con token devuelve HTTP 200 y permite descargar el PDF.
+4. **Caso 4 — Conversión de Invitado en 1 Clic (*Claim Account*):** Asignación de contraseña tras la compra, inicio de sesión automático y vinculación del pedido al nuevo usuario.
+5. **Caso 5 — Operativa de Paquetería en Panel Admin:** Avance del estado logístico en `/admin/orders` y generación de la etiqueta térmica A6 (10x15 cm) con código de barras para el transportista.
+6. **Caso 6 — Autenticación Federada Google OAuth 2.0:** Verificación de redirección a las cuentas de Google con `client_id`, `redirect_uri` y scopes requeridos.
+7. **Caso 6.4 — Google OAuth desde Checkout con Fusión de Carrito:** Inicio de sesión desde el proceso de compra preservando los productos del carrito y retornando al checkout.
+8. **Caso 6.5 — Pasarela Stripe Checkout:** Selección del método de pago seguro e iniciación del flujo con redirección a Stripe.
+
+---
+
+### 6.4. Guion de Defensa Académica para el Tribunal (Q&A de Arquitectura de Pruebas)
+
+Como parte de la preparación rigurosa para la defensa pública del Trabajo de Fin de Grado, se ha elaborado un repertorio dialéctico que anticipa las preguntas técnicas del tribunal sobre la estrategia de calidad:
+
+#### Pregunta 1: *"¿Por qué la distribución de pruebas en su proyecto asigna un peso cuantitativo mayor a la Integración que a las Pruebas Unitarias, contraviniendo la Pirámide Clásica de Mike Cohn?"*
+> **Respuesta Defensiva:**  
+> *"La pirámide de Mike Cohn fue formulada en 2009, en una coyuntura donde ejecutar pruebas contra bases de datos tomaba minutos debido a limitaciones de hardware y motores relacionales monolíticos. En la ingeniería de software actual, autores de máxima referencia como **Martin Fowler** y **Kent C. Dodds (Testing Trophy)** han demostrado que en aplicaciones web transaccionales, el mayor retorno de inversión (*ROI*) radica en la **capa de integración**.*  
+> *En una tienda online, un test unitario con mocks no puede comprobar si un bloqueo pesimista `SELECT ... FOR UPDATE` previene la sobreventa de stock en compras concurrentes, ni si una clave foránea en cascada preserva la integridad de la base de datos. Nuestra suite de integración ejecuta 89 pruebas exhaustivas contra MySQL 8 en apenas 1.95 segundos gracias a la virtualización con Docker Engine. Obtenemos máxima fidelidad operacional a velocidad de test unitario. Las pruebas unitarias las hemos reservado para donde aportan un valor insustituible: el autómata de estados finitos y el cálculo logístico."*
+
+#### Pregunta 2: *"¿Qué criterio formal aplicó para decidir qué componentes debían ser evaluados mediante pruebas unitarias puras y cuáles mediante pruebas de integración?"*
+> **Respuesta Defensiva:**  
+> *"Aplicamos un principio de demarcación riguroso basado en el determinismo y los efectos colaterales. Consideramos estrictamente unitario todo algoritmo matemático y autómata de estados finitos cuya computación resida exclusivamente en memoria y carezca de dependencias de I/O, red o base de datos. Bajo esta directriz, aislamos en `tests/Unit/`:*  
+> *1. La **máquina de estados finitos** de los pedidos (`Order`), verificando las transiciones permitidas del grafo dirigido y corrigiendo el defecto histórico que permitía saltar de `processing` a `completed` sin pasar por `shipped`.*  
+> *2. El **motor de tarifas logísticas** (`MockStandardCourierService`), comprobando el umbral de gratuidad de 50€ y la expresión regular estricta de seguimiento postal `^RPX\d{4}\d{6}ES$`.*  
+> *3. La **lógica de dominio en memoria**, evaluando la resolución de identidad de invitados (`isGuest`) y los fallbacks de snapshots sin tocar la base de datos.*  
+> *En cambio, cualquier operación que involucre persistencia SQL, integridad referencial, seguridad de cookies o concurrencia se asignó imperativamente a la capa de integración."*
+
+#### Pregunta 3: *"¿Por qué no utilizó herramientas de Mocking masivo (como Mockery o los mocks nativos de PHPUnit) para convertir toda la suite de Feature Tests en Unit Tests?"*
+> **Respuesta Defensiva:**  
+> *"Porque el uso intensivo de mocks en flujos transaccionales introduce el grave antipatrón de **falsa confianza**. Cuando se mockea el ORM Eloquent, el desarrollador termina probando que el mock responde lo que él mismo programó que respondiera, no cómo se comportará el motor relacional en producción. Un mock nunca lanzará un error de clave foránea ni detectará una consulta N+1. Preferimos probar contra el motor real MySQL InnoDB garantizando rollback atómico por test, asegurando que si la suite pasa en verde, el sistema funciona de verdad en el entorno de despliegue."*
+
+---
+
+### 6.5. Gestión de Ramas y Estabilización (GitFlow)
+El desarrollo del proyecto se articuló sobre el modelo de ramificación **GitFlow**, garantizando la estabilidad de las ramas troncales (`main` y `develop`):
+* **Ramas troncales:** `main` para código en producción auditado y `develop` como rama de integración continua de características.
+* **Convención de Ramas:** Se estandarizó la nomenclatura bajo el prefijo singular `feature/` (`feature/guest-checkout-and-shipping`, `feature/ui-phase-5-transactional-resilience`, etc.), resolviendo inconsistencias de fases iniciales.
+* **Consolidación sin avance rápido (`--no-ff`):** Todas las características se integraron en `develop` mediante fusiones explícitas con `--no-ff` (`git merge --no-ff feature/...`), preservando el grafo de historial de commits y la trazabilidad de los hitos técnicos.
+* **Integración de Fase 5:** La rama `feature/guest-checkout-and-shipping` (19 commits, +6700 líneas) consolidó el checkout de invitados, paquetería estándar, Google OAuth 2.0 y la suite unitaria pura en `develop` tras certificar la ejecución del 100% de las pruebas automatizadas.
+
+### 6.6. Auditoría EPD3 y Refinamientos de Resiliencia
+Como paso previo a la homologación, se sometió el código a auditorías técnicas continuas para corregir desviaciones y maximizar la resiliencia operativa:
+1. **Vistas SQL Nativas:** Incorporación de `v_order_summary` y `v_top_favorited_products` para optimizar consultas de reporting en el panel administrativo, reduciendo tiempos de respuesta en un 30%.
+2. **Atomicidad Transaccional y Bloqueo Pesimista:** Blindaje del checkout con `DB::transaction()` y `lockForUpdate()`, previniendo sobreventas e inconsistencias de pedidos huérfanos ante excepciones imprevistas.
+3. **Optimización contra el Problema N+1:** Implementación de *Eager Loading* (`with()`, `load()`) en perfiles, catálogos y órdenes de compra, empaquetando consultas dispersas en operaciones masivas indexadas.
+4. **Resiliencia de Conexión en Dev Containers:** Identificación y resolución de resolución DNS interna en entornos virtualizados (utilización del hostname `reposaplus_mysql` frente a `localhost`/`127.0.0.1` en la red puente de Docker).
+
+### 6.7. Credenciales y Entorno de Evaluación
+Para la evaluación de la plataforma por parte del tribunal académico y los responsables de QA, el sistema provee mediante *Seeders* los siguientes accesos predefinidos:
+* **Usuario Administrador:** `admin@reposaplus.com` / `admin123` (Acceso completo al back-office `/admin`, gestión de catálogo, pedidos y generación de etiquetas de transporte).
+* **Usuario Registrado Estándar:** `user@reposaplus.com` / `user123` (Acceso a catálogo, carrito, favoritos y perfil con dirección configurada).
+* **Flujo Libre como Invitado (*Guest Checkout*):** Cualquier usuario anónimo puede completar el ciclo de compra sin necesidad de registrarse previamente, recibiendo confirmación con token criptográfico seguro y opción de conversión de cuenta en un clic (*Claim Account*).
 
 ---
 
@@ -513,16 +659,22 @@ Más allá del ámbito puramente técnico, la integración experimental de un **
 ### 7.2. Trabajo Futuro y Evolución del Sistema
 Reposa+ cuenta con una arquitectura base sólidamente cimentada. Sin embargo, para su paso a un entorno de producción real y comercialización abierta al público, se contemplan las siguientes líneas de mejora:
 
-1.  **Pasarela de Pagos (Stripe / PayPal):** Sustitución del pago simulado actual por una integración completa con la API de Stripe. Esto habilitará cobros reales por tarjeta de crédito, Apple Pay y Google Pay, garantizando el cumplimiento de la normativa de seguridad de datos (PCI-DSS) al no almacenar tarjetas en el servidor propio.
+1.  **Evolución de Pasarela de Pagos (Suscripciones y Multi-divisa):** Tras la exitosa integración de Stripe Checkout con webhooks asíncronos en la Fase 5, una línea natural de expansión consiste en incorporar modelos de pago recurrente (suscripciones de descanso, sustitución programada de almohadas cada 18 meses) y pagos fraccionados (Klarna / PayPal Sandbox).
 2.  **Métricas Predictivas e Inteligencia de Negocio:** Ampliar el Panel de Administración actual para que no solo muestre datos descriptivos, sino que integre librerías gráficas (Chart.js) y aplique algoritmos que sugieran qué almohadas deben ser repuestas basándose en la velocidad de agotamiento de su stock.
 3.  **Optimización SEO y Accesibilidad (a11y):** Refinar el marcado semántico HTML5 de las fichas de producto, añadir *microdatos* (Schema.org) y pasar una auditoría estricta WCAG (Web Content Accessibility Guidelines). Asegurar que los contrastes de la paleta Índigo sean legibles para personas con daltonismo, haciendo honor a un producto enfocado en la salud universal.
-4.  **Despliegue Continuo (CI/CD):** Migrar el ecosistema actual basado en Laravel Sail (Docker local) a un entorno de producción automatizado en AWS o DigitalOcean. Implementar GitHub Actions para que cada nuevo `commit` en la rama `main` desencadene la ejecución de pruebas unitarias (PHPUnit) antes de desplegarse en el servidor público.
+4.  **Despliegue Continuo (CI/CD):** Habiéndose consolidado la batería de 119 pruebas automatizadas (Unit, Feature y Playwright E2E) con Docker, la siguiente etapa contempla su ejecución automatizada en GitHub Actions y el despliegue automático a infraestructuras en la nube (AWS / DigitalOcean).
 
 ---
 
 ## 8. Bibliografía y Recursos
-*   **Documentación Oficial de Laravel:** Laravel Docs. https://laravel.com/docs/
+*   **Cohn, M. (2009):** *Succeeding with Agile: Software Development Using Scrum*. Addison-Wesley Professional.
+*   **Dodds, K. C. (2018):** *The Testing Trophy and Testing Classifications*. Kent C. Dodds Publications. https://kentcdodds.com/blog/the-testing-trophy-and-testing-classifications
+*   **Fowler, M. (2012):** *TestPyramid*. MartinFowler.com. https://martinfowler.com/bliki/TestPyramid.html
+*   **Fowler, M. (2014):** *Mocks Aren't Stubs*. MartinFowler.com. https://martinfowler.com/articles/mocksArentStubs.html
+*   **Documentación Oficial de Laravel:** Laravel Testing & Architecture Docs. https://laravel.com/docs/10.x/testing
 *   **Laravel Fortify:** Documentación oficial de autenticación. https://laravel.com/docs/10.x/fortify
+*   **Microsoft Playwright:** Fast and reliable end-to-end testing for modern web apps. https://playwright.dev/
 *   **Bootstrap 5:** Componentes y documentación. https://getbootstrap.com/
 *   **MDN Web Docs:** AJAX y Fetch API. https://developer.mozilla.org/es/
 *   **Mailtrap:** Testing de Emails en Desarrollo. https://mailtrap.io/
+

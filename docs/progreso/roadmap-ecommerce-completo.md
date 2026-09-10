@@ -48,6 +48,8 @@ Este documento define las fases restantes para llevar Reposa+ al nivel de un e-c
 | 31 | **Localización completa de la interfaz (es/en) — ~215 strings** | ✅ |
 | 32 | **Fix checkout flow — cancelar pago preserva carrito** | ✅ |
 | 33 | **Dev Containers — Entorno de desarrollo ligero (.devcontainer/ + docker-compose.dev.yml)** | ✅ |
+| 34 | **Guest Checkout, Paquetería Estándar, Google OAuth 2.0 y Onboarding de Dirección** | ✅ |
+| 35 | **Testing Trophy (119 tests en <12s), Suite Unitaria Pura (0.06s) y Formalización Memoria TFG** | ✅ |
 
 ---
 
