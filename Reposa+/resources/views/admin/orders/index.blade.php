@@ -37,7 +37,7 @@
                 <div class="card-body p-3">
                     <form action="{{ route('admin.orders') }}" method="GET" class="row g-2 align-items-center">
                         {{-- Search Input --}}
-                        <div class="col-md-5">
+                        <div class="col-md-4">
                             <div class="input-group input-group-sm">
                                 <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-search"></i></span>
                                 <input type="text" name="q" class="form-control border-start-0" 
@@ -52,7 +52,7 @@
                         </div>
 
                         {{-- Status Filter Select --}}
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
                                 <option value="">{{ __('messages.admin.orders.filter_all') }}</option>
                                 @foreach(['pending', 'processing', 'shipped', 'delivered', 'completed', 'cancelled', 'refunded'] as $st)
@@ -64,16 +64,50 @@
                             </select>
                         </div>
 
-                        {{-- Action Buttons --}}
+                        {{-- Carrier Filter Select --}}
+                        <div class="col-md-2">
+                            <select name="carrier" class="form-select form-select-sm" onchange="this.form.submit()">
+                                <option value="">Todos los transportistas</option>
+                                <option value="Correos Express" {{ request('carrier') === 'Correos Express' ? 'selected' : '' }}>Correos Express</option>
+                            </select>
+                        </div>
+
+                        {{-- Action Buttons & Date Range Toggle --}}
                         <div class="col-md-3 d-flex gap-2 justify-content-md-end">
                             <button type="submit" class="btn btn-sm btn-primary flex-grow-1 flex-md-grow-0">
                                 <i class="bi bi-funnel me-1"></i> Filtrar
                             </button>
-                            @if(request('status') || request('q'))
+                            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#dateFilterCollapse" aria-expanded="{{ request('date_from') || request('date_to') ? 'true' : 'false' }}" title="Rango de fechas">
+                                <i class="bi bi-calendar3"></i>
+                            </button>
+                            @if(request('status') || request('q') || request('carrier') || request('date_from') || request('date_to'))
                                 <a href="{{ route('admin.orders') }}" class="btn btn-sm btn-outline-secondary" title="{{ __('messages.catalog.clear_filters') }}">
                                     <i class="bi bi-x-circle"></i>
                                 </a>
                             @endif
+                        </div>
+
+                        {{-- Collapsible Date Filters --}}
+                        <div class="col-12 collapse {{ request('date_from') || request('date_to') ? 'show' : '' }} mt-2 pt-2 border-top" id="dateFilterCollapse">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-sm-5">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-light text-muted">Desde</span>
+                                        <input type="date" name="date_from" class="form-control" value="{{ request('date_from') }}">
+                                    </div>
+                                </div>
+                                <div class="col-sm-5">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-light text-muted">Hasta</span>
+                                        <input type="date" name="date_to" class="form-control" value="{{ request('date_to') }}">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2 text-end">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary w-100">
+                                        Aplicar fechas
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -149,7 +183,7 @@
                                                 @method('PATCH')
                                                 <select name="status" class="form-select form-select-sm py-1 px-2 border-0 bg-light fw-semibold" 
                                                         style="font-size: 0.75rem; border-radius: 6px;" 
-                                                        onchange="this.form.submit()"
+                                                        onchange="if(confirm('¿Confirmar cambio de estado de pedido a ' + this.options[this.selectedIndex].text.replace(/[→\s]+/g, ' ').trim() + '?')) { this.form.submit(); } else { this.value = '{{ $order->status }}'; }"
                                                         aria-label="Cambiar estado del pedido #{{ $order->id }}">
                                                     <option value="{{ $order->status }}" disabled selected>
                                                         {{ \App\Models\Order::getStatusLabel($order->status) }}
@@ -184,13 +218,13 @@
                                                     @if($order->shipment->status !== \App\Models\Shipment::STATUS_DELIVERED)
                                                         <form action="{{ route('admin.shipments.advance', $order->shipment) }}" method="POST" class="d-inline">
                                                             @csrf
-                                                            <button type="submit" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.68rem;" title="{{ __('messages.admin.orders.advance_status') }}">
+                                                            <button type="submit" class="btn btn-sm btn-outline-primary py-0 px-2 fw-semibold" style="font-size: 0.68rem;" title="{{ __('messages.admin.orders.advance_status') }}">
                                                                 <i class="bi bi-fast-forward-fill me-1"></i>Avanzar
                                                             </button>
                                                         </form>
                                                     @endif
-                                                    <a href="{{ route('admin.shipments.label', $order->shipment) }}" target="_blank" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 0.68rem;" title="{{ __('messages.admin.orders.view_label') }}">
-                                                        <i class="bi bi-tag-fill me-1"></i>Etiqueta
+                                                    <a href="{{ route('admin.shipments.label', $order->shipment) }}" target="_blank" class="btn btn-sm btn-outline-dark bg-white shadow-2xs py-0 px-2 fw-semibold d-inline-flex align-items-center" style="font-size: 0.68rem;" title="Imprimir albarán térmico A6 (10x15cm) con código Code 128">
+                                                        <i class="bi bi-printer-fill text-primary me-1"></i>Etiqueta A6
                                                     </a>
                                                 </div>
                                             </div>

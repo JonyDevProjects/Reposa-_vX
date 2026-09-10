@@ -171,14 +171,41 @@
                 {{-- Bloque 2: Opciones de Envío / Paquetería --}}
                 <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4">
                     <div class="card-body p-4">
-                        <h2 class="h6 fw-bold text-navy mb-3 d-flex align-items-center gap-2">
-                            <i class="bi bi-truck text-primary"></i>
-                            <span>{{ __('messages.checkout.shipping_method') }}</span>
-                        </h2>
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                            <h2 class="h6 fw-bold text-navy mb-0 d-flex align-items-center gap-2">
+                                <i class="bi bi-truck text-primary"></i>
+                                <span>{{ __('messages.checkout.shipping_method') }}</span>
+                            </h2>
+                            @if($total >= 50.00)
+                                <span class="badge bg-success-subtle text-success border border-success-subtle fw-semibold px-2 py-1 small">
+                                    <i class="bi bi-gift-fill me-1"></i>¡Envío gratuito disponible!
+                                </span>
+                            @endif
+                        </div>
+
+                        @if($total >= 50.00)
+                            <div class="alert alert-success d-flex align-items-center gap-3 py-2 px-3 rounded-3 border-0 bg-success-subtle text-success mb-3 small">
+                                <i class="bi bi-stars fs-4 flex-shrink-0 text-success"></i>
+                                <div>
+                                    <div class="fw-bold">¡Enhorabuena! Has superado el umbral de 50,00€.</div>
+                                    <div class="text-success-emphasis" style="font-size: 0.8rem;">Disfrutas de Envío Estándar Correos Express <strong>100% gratuito</strong> en esta compra.</div>
+                                </div>
+                            </div>
+                        @else
+                            @php $remainingForFree = 50.00 - $total; @endphp
+                            <div class="p-2 px-3 rounded-3 bg-light border mb-3 d-flex align-items-center justify-content-between flex-wrap gap-2 small text-muted">
+                                <span><i class="bi bi-info-circle text-primary me-1"></i>Añade <strong>{{ number_format($remainingForFree, 2) }}€</strong> más para conseguir <strong>Envío Estándar Gratuito</strong>.</span>
+                                <a href="{{ route('catalog.index') }}" class="text-primary fw-semibold text-decoration-none">
+                                    Añadir productos <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        @endif
 
                         <div class="d-flex flex-column gap-3">
                             @foreach($shippingRates as $rate)
-                                <div class="p-3 rounded-3 border bg-light d-flex align-items-center justify-content-between gap-3">
+                                @php $isFree = ($rate['cost'] == 0); @endphp
+                                <div class="p-3 rounded-3 border {{ $isFree ? 'border-success border-2 bg-success-subtle bg-opacity-25 shadow-2xs' : 'bg-light border-light-subtle' }} d-flex align-items-center justify-content-between gap-3 shipping-rate-card transition-all"
+                                     style="{{ $isFree ? 'border-color: rgba(5, 150, 105, 0.45) !important;' : '' }}">
                                     <div class="form-check flex-grow-1">
                                         <input class="form-check-input mt-1" type="radio" 
                                                name="shipping_service_type" 
@@ -187,18 +214,23 @@
                                                data-cost="{{ $rate['cost'] }}"
                                                {{ $loop->first ? 'checked' : '' }}
                                                onchange="updateShippingTotal({{ $rate['cost'] }})">
-                                        <label class="form-check-label w-100" for="ship_{{ $rate['id'] }}">
-                                            <div class="d-flex align-items-center justify-content-between">
-                                                <div>
+                                        <label class="form-check-label w-100 cursor-pointer" for="ship_{{ $rate['id'] }}">
+                                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                                <div class="d-flex align-items-center flex-wrap gap-2">
                                                     <strong class="text-navy">{{ $rate['name'] }}</strong>
-                                                    <span class="badge bg-light text-secondary border ms-1 small">{{ $rate['carrier'] }}</span>
+                                                    <span class="badge bg-white text-secondary border small">{{ $rate['carrier'] }}</span>
+                                                    @if($isFree)
+                                                        <span class="badge bg-success text-white fw-bold small shadow-2xs">
+                                                            <i class="bi bi-check-circle-fill me-1"></i>¡ENVÍO GRATUITO!
+                                                        </span>
+                                                    @endif
                                                 </div>
-                                                <span class="badge {{ $rate['cost'] == 0 ? 'bg-success text-white' : 'bg-primary-subtle text-primary border' }} fw-bold tabular-nums">
-                                                    {{ $rate['cost'] == 0 ? 'Gratis' : number_format($rate['cost'], 2) . '€' }}
+                                                <span class="badge {{ $isFree ? 'bg-success text-white px-3 py-1 fs-6' : 'bg-primary-subtle text-primary border' }} fw-bold tabular-nums">
+                                                    {{ $isFree ? '0,00€ (Gratis)' : number_format($rate['cost'], 2) . '€' }}
                                                 </span>
                                             </div>
                                             <div class="text-muted small mt-1">{{ $rate['description'] }}</div>
-                                            <div class="small text-primary fw-semibold mt-1">
+                                            <div class="small {{ $isFree ? 'text-success fw-semibold' : 'text-primary fw-semibold' }} mt-1">
                                                 <i class="bi bi-clock-history me-1"></i>{{ $rate['estimated_days'] }}
                                             </div>
                                         </label>
@@ -379,5 +411,24 @@
             if (btnIcon) btnIcon.className = 'bi bi-shield-lock-fill me-2';
         }
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkoutForm = document.getElementById('checkout-form');
+        const submitBtn = document.getElementById('btn-submit-order');
+        if (checkoutForm && submitBtn) {
+            checkoutForm.addEventListener('submit', function (e) {
+                if (!checkoutForm.checkValidity()) {
+                    return;
+                }
+                const isStripe = document.getElementById('payment_stripe')?.checked;
+                setTimeout(function () {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = isStripe
+                        ? '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Redirigiendo a pasarela segura...'
+                        : '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Procesando pedido seguro...';
+                }, 10);
+            });
+        }
+    });
 </script>
 @endsection

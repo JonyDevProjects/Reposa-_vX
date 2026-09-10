@@ -160,6 +160,7 @@ export function initCartInteractions() {
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>' + originalContent;
         }
 
+        let wasSuccessful = false;
         fetch(form.action, {
             method: 'POST',
             body: new FormData(form),
@@ -176,6 +177,18 @@ export function initCartInteractions() {
         })
         .then(data => {
             if (data.success) {
+                wasSuccessful = true;
+                // Microinteracción táctil de confirmación en el propio botón
+                if (isRoundBtn) {
+                    btn.classList.add('bg-success', 'border-success', 'text-white', 'is-success-pulse');
+                    btn.classList.remove('btn-outline-primary');
+                    btn.innerHTML = '<i class="bi bi-check-lg fs-6"></i>';
+                } else {
+                    btn.classList.add('btn-success', 'is-success-pulse');
+                    btn.classList.remove('btn-primary');
+                    btn.innerHTML = '<i class="bi bi-check2-circle me-2"></i>¡Añadido!';
+                }
+
                 // Update badges (Desktop & Mobile) with elastic spring bump
                 const badges = document.querySelectorAll('#cart-badge, #mobile-cart-badge, .js-cart-badge');
                 badges.forEach(badge => {
@@ -203,8 +216,18 @@ export function initCartInteractions() {
             });
         })
         .finally(() => {
-            btn.innerHTML = originalContent;
-            btn.disabled = false;
+            const delay = wasSuccessful ? 850 : 0;
+            setTimeout(() => {
+                if (isRoundBtn) {
+                    btn.classList.remove('bg-success', 'border-success', 'text-white', 'is-success-pulse');
+                    btn.classList.add('btn-outline-primary');
+                } else {
+                    btn.classList.remove('btn-success', 'is-success-pulse');
+                    btn.classList.add('btn-primary');
+                }
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            }, delay);
         });
     });
 }
