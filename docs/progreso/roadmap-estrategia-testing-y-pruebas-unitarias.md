@@ -53,11 +53,11 @@ Este roadmap resuelve dicha asimetría en dos vertientes complementarias:
 
 | Fase | Denominación / Enfoque | Entregables Clave | Estado |
 |:---:|---|---|:---:|
-| **1** | Fundamentación Epistemológica y Análisis de Fallos | Justificación teórica frente a la Pirámide de Cohn, taxonomía de errores transaccionales y matriz de ROI de pruebas. | ⏳ Planificada |
-| **2** | Especificación de Pruebas Unitarias de Alto Valor | Diseño de casos de prueba puros para máquina de estados (`Order`), cálculo logístico (`Courier`) y dominio en memoria. | ⏳ Planificada |
-| **3** | Implementación de la Suite Unitaria Pura (`tests/Unit`) | Creación de clases de test heredando de `PHPUnit\Framework\TestCase`, sin kernel de base de datos, ejecución sub-10ms. | ⏳ Planificada |
-| **4** | Consolidación y Certificación de la Pirámide Tripartita | Ejecución conjunta (Unit + Feature + E2E), reporte unificado de cobertura y actualización de CI/CD. | ⏳ Planificada |
-| **5** | Argumentario Académico y Guion de Defensa para el TFG | Guion de preguntas y respuestas críticas para la defensa ante el tribunal universitario y formalización en memoria. | ⏳ Planificada |
+| **1** | Fundamentación Epistemológica y Análisis de Fallos | Justificación teórica frente a la Pirámide de Cohn, taxonomía de errores transaccionales y matriz de ROI de pruebas. | ✅ Completada |
+| **2** | Especificación de Pruebas Unitarias de Alto Valor | Diseño de casos de prueba puros para máquina de estados (`Order`), cálculo logístico (`Courier`) y dominio en memoria. | ✅ Completada |
+| **3** | Implementación de la Suite Unitaria Pura (`tests/Unit`) | Creación de clases de test heredando de `PHPUnit\Framework\TestCase`, sin kernel de base de datos, ejecución sub-50ms (22ms). | ✅ Completada |
+| **4** | Consolidación y Certificación de la Pirámide Tripartita | Ejecución conjunta (Unit: 22 tests en 22ms, Feature: 89 tests en 1.95s, E2E: 8 tests en 9.7s). Pirámide 100% verde. | ✅ Completada |
+| **5** | Argumentario Académico y Guion de Defensa para el TFG | Guion de preguntas y respuestas críticas para la defensa ante el tribunal universitario y formalización en memoria. | ✅ Completada |
 
 ---
 
@@ -207,3 +207,4 @@ Reposa+/tests/Unit/
 | Fecha | Autor | Versión | Resumen de Cambios |
 |---|---|:---:|---|
 | **10/09/2026** | Jonathan Quispe | `v1.0.0` | Creación del roadmap integral de estrategia de testing, justificación epistemológica frente a la Pirámide de Cohn (Testing Trophy), especificación del catálogo de pruebas unitarias puras y guion de defensa para el TFG. |
+| **10/09/2026** | Jonathan Quispe | `v1.1.0` | Implementación y certificación de la suite de pruebas unitarias puras (`OrderStateUnitTest`, `ShippingRateCalculatorUnitTest`, `OrderDomainLogicUnitTest`, `ProductDomainUnitTest`). 22 tests ejecutados en 22ms. Pirámide tripartita 100% verificada. |

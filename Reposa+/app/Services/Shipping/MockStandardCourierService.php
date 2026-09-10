@@ -254,7 +254,7 @@ class MockStandardCourierService implements ShippingServiceInterface
      * Genera un número de seguimiento realista compatible con estándares de paquetería en España.
      * Ejemplo: RPX2026849201ES
      */
-    protected function generateTrackingNumber(): string
+    public function generateTrackingNumber(): string
     {
         $prefix = 'RPX' . date('Y');
         $random = str_pad((string) mt_rand(100000, 999999), 6, '0', STR_PAD_LEFT);
@@ -301,7 +301,7 @@ class MockStandardCourierService implements ShippingServiceInterface
     /**
      * Calcula una fecha sumando únicamente días hábiles (lunes a viernes).
      */
-    protected function calculateBusinessDays(Carbon $startDate, int $days): Carbon
+    public function calculateBusinessDays(Carbon $startDate, int $days): Carbon
     {
         $date = $startDate->copy();
         while ($days > 0) {

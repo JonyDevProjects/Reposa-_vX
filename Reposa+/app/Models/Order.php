@@ -37,12 +37,28 @@ class Order extends Model
 
     public function getCustomerNameAttribute(): string
     {
-        return $this->shipping_name ?: ($this->user?->name ?? 'Cliente Reposa+');
+        if (! empty($this->shipping_name)) {
+            return $this->shipping_name;
+        }
+
+        if ($this->relationLoaded('user') || ! empty($this->user_id)) {
+            return $this->user?->name ?? 'Cliente Reposa+';
+        }
+
+        return 'Cliente Reposa+';
     }
 
     public function getCustomerEmailAttribute(): string
     {
-        return $this->shipping_email ?: ($this->user?->email ?? '');
+        if (! empty($this->shipping_email)) {
+            return $this->shipping_email;
+        }
+
+        if ($this->relationLoaded('user') || ! empty($this->user_id)) {
+            return $this->user?->email ?? '';
+        }
+
+        return '';
     }
 
     const STATUS_PENDING = 'pending';
