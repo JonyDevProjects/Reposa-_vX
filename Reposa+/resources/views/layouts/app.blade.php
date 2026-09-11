@@ -39,14 +39,12 @@
                         <a class="nav-link" href="/catalog">{{ __('messages.nav.catalog') }}</a>
                     </li>
                 </ul>
-                @if(!request()->routeIs('catalog'))
-                    <form action="/catalog" method="GET" class="d-none d-lg-flex me-3" style="max-width: 300px; width: 100%;">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
-                            <input type="text" name="q" class="form-control border-start-0" placeholder="{{ __('messages.layout.search_placeholder') }}" value="{{ request('q') }}" aria-label="{{ __('messages.layout.search_placeholder') }}">
-                        </div>
-                    </form>
-                @endif
+                <form action="/catalog" method="GET" class="d-flex my-2 my-lg-0 me-lg-3" style="max-width: 300px; width: 100%;">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="q" class="form-control border-start-0" placeholder="{{ __('messages.layout.search_placeholder') }}" value="{{ request('q') }}" aria-label="{{ __('messages.layout.search_placeholder') }}">
+                    </div>
+                </form>
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-inline-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">

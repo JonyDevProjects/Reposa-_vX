@@ -45,9 +45,6 @@
                 actionUrl="/catalog"
                 :actionText="__('messages.cart.empty_btn_catalog')"
                 actionIcon="bi-arrow-right"
-                secondaryUrl="/#sleep-finder"
-                :secondaryText="__('messages.cart.empty_btn_advisor')"
-                secondaryIcon="bi-stars"
             />
         </div>
     @else

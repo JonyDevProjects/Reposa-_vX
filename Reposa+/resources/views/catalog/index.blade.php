@@ -43,48 +43,10 @@
     </div>
 
     <div class="container pb-5">
-        {{-- 1. Prominent Search Toolbar & Fast Category Chips (1-Click) --}}
+        {{-- 1. Fast Category Chips (1-Click) & Advanced Filter Controls --}}
         <div class="card border-0 shadow-sm rounded-4 p-3 p-md-4 mb-4 bg-white catalog-hub-card">
-            {{-- Search Bar --}}
-            <form action="/catalog" method="GET" class="mb-3" id="catalog-search-form">
-                {{-- Preserve current filters & sorting --}}
-                @if(request('category'))<input type="hidden" name="category" value="{{ request('category') }}">@endif
-                @if(request('material'))<input type="hidden" name="material" value="{{ request('material') }}">@endif
-                @if(request('firmness'))<input type="hidden" name="firmness" value="{{ request('firmness') }}">@endif
-                @if(request('min_price'))<input type="hidden" name="min_price" value="{{ request('min_price') }}">@endif
-                @if(request('max_price'))<input type="hidden" name="max_price" value="{{ request('max_price') }}">@endif
-                @if(request('sort'))<input type="hidden" name="sort" value="{{ request('sort') }}">@endif
-
-                <div class="catalog-search-wrapper position-relative">
-                    <div class="input-group rounded-pill border bg-white overflow-hidden shadow-xs focus-within-shadow">
-                        <span class="input-group-text bg-transparent border-0 ps-3 ps-md-4 text-primary pe-2">
-                            <i class="bi bi-search fs-5"></i>
-                        </span>
-                        <input type="text" 
-                               name="q" 
-                               id="catalog-search-input" 
-                               class="form-control bg-transparent border-0 py-3 ps-1 pe-3 text-navy" 
-                               placeholder="{{ __('messages.catalog.search_smart_placeholder') }}" 
-                               value="{{ request('q') }}"
-                               aria-label="{{ __('messages.catalog.search') }}">
-                        @if(request('q'))
-                            <a href="{{ request()->fullUrlWithQuery(['q' => null, 'page' => null]) }}" 
-                               class="btn btn-link text-muted pe-3 d-flex align-items-center text-decoration-none" 
-                               title="{{ __('messages.catalog.clear_search') }}"
-                               aria-label="{{ __('messages.catalog.clear_search') }}">
-                                <i class="bi bi-x-circle-fill fs-5 text-secondary"></i>
-                            </a>
-                        @endif
-                        <button type="submit" class="btn btn-primary px-4 px-md-5 fw-semibold rounded-pill m-1 text-nowrap">
-                            <i class="bi bi-search me-1 d-sm-none"></i>
-                            <span class="d-none d-sm-inline">{{ __('messages.catalog.search') }}</span>
-                        </button>
-                    </div>
-                </div>
-            </form>
-
-            {{-- 2. Horizontal Category Chips (Category Chips in 1 Click) --}}
-            <div class="d-flex align-items-center gap-2 pt-1">
+            {{-- Horizontal Category Chips (Category Chips in 1 Click) --}}
+            <div class="d-flex align-items-center gap-2">
                 <span class="text-muted small fw-semibold d-none d-lg-inline text-nowrap me-1">
                     <i class="bi bi-tags me-1"></i>{{ __('messages.catalog.category') }}:
                 </span>
@@ -256,10 +218,7 @@
             </div>
         </div>
 
-        {{-- 4. Signature Feature: Interactive Anatomical Firmness Guide (Collapsed by Default) --}}
-        @include('catalog.partials.firmness-guide')
-
-        {{-- 5. Products Grid (Full-width 12-column Scaffolding) --}}
+        {{-- 2. Products Grid (Full-width 12-column Scaffolding) --}}
         @if($products->isEmpty())
             <div class="card shadow-sm border-0 rounded-4 overflow-hidden p-3 p-md-4 mt-2">
                 <x-empty-state 
@@ -269,16 +228,13 @@
                     actionUrl="/catalog"
                     :actionText="__('messages.catalog.empty.btn_reset')"
                     actionIcon="bi-arrow-repeat"
-                    secondaryUrl="#firmness-guide-section"
-                    :secondaryText="__('messages.catalog.empty.btn_advisor')"
-                    secondaryIcon="bi-stars"
                 >
-                    <!-- Search Tips & Fast Category Discovery -->
+                    <!-- Search Tips -->
                     <div class="mt-4 pt-4 border-top text-start" style="max-width: 580px; margin: 0 auto;">
                         <h4 class="h6 fw-bold text-navy mb-3">
                             <i class="bi bi-lightbulb text-warning me-2"></i>{{ __('messages.catalog.empty.tips_title') }}
                         </h4>
-                        <ul class="list-unstyled text-muted small mb-4">
+                        <ul class="list-unstyled text-muted small mb-0">
                             <li class="mb-2 d-flex align-items-start gap-2">
                                 <i class="bi bi-check2 text-primary mt-1"></i>
                                 <span>{{ __('messages.catalog.empty.tip_1') }}</span>
@@ -288,22 +244,6 @@
                                 <span>{{ __('messages.catalog.empty.tip_2') }}</span>
                             </li>
                         </ul>
-
-                        <!-- Direct Sleep Finder Banner Callout -->
-                        <div class="p-3 rounded-3 bg-indigo-subtle border border-primary-subtle d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
-                            <div>
-                                <span class="fw-bold text-navy d-block small">{{ __('messages.catalog.empty.advisor_banner_title') }}</span>
-                                <span class="text-muted" style="font-size: 0.78rem;">{{ __('messages.catalog.empty.advisor_banner_desc') }}</span>
-                            </div>
-                            <button type="button" 
-                                    class="btn btn-primary btn-sm rounded-pill px-3 flex-shrink-0 text-decoration-none"
-                                    data-bs-toggle="collapse" 
-                                    data-bs-target="#advisorContentCollapse" 
-                                    aria-expanded="true" 
-                                    onclick="const el = document.getElementById('firmness-guide-section'); if (el) el.scrollIntoView({ behavior: 'smooth' });">
-                                <i class="bi bi-stars me-1"></i>{{ __('messages.catalog.empty.btn_advisor') }}
-                            </button>
-                        </div>
                     </div>
                 </x-empty-state>
             </div>
