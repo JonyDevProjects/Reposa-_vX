@@ -335,10 +335,6 @@ class AdminController extends Controller
             return back()->with('error', __('messages.admin.refund_only_completed'));
         }
 
-        if (! $order->payment_intent_id) {
-            return back()->with('error', __('messages.admin.refund_no_stripe'));
-        }
-
         if ($order->refunds()->where('status', 'succeeded')->exists()) {
             return back()->with('error', __('messages.admin.refund_already_done'));
         }
@@ -351,21 +347,27 @@ class AdminController extends Controller
             $stripeRefundId = null;
             $refundStatus = 'succeeded';
 
-            try {
-                $stripeRefund = Cashier::stripe()->refunds->create([
-                    'payment_intent' => $order->payment_intent_id,
-                ]);
-                $stripeRefundId = $stripeRefund->id;
-                $refundStatus = $stripeRefund->status;
-            } catch (InvalidRequestException $e) {
-                // En pruebas locales o si el payment_intent no existe físicamente en los servidores de Stripe (ej: seeds de pruebas)
-                if (str_starts_with(config('cashier.secret', ''), 'sk_test_') && str_contains($e->getMessage(), 'No such payment_intent')) {
-                    Log::warning("Simulando reembolso Stripe para pedido de prueba {$order->id} (PI: {$order->payment_intent_id}): {$e->getMessage()}");
-                    $stripeRefundId = 're_simulated_'.substr(md5($order->id.time()), 0, 16);
-                    $refundStatus = 'succeeded';
-                } else {
-                    throw $e;
+            if ($order->payment_intent_id) {
+                try {
+                    $stripeRefund = Cashier::stripe()->refunds->create([
+                        'payment_intent' => $order->payment_intent_id,
+                    ]);
+                    $stripeRefundId = $stripeRefund->id;
+                    $refundStatus = $stripeRefund->status;
+                } catch (InvalidRequestException $e) {
+                    // En pruebas locales o si el payment_intent no existe físicamente en los servidores de Stripe (ej: seeds de pruebas)
+                    if (str_starts_with(config('cashier.secret', ''), 'sk_test_') && str_contains($e->getMessage(), 'No such payment_intent')) {
+                        Log::warning("Simulando reembolso Stripe para pedido de prueba {$order->id} (PI: {$order->payment_intent_id}): {$e->getMessage()}");
+                        $stripeRefundId = 're_simulated_'.substr(md5($order->id.time()), 0, 16);
+                        $refundStatus = 'succeeded';
+                    } else {
+                        throw $e;
+                    }
                 }
+            } else {
+                // Pedido con pago directo: registro contable de reembolso administrativo
+                $stripeRefundId = 'direct_refund_'.substr(md5($order->id.time()), 0, 16);
+                $refundStatus = 'succeeded';
             }
 
             $refund = Refund::create([

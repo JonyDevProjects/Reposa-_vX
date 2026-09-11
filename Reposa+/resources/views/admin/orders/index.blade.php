@@ -268,7 +268,7 @@
                                                 </a>
                                             @endif
 
-                                            @if(in_array($order->status, ['completed', 'delivered']) && $order->payment_intent_id && !$order->refunds()->where('status', 'succeeded')->exists())
+                                            @if(in_array($order->status, ['completed', 'delivered']) && !$order->refunds()->where('status', 'succeeded')->exists())
                                                 <button class="btn btn-sm btn-outline-danger py-0 px-2 fw-semibold d-inline-flex align-items-center shadow-2xs" type="button"
                                                         data-bs-toggle="modal" data-bs-target="#refundModal{{ $order->id }}"
                                                         title="{{ __('messages.admin.orders.refund') }}"
@@ -285,7 +285,7 @@
                                         </div>
 
                                         {{-- Refund Modal --}}
-                                        @if(in_array($order->status, ['completed', 'delivered']) && $order->payment_intent_id && !$order->refunds()->where('status', 'succeeded')->exists())
+                                        @if(in_array($order->status, ['completed', 'delivered']) && !$order->refunds()->where('status', 'succeeded')->exists())
                                             <div class="modal fade" id="refundModal{{ $order->id }}" tabindex="-1" aria-labelledby="refundModalLabel{{ $order->id }}" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered text-start">
                                                     <div class="modal-content border-0 shadow">
@@ -302,7 +302,17 @@
                                                                     {{ __('messages.admin.orders.refund_desc') }} 
                                                                     <strong class="text-danger">{{ number_format($order->total_amount, 2) }}€</strong> 
                                                                     {{ __('messages.admin.orders.refund_to_client') }} 
-                                                                    <strong>{{ $order->customer_name }}</strong>.
+                                                                    <strong>{{ $order->customer_name }}</strong>
+                                                                    @if($order->payment_intent_id)
+                                                                        <span class="badge bg-primary-subtle text-primary border ms-1" style="font-size: 0.65rem;">
+                                                                            <i class="bi bi-credit-card-2-front me-1"></i>Stripe
+                                                                        </span>
+                                                                    @else
+                                                                        <span class="badge bg-light text-muted border ms-1" style="font-size: 0.65rem;">
+                                                                            <i class="bi bi-cash-stack me-1"></i>Directo
+                                                                        </span>
+                                                                    @endif
+                                                                    .
                                                                 </p>
                                                                 <p class="text-muted small mb-3">
                                                                     <i class="bi bi-info-circle me-1"></i>{{ __('messages.admin.orders.stock_restore') }}

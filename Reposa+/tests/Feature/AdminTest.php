@@ -129,15 +129,39 @@ class AdminTest extends TestCase
         $response->assertSessionHas('error');
     }
 
-    public function test_cannot_refund_order_without_payment_intent(): void
+    public function test_admin_can_refund_direct_order_without_payment_intent(): void
     {
+        Mail::fake();
+
+        $product = Product::factory()->create(['stock' => 5]);
         $order = Order::factory()->completed()->create([
             'payment_intent_id' => null,
+            'stripe_session_id' => null,
+            'total_amount' => 50.00,
+        ]);
+        OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'product_id' => $product->id,
+            'quantity' => 2,
+            'price_at_purchase' => 25.00,
         ]);
 
-        $response = $this->actingAs($this->admin)->post("/admin/orders/{$order->id}/refund");
+        $product->decrement('stock', 2);
+        $this->assertEquals(3, $product->fresh()->stock);
 
-        $response->assertSessionHas('error');
+        $response = $this->actingAs($this->admin)->post("/admin/orders/{$order->id}/refund", [
+            'reason' => 'Devolución directa en efectivo',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+        $this->assertEquals(Order::STATUS_REFUNDED, $order->fresh()->status);
+        $this->assertEquals(5, $product->fresh()->stock);
+        $this->assertDatabaseHas('refunds', [
+            'order_id' => $order->id,
+            'amount' => 50.00,
+            'status' => 'succeeded',
+        ]);
     }
 
     public function test_admin_can_refund_completed_order_via_refund_endpoint(): void
