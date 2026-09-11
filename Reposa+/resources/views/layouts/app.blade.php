@@ -33,9 +33,6 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/">{{ __('messages.nav.home') }}</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="/catalog">{{ __('messages.nav.catalog') }}</a>
                     </li>
                 </ul>
