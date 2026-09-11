@@ -847,14 +847,18 @@ class CartController extends Controller
 
     public function downloadInvoice(Order $order)
     {
-        if ($order->user_id) {
-            if (! auth()->check() || $order->user_id !== auth()->id()) {
-                abort(403);
-            }
-        } else {
-            $token = request('token') ?? session('guest_order_token');
-            if (! $token || $order->guest_token !== $token) {
-                abort(403);
+        $isAdmin = auth()->check() && auth()->user()->isAdmin();
+
+        if (! $isAdmin) {
+            if ($order->user_id) {
+                if (! auth()->check() || $order->user_id !== auth()->id()) {
+                    abort(403);
+                }
+            } else {
+                $token = request('token') ?? session('guest_order_token');
+                if (! $token || $order->guest_token !== $token) {
+                    abort(403);
+                }
             }
         }
 

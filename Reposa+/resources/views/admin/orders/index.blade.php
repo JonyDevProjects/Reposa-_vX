@@ -163,9 +163,20 @@
                                         </div>
                                     </td>
 
-                                    {{-- Total --}}
-                                    <td class="text-end fw-bold tabular-nums text-navy text-nowrap">
-                                        {{ number_format($order->total_amount, 2) }}€
+                                    {{-- Total & Método de Pago --}}
+                                    <td class="text-end tabular-nums text-nowrap">
+                                        <div class="fw-bold text-navy">{{ number_format($order->total_amount, 2) }}€</div>
+                                        <div style="font-size: 0.65rem;">
+                                            @if($order->payment_intent_id || $order->stripe_session_id)
+                                                <span class="badge bg-primary-subtle text-primary border" style="font-size: 0.6rem; padding: 1px 4px;">
+                                                    <i class="bi bi-credit-card-2-front me-1"></i>Stripe
+                                                </span>
+                                            @else
+                                                <span class="badge bg-light text-muted border" style="font-size: 0.6rem; padding: 1px 4px;">
+                                                    <i class="bi bi-cash-stack me-1"></i>Directo
+                                                </span>
+                                            @endif
+                                        </div>
                                     </td>
 
                                     {{-- Date --}}
@@ -243,21 +254,26 @@
 
                                     {{-- Actions --}}
                                     <td class="text-end text-nowrap">
-                                        <div class="btn-group btn-group-sm">
+                                        <div class="d-inline-flex gap-1 align-items-center">
+                                            @if($order->status !== \App\Models\Order::STATUS_CANCELLED)
+                                                <a href="{{ route('orders.invoice', $order) }}" target="_blank" class="btn btn-sm btn-outline-secondary py-0 px-2 fw-semibold d-inline-flex align-items-center shadow-2xs bg-white" style="font-size: 0.68rem;" title="{{ __('messages.orders.download_invoice') }}">
+                                                    <i class="bi bi-file-earmark-pdf-fill text-danger me-1"></i>PDF
+                                                </a>
+                                            @endif
+
                                             @if(in_array($order->status, ['completed', 'delivered']) && $order->payment_intent_id && !$order->refunds()->where('status', 'succeeded')->exists())
-                                                <button class="btn btn-sm btn-outline-danger py-0 px-2" type="button"
+                                                <button class="btn btn-sm btn-outline-danger py-0 px-2 fw-semibold d-inline-flex align-items-center shadow-2xs" type="button"
                                                         data-bs-toggle="modal" data-bs-target="#refundModal{{ $order->id }}"
                                                         title="{{ __('messages.admin.orders.refund') }}"
-                                                        aria-label="{{ __('messages.admin.orders.refund') }}">
-                                                    <i class="bi bi-arrow-counterclockwise"></i>
-                                                    <span class="d-none d-xl-inline ms-1">{{ __('messages.admin.orders.refund') }}</span>
+                                                        aria-label="{{ __('messages.admin.orders.refund') }}"
+                                                        style="font-size: 0.68rem;">
+                                                    <i class="bi bi-arrow-counterclockwise me-1"></i>
+                                                    <span>{{ __('messages.admin.orders.refund') }}</span>
                                                 </button>
                                             @elseif($order->status === 'refunded')
-                                                <span class="badge admin-badge admin-badge-refunded py-1 px-2">
+                                                <span class="badge admin-badge admin-badge-refunded py-1 px-2" style="font-size: 0.68rem;">
                                                     {{ __('messages.admin.orders.refunded') }}
                                                 </span>
-                                            @else
-                                                <span class="text-muted small px-2">&mdash;</span>
                                             @endif
                                         </div>
 
