@@ -49,7 +49,7 @@ main ───────────────────────┴─
 | **2** | **Automatización CI/CD en GitHub Actions** | Creación y ajuste de `.github/workflows/ci.yml` ejecutando secuencialmente Pint, Unit tests, Feature tests (MySQL+Redis), Vite build y Playwright E2E. | ✅ Completada |
 | **3** | **Consolidación del Hito Base v1.0.0 (Core Transaccional)** | Etiquetado semántico oficial `v1.0.0` certificando el backend transaccional y la pirámide de 119 pruebas automatizadas. | ✅ Completada |
 | **4.1** | **Estabilización Operativa Back-Office (Propuesta 1)** | Desviaciones D1 a D5 resueltas: logística bidireccional, comando `orders:reset-test-matrix`, PDF admin, fix error 500 Stripe y reembolsos directos (125 tests). | ✅ Completada |
-| **4.2** | **Rediseño del Catálogo Storefront (Propuesta 1)** | Divulgación progresiva: Asesor Anatómico colapsado bajo demanda, píldoras de categoría, búsqueda tolerante/semántica y filtros despejados. | ⏳ Planificada (Próxima) |
+| **4.2** | **Rediseño del Catálogo Storefront (Propuesta 1)** | Divulgación progresiva: Asesor Anatómico colapsado bajo demanda, píldoras de categoría, búsqueda tolerante/semántica y filtros despejados. | ✅ Completada |
 | **5** | **Promoción de Release Final v1.1.0 a `main` (GitFlow)** | Fusión `--no-ff` a `main`, etiquetado oficial `v1.1.0-tfg-final` y back-merge hacia `develop`. | ⏳ Planificada |
 | **6** | **Preparación del Material de Soporte para la Defensa del TFG** | Confección de `docs/defensa-tfg/` con guion temporalizado (15 min), catálogo de diapositivas y argumentario defensivo. | ⏳ Planificada |
 
@@ -152,37 +152,30 @@ Durante la ejecución de las pruebas manuales e interactivas de la versión `rel
 
 ---
 
-### 4.2 Plan para la Iteración 4.2: Simplificación Cognitiva del Catálogo Storefront y Búsqueda Ágil (En Planificación)
+### 4.2 Trazabilidad de la Iteración 4.2: Simplificación Cognitiva del Catálogo Storefront y Búsqueda Ágil (Completada)
 
 #### A. Diagnóstico de Fricción Heurística en la Vista del Catálogo (`/catalog`)
-Actualmente, la vista [`catalog/index.blade.php`](file:///Users/jonathanquishpe/JoniDev/Reposa+_TFG/Reposa+/resources/views/catalog/index.blade.php) presenta un nivel excesivo de **sobrecarga cognitiva** y fatiga de decisión para el usuario:
-1. **Pérdida de foco del producto (*Above the Fold*):** El "Selector Anatómico / Asesor de Firmeza" (`firmness-guide.blade.php`, 350+ líneas) se carga expandido por defecto (`collapse show`), acaparando prácticamente todo el primer viewport útil y obligando al comprador a hacer scroll para ver la primera almohada.
-2. **Parálisis por Análisis:** Entre el selector biomecánico de 3 pasos (postura, nivel 1-10 y diagnóstico), la barra lateral con 5 tipos de filtros (búsqueda, categorías, materiales, firmezas y rangos numéricos de precio) y el desplegable de ordenación en la cabecera, se produce una sensación de caos de configuración.
-3. **Búsqueda Rígida:** La búsqueda actual realiza un `LIKE %q%` estricto en JSON de nombre y descripción. Si un usuario busca *"dormir de lado"*, *"cuello"* o *"almohada dura"*, no obtiene coincidencias si esas palabras exactas no están en el título.
+Originalmente, la vista [`catalog/index.blade.php`](file:///Users/jonathanquishpe/JoniDev/Reposa+_TFG/Reposa+/resources/views/catalog/index.blade.php) presentaba sobrecarga cognitiva y fatiga de decisión:
+1. **Pérdida de foco del producto (*Above the Fold*):** El "Selector Anatómico / Asesor de Firmeza" (`firmness-guide.blade.php`, 350+ líneas) se cargaba expandido por defecto (`collapse show`), acaparando prácticamente todo el primer viewport útil y obligando al comprador a hacer scroll para ver la primera almohada.
+2. **Parálisis por Análisis:** Competencia visual entre el selector biomecánico de 3 pasos, la barra lateral con 5 tipos de filtros y la dispersión de opciones.
+3. **Búsqueda Rígida:** Coincidencia `LIKE %q%` estricta solo en nombre y descripción, fallando ante búsquedas de postura (*"dormir de lado"*), dolencias (*"cuello"*, *"cervical"*) o materiales (*"visco"*).
 
-#### B. Objetivos de Diseño y Arquitectura (Filosofía Impeccable: *Distill, Clarify & Layout*)
-* **Principio Rector:** **Divulgación Progresiva (*Progressive Disclosure*)**. El producto debe ser el protagonista indiscutible. Un comprador que simplemente quiere explorar almohadas debe ver el catálogo de inmediato sin barreras.
-* **Asesor Anatómico bajo Demanda:** El recomendador anatómico debe transformarse en una herramienta de asistencia inteligente **colapsada por defecto**, accesible mediante un llamador visualmente refinado y sereno (*"🧠 ¿Dudas sobre qué almohada necesitas? Descubre tu almohada ideal según tu postura"*).
-* **Navegación Rápida por Píldoras Horizontales (*Category Chips*):** Extraer las categorías principales a una botonera horizontal ágil (`Todas`, `Viscoelásticas`, `Cervicales`, `Ergonómicas`, `Fibra`) debajo del título para filtrado instantáneo en 1 clic sin fricción lateral.
-* **Búsqueda Prominente y Tolerante (Semántica / Multiatributo):**
-  - Barra de búsqueda limpia con botón de borrado rápido (`clear`).
-  - Extensión en `ProductController::index` para que busque no solo en nombre y descripción, sino también en atributos clave de descanso (postura recomendada, firmeza, materiales) permitiendo que términos como *"cervical"*, *"lado"*, *"suave"* o *"firme"* arrojen los productos óptimos.
-* **Filtros Secundarios Despejados (*Offcanvas / Collapsible Drawer*):**
-  - Mover los filtros secundarios (materiales, nivel numérico de firmeza, rango de precio) a un botón desplegable compacto `"Filtros"`, reduciendo el ruido visual lateral y maximizando el espacio para un grid de 3 o 4 columnas de productos en monitores estándar.
-  - Indicación clara de filtros activos mediante chips descartables (*tags*) y botón directo de `"Limpiar filtros"`.
+#### B. Soluciones Implementadas (Filosofía Impeccable: *Distill, Clarify & Layout*)
+* **Divulgación Progresiva (*Progressive Disclosure*):** El Asesor Anatómico ahora está colapsado por defecto y se presenta como un banner de valor no invasivo (*"🧠 ¿Dudas sobre qué almohada necesitas? Descubre tu almohada ideal según tu postura"*), permitiendo que los productos sean visibles inmediatamente (*above the fold*).
+* **Navegación Rápida por Píldoras Horizontales (*Category Chips* en 1 Clic):** Barra horizontal de chips interactivos (`Todas`, `Viscoelásticas`, `Cervicales`, `Ergonómicas`, `Fibra`, etc.) con estado activo/inactivo claro y sin recarga manual.
+* **Búsqueda Prominente y Multiatributo Tolerante:**
+  - Buscador visualmente prominente con botón de borrado rápido (`clear`).
+  - Motor de búsqueda en `ProductController::index` enriquecido con mapeo semántico y postural (`lado`, `cuello`, `cervical`, `firme`, `suave`, `visco`, `bambú`), coincidencia en categorías, materiales y firmezas, y resolución insensible a mayúsculas mediante `LOWER(JSON_UNQUOTE(...))`.
+* **Filtros Secundarios Despejados:**
+  - Panel colapsable compacto con contador de filtros activos.
+  - Tags/chips descartables individuales (`&times;`) para cada criterio activo y botón directo de `"Limpiar filtros"`.
+  - Grid de productos a ancho completo (`col-12`) con distribución fluida de 3 a 4 columnas.
 
-#### C. Matriz de Tareas de la Iteración 4.2
-1. **Tarea 4.2.1 — Refactorización Blade de `/catalog`:**
-   - Colapsar por defecto el Asesor Anatómico y rediseñar su tarjeta cabecera como un banner de valor no invasivo.
-   - Implementar la barra superior unificada con buscador y píldoras horizontales de categoría.
-   - Reestructurar el grid de productos para ocupar ancho completo o 9/12 con panel de filtros colapsable/offcanvas.
-2. **Tarea 4.2.2 — Optimización de Búsqueda y Filtros en `ProductController`:**
-   - Mejorar la query de búsqueda para contemplar coincidencias en campos JSON transducibles y atributos ergonómicos.
-   - Asegurar que la paginación y ordenación se mantengan fluidas con `withQueryString()`.
-3. **Tarea 4.2.3 — Verificación y Certificación:**
-   - Revisión visual y táctil en viewport móvil y escritorio.
-   - Ejecución de la suite completa de 125 pruebas en Pest y 8 pruebas en Playwright.
-   - Verificación de formateo con Laravel Pint.
+#### C. Certificación de Calidad y Resultados
+* **Vite Assets:** Compilación exitosa (`npm run build`).
+* **Pirámide de Pruebas Pest:** 125 pruebas automatizadas (22 Unit + 103 Feature, 566 aserciones) en 2.82s (100% verde, 0 regresiones).
+* **Pruebas End-to-End Playwright:** 8/8 pruebas superadas en 11.1s.
+* **Estilo de Código:** Laravel Pint 100% aprobado.
 
 ---
 

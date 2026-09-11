@@ -1662,4 +1662,30 @@ body {
     }
 }
 
+// --- Iteration 4.2: Storefront Cognitive Simplification & Fast Category Chips ---
+.category-chips-wrapper {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.hover-lift {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(24, 36, 71, 0.08);
+    }
+}
+
+.hover-danger:hover {
+    color: var(--color-danger, #dc2626) !important;
+}
+
+.focus-within-shadow:focus-within {
+    border-color: var(--color-serene-indigo, #4f46e5) !important;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
+}
+
 

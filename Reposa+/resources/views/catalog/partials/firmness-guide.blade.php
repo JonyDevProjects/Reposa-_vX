@@ -45,29 +45,45 @@
             'materials' => $isEnglish ? 'High Resilience Orthopedic Foam' : 'Espuma HR ortopédica estructural con canales de aireación 3D'
         ],
     ];
+    $advisorOpen = request('advisor') == '1' || request()->has('open_advisor');
 @endphp
 
-<div class="firmness-advisor-wrapper mb-5" id="firmness-guide-section">
+<div class="firmness-advisor-wrapper mb-4" id="firmness-guide-section">
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden firmness-advisor-card">
-        {{-- Card Header --}}
-        <div class="card-header border-0 py-3 px-4 d-flex flex-wrap justify-content-between align-items-center gap-2 bg-navy-sanctuary text-white">
+        {{-- Card Header: Non-invasive Smart Value Banner --}}
+        <div class="card-header border-0 py-3 px-4 d-flex flex-wrap justify-content-between align-items-center gap-3 bg-navy-sanctuary text-white">
             <div class="d-flex align-items-center gap-3">
-                <span class="advisor-badge-pill">
-                    <i class="bi bi-stars me-1"></i> {{ __('messages.firmness_guide.badge') }}
-                </span>
+                <div class="d-inline-flex align-items-center justify-content-center bg-white bg-opacity-10 text-warning rounded-circle flex-shrink-0" style="width: 40px; height: 40px;">
+                    <i class="bi bi-stars fs-5"></i>
+                </div>
                 <div>
-                    <h2 class="h5 fw-bold mb-0 text-white">{{ __('messages.firmness_guide.title') }}</h2>
-                    <p class="mb-0 text-white-50 small d-none d-md-block">{{ __('messages.firmness_guide.subtitle') }}</p>
+                    <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                        <span class="advisor-badge-pill">
+                            <i class="bi bi-cpu me-1"></i> {{ __('messages.firmness_guide.badge') }}
+                        </span>
+                        <span class="text-white-50 small d-none d-sm-inline">&bull; {{ __('messages.firmness_guide.banner_subtitle') }}</span>
+                    </div>
+                    <h2 class="h6 fw-bold mb-0 text-white">
+                        {{ __('messages.firmness_guide.banner_prompt') }}
+                    </h2>
                 </div>
             </div>
-            <button class="btn btn-sm btn-outline-light rounded-pill px-3" type="button" data-bs-toggle="collapse" data-bs-target="#advisorContentCollapse" aria-expanded="true" aria-controls="advisorContentCollapse" id="toggleAdvisorBtn">
-                <i class="bi bi-sliders me-1"></i> <span id="advisorToggleText">{{ __('messages.firmness_guide.toggle_close') }}</span>
+            <button class="btn btn-sm btn-outline-light rounded-pill px-3 py-1 fw-semibold d-inline-flex align-items-center gap-2 text-nowrap ms-auto" 
+                    type="button" 
+                    data-bs-toggle="collapse" 
+                    data-bs-target="#advisorContentCollapse" 
+                    aria-expanded="{{ $advisorOpen ? 'true' : 'false' }}" 
+                    aria-controls="advisorContentCollapse" 
+                    id="toggleAdvisorBtn">
+                <i class="bi bi-sliders me-1"></i> 
+                <span id="advisorToggleText">{{ $advisorOpen ? __('messages.firmness_guide.toggle_close') : __('messages.firmness_guide.toggle_btn') }}</span>
+                <i class="bi bi-chevron-down ms-1" id="advisorToggleChevron" style="transition: transform 0.25s ease; {{ $advisorOpen ? 'transform: rotate(180deg);' : '' }}"></i>
             </button>
         </div>
 
-        {{-- Collapsible Interactive Body --}}
-        <div class="collapse show" id="advisorContentCollapse">
-            <div class="card-body p-4 bg-white">
+        {{-- Collapsible Interactive Body (Collapsed by default for Progressive Disclosure) --}}
+        <div class="collapse {{ $advisorOpen ? 'show' : '' }}" id="advisorContentCollapse">
+            <div class="card-body p-4 bg-white border-top border-light-subtle">
                 <div class="row g-4">
                     {{-- Left Column: Interactive Controls --}}
                     <div class="col-lg-7">
@@ -323,15 +339,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Toggle button label
+    // Toggle button label and chevron
     const collapseEl = document.getElementById('advisorContentCollapse');
     const toggleText = document.getElementById('advisorToggleText');
+    const toggleChevron = document.getElementById('advisorToggleChevron');
     if (collapseEl && toggleText) {
         collapseEl.addEventListener('hidden.bs.collapse', function() {
             toggleText.textContent = '{{ __('messages.firmness_guide.toggle_btn') }}';
+            if (toggleChevron) toggleChevron.style.transform = 'rotate(0deg)';
         });
         collapseEl.addEventListener('shown.bs.collapse', function() {
             toggleText.textContent = '{{ __('messages.firmness_guide.toggle_close') }}';
+            if (toggleChevron) toggleChevron.style.transform = 'rotate(180deg)';
         });
     }
 
