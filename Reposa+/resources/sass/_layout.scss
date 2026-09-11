@@ -1519,22 +1519,52 @@ body {
 }
 
 // --- Subphase 6.3: Signature Feature (Firmness Advisor & Guide) ---
+.bg-navy-sanctuary {
+    background: linear-gradient(135deg, #182447 0%, #1e2b54 50%, #2a3e75 100%) !important;
+    color: #ffffff !important;
+}
+
 .firmness-advisor-wrapper {
     .firmness-advisor-card {
-        border: 1px solid var(--color-border-subtle, #e2e8f0);
+        border: 1px solid rgba(24, 36, 71, 0.12) !important;
         background: #ffffff;
         box-shadow: 0 4px 20px -2px rgba(24, 36, 71, 0.08);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .btn-advisor-toggle {
+        background: rgba(255, 255, 255, 0.14);
+        border: 1.5px solid rgba(255, 255, 255, 0.35);
+        color: #ffffff !important;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+        &:hover,
+        &:focus {
+            background: rgba(255, 255, 255, 0.24);
+            border-color: #ffffff;
+            color: #ffffff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        &:focus-visible {
+            outline: 2px solid #ffffff;
+            outline-offset: 2px;
+        }
     }
 
     .advisor-badge-pill {
-        background: rgba(255, 255, 255, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        color: #ffffff;
+        background: rgba(255, 255, 255, 0.16);
+        border: 1px solid rgba(255, 255, 255, 0.30);
+        color: #c7d2fe;
         font-size: 0.72rem;
-        font-weight: 600;
+        font-weight: 700;
         padding: 0.25rem 0.75rem;
         border-radius: 50rem;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.05em;
         text-transform: uppercase;
     }
 
@@ -1663,12 +1693,99 @@ body {
 }
 
 // --- Iteration 4.2: Storefront Cognitive Simplification & Fast Category Chips ---
+.catalog-hub-card {
+    border: 1px solid rgba(24, 36, 71, 0.08) !important;
+}
+
+.catalog-search-wrapper {
+    .input-group {
+        border: 1.5px solid var(--color-border-subtle, #e2e8f0) !important;
+        background-color: #ffffff !important;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-control:focus {
+        box-shadow: none !important;
+    }
+}
+
+.catalog-category-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 18px;
+    border-radius: 50rem;
+    font-size: 0.845rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    background-color: #ffffff;
+    border: 1.5px solid var(--color-border-subtle, #e2e8f0);
+    color: var(--color-text-secondary, #334155);
+
+    &:hover {
+        background-color: #f8fafc;
+        border-color: #cbd5e1;
+        color: var(--color-deep-sanctuary-navy, #182447);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(24, 36, 71, 0.08);
+    }
+
+    &.active {
+        background-color: var(--color-deep-sanctuary-navy, #182447);
+        border-color: var(--color-deep-sanctuary-navy, #182447);
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(24, 36, 71, 0.25);
+        transform: translateY(-1px);
+
+        i {
+            color: #ffffff !important;
+        }
+    }
+}
+
 .category-chips-wrapper {
     scrollbar-width: none;
     -ms-overflow-style: none;
     &::-webkit-scrollbar {
         display: none;
     }
+
+    @media (max-width: 767.98px) {
+        -webkit-overflow-scrolling: touch;
+        padding-right: 1rem;
+    }
+}
+
+.active-filter-badge {
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1e3a8a;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 50rem;
+    padding: 4px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    .filter-remove-btn {
+        color: #64748b;
+        text-decoration: none;
+        font-size: 1.15rem;
+        line-height: 1;
+        margin-left: 2px;
+        transition: color 0.15s ease;
+
+        &:hover {
+            color: var(--color-danger, #dc2626);
+        }
+    }
+}
+
+.secondary-filters-card {
+    background-color: #f8fafc;
+    border: 1px solid var(--color-border-subtle, #e2e8f0);
 }
 
 .hover-lift {

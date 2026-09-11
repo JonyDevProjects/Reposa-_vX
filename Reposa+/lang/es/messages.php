@@ -430,7 +430,7 @@ return [
     'catalog.login_favorite' => 'Inicia sesión para añadir a favoritos',
     'catalog.low_stock' => '¡Quedan :count!',
     'catalog.filters' => 'Filtros',
-    'catalog.search_smart_placeholder' => 'Buscar por postura, material, firmeza o término (ej. lado, cervical, fresca)...',
+    'catalog.search_smart_placeholder' => 'Buscar por postura, firmeza o material (ej. de lado, cervical, suave)...',
     'catalog.category_chips_all' => 'Todas las almohadas',
     'catalog.secondary_filters_toggle' => 'Filtros avanzados',
     'catalog.filter_active_tag' => 'Filtros activos',
@@ -679,9 +679,9 @@ return [
     'firmness_guide.recommendation_title' => 'Firmeza Recomendada para ti',
     'firmness_guide.filter_cta' => 'Ver almohadas con firmeza',
     'firmness_guide.pillows_found' => 'modelos compatibles en catálogo',
-    'firmness_guide.toggle_btn' => '✨ Guía Anatómica de Firmeza',
+    'firmness_guide.toggle_btn' => 'Guía Anatómica de Firmeza',
     'firmness_guide.toggle_close' => 'Cerrar Asesor',
-    'firmness_guide.banner_prompt' => '🧠 ¿Dudas sobre qué almohada necesitas? Descubre tu almohada ideal según tu postura',
+    'firmness_guide.banner_prompt' => '¿Dudas sobre qué almohada necesitas? Descubre tu almohada ideal según tu postura',
     'firmness_guide.banner_subtitle' => 'Asesor anatómico interactivo: alinea tu columna y cuello en 2 pasos',
 
     // Phase 7 — Mobile Ergonomics & Extreme Web Performance

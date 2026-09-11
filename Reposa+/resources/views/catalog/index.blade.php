@@ -18,45 +18,33 @@
         <div class="container">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <div>
-                    <h1 class="fw-bold mb-0 text-navy">{{ __('messages.catalog.title') }}</h1>
+                    <h1 class="h2 fw-bold mb-1 text-navy">{{ __('messages.catalog.title') }}</h1>
                     <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb mb-0 mt-2">
-                            <li class="breadcrumb-item"><a href="/">{{ __('messages.catalog.breadcrumb.home') }}</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">{{ __('messages.catalog.breadcrumb.catalog') }}</li>
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">{{ __('messages.catalog.breadcrumb.home') }}</a></li>
+                            <li class="breadcrumb-item active text-navy fw-medium" aria-current="page">{{ __('messages.catalog.breadcrumb.catalog') }}</li>
                             @if(request('q'))
-                                <li class="breadcrumb-item active text-primary">«{{ request('q') }}»</li>
+                                <li class="breadcrumb-item active text-primary fw-medium">«{{ request('q') }}»</li>
                             @endif
                         </ol>
                     </nav>
                 </div>
                 
-                {{-- Quick Header Actions --}}
-                <div class="d-flex gap-2 align-items-center">
-                    @if($hasAnyFilter)
-                        <a href="/catalog" class="btn btn-outline-danger btn-sm rounded-pill px-3">
-                            <i class="bi bi-x-circle me-1"></i>{{ __('messages.catalog.clear_filters') }}
+                {{-- Quick Clear Link if any filter is active --}}
+                @if($hasAnyFilter)
+                    <div>
+                        <a href="/catalog" class="btn btn-outline-danger btn-sm rounded-pill px-3 shadow-xs">
+                            <i class="bi bi-trash3 me-1"></i>{{ __('messages.catalog.clear_filters') }}
                         </a>
-                    @endif
-                    <div class="dropdown">
-                        <button class="btn btn-outline-primary dropdown-toggle btn-sm rounded-pill px-3" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-arrow-down-up me-1"></i>{{ __('messages.catalog.sort') }}
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
-                            <li><a class="dropdown-item {{ $currentSort === 'newest' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'newest']) }}">{{ __('messages.catalog.sort.newest') }}</a></li>
-                            <li><a class="dropdown-item {{ $currentSort === 'price_asc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'price_asc']) }}">{{ __('messages.catalog.sort.price_asc') }}</a></li>
-                            <li><a class="dropdown-item {{ $currentSort === 'price_desc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'price_desc']) }}">{{ __('messages.catalog.sort.price_desc') }}</a></li>
-                            <li><a class="dropdown-item {{ $currentSort === 'name_asc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'name_asc']) }}">{{ __('messages.catalog.sort.name_asc') }}</a></li>
-                            <li><a class="dropdown-item {{ $currentSort === 'name_desc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'name_desc']) }}">{{ __('messages.catalog.sort.name_desc') }}</a></li>
-                        </ul>
                     </div>
-                </div>
+                @endif
             </div>
         </div>
     </div>
 
     <div class="container pb-5">
         {{-- 1. Prominent Search Toolbar & Fast Category Chips (1-Click) --}}
-        <div class="card border-0 shadow-sm rounded-4 p-3 p-md-4 mb-4 bg-white">
+        <div class="card border-0 shadow-sm rounded-4 p-3 p-md-4 mb-4 bg-white catalog-hub-card">
             {{-- Search Bar --}}
             <form action="/catalog" method="GET" class="mb-3" id="catalog-search-form">
                 {{-- Preserve current filters & sorting --}}
@@ -67,29 +55,31 @@
                 @if(request('max_price'))<input type="hidden" name="max_price" value="{{ request('max_price') }}">@endif
                 @if(request('sort'))<input type="hidden" name="sort" value="{{ request('sort') }}">@endif
 
-                <div class="input-group input-group-lg rounded-pill border bg-light overflow-hidden shadow-xs focus-within-shadow">
-                    <span class="input-group-text bg-transparent border-0 ps-3 ps-md-4 text-primary">
-                        <i class="bi bi-search fs-5"></i>
-                    </span>
-                    <input type="text" 
-                           name="q" 
-                           id="catalog-search-input" 
-                           class="form-control bg-transparent border-0 py-3 ps-2 pe-3 text-navy" 
-                           placeholder="{{ __('messages.catalog.search_smart_placeholder') }}" 
-                           value="{{ request('q') }}"
-                           aria-label="{{ __('messages.catalog.search') }}">
-                    @if(request('q'))
-                        <a href="{{ request()->fullUrlWithQuery(['q' => null, 'page' => null]) }}" 
-                           class="btn btn-link text-muted pe-3 d-flex align-items-center text-decoration-none" 
-                           title="{{ __('messages.catalog.clear_search') }}"
-                           aria-label="{{ __('messages.catalog.clear_search') }}">
-                            <i class="bi bi-x-circle-fill fs-5 text-secondary"></i>
-                        </a>
-                    @endif
-                    <button type="submit" class="btn btn-primary px-4 px-md-5 fw-semibold rounded-pill my-1 me-1">
-                        <span class="d-none d-sm-inline">{{ __('messages.catalog.search') }}</span>
-                        <i class="bi bi-arrow-right d-sm-none"></i>
-                    </button>
+                <div class="catalog-search-wrapper position-relative">
+                    <div class="input-group rounded-pill border bg-white overflow-hidden shadow-xs focus-within-shadow">
+                        <span class="input-group-text bg-transparent border-0 ps-3 ps-md-4 text-primary pe-2">
+                            <i class="bi bi-search fs-5"></i>
+                        </span>
+                        <input type="text" 
+                               name="q" 
+                               id="catalog-search-input" 
+                               class="form-control bg-transparent border-0 py-3 ps-1 pe-3 text-navy" 
+                               placeholder="{{ __('messages.catalog.search_smart_placeholder') }}" 
+                               value="{{ request('q') }}"
+                               aria-label="{{ __('messages.catalog.search') }}">
+                        @if(request('q'))
+                            <a href="{{ request()->fullUrlWithQuery(['q' => null, 'page' => null]) }}" 
+                               class="btn btn-link text-muted pe-3 d-flex align-items-center text-decoration-none" 
+                               title="{{ __('messages.catalog.clear_search') }}"
+                               aria-label="{{ __('messages.catalog.clear_search') }}">
+                                <i class="bi bi-x-circle-fill fs-5 text-secondary"></i>
+                            </a>
+                        @endif
+                        <button type="submit" class="btn btn-primary px-4 px-md-5 fw-semibold rounded-pill m-1 text-nowrap">
+                            <i class="bi bi-search me-1 d-sm-none"></i>
+                            <span class="d-none d-sm-inline">{{ __('messages.catalog.search') }}</span>
+                        </button>
+                    </div>
                 </div>
             </form>
 
@@ -98,27 +88,27 @@
                 <span class="text-muted small fw-semibold d-none d-lg-inline text-nowrap me-1">
                     <i class="bi bi-tags me-1"></i>{{ __('messages.catalog.category') }}:
                 </span>
-                <div class="category-chips-wrapper d-flex gap-2 overflow-x-auto pb-1 no-scrollbar flex-grow-1 align-items-center">
+                <div class="category-chips-wrapper d-flex flex-nowrap flex-md-wrap gap-2 overflow-x-auto pb-1 pb-md-0 no-scrollbar flex-grow-1 align-items-center">
                     {{-- All Categories Chip --}}
                     <a href="/catalog?{{ http_build_query(request()->except('category', 'page')) }}" 
-                       class="btn btn-sm rounded-pill px-3 py-2 fw-semibold text-nowrap transition-all {{ !$activeCategory ? 'btn-primary shadow-sm' : 'btn-light border bg-white text-secondary hover-lift' }}">
+                       class="catalog-category-chip {{ !$activeCategory ? 'active' : '' }}">
                         <i class="bi bi-grid-fill me-1"></i> {{ __('messages.catalog.category_chips_all') }}
                     </a>
 
                     @foreach($categories as $category)
                         @php $isCatActive = ($activeCategory === $category->slug); @endphp
                         <a href="/catalog?{{ http_build_query(array_merge(request()->except('category', 'page'), ['category' => $category->slug])) }}" 
-                           class="btn btn-sm rounded-pill px-3 py-2 fw-semibold text-nowrap transition-all {{ $isCatActive ? 'btn-primary shadow-sm' : 'btn-light border bg-white text-secondary hover-lift' }}">
+                           class="catalog-category-chip {{ $isCatActive ? 'active' : '' }}">
                             {{ $category->name }}
                         </a>
                     @endforeach
                 </div>
             </div>
 
-            {{-- Toolbar: Secondary Filters Toggle & Active Tags --}}
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 pt-3 mt-3 border-top">
+            {{-- 3. Toolbar: Advanced Filters Toggle, Active Tags, Results Count & Sorting --}}
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pt-3 mt-3 border-top">
+                {{-- Left: Filter Toggle & Active Chips --}}
                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                    {{-- Toggle Secondary Filters Panel --}}
                     <button class="btn btn-sm {{ $hasSecondaryFilters ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-3 py-1 fw-semibold d-inline-flex align-items-center gap-2" 
                             type="button" 
                             data-bs-toggle="collapse" 
@@ -131,43 +121,43 @@
                         @if($activeSecondaryCount > 0)
                             <span class="badge bg-white text-primary rounded-pill">{{ $activeSecondaryCount }}</span>
                         @endif
-                        <i class="bi bi-chevron-down small" id="filtersChevron"></i>
+                        <i class="bi bi-chevron-down small" id="filtersChevron" style="transition: transform 0.2s ease; {{ $hasSecondaryFilters ? 'transform: rotate(180deg);' : '' }}"></i>
                     </button>
 
                     {{-- Active Filter Dismissible Chips --}}
                     @if(request('q'))
-                        <span class="badge bg-light text-navy border rounded-pill px-3 py-2 d-inline-flex align-items-center gap-1">
+                        <span class="active-filter-badge">
                             <i class="bi bi-search text-primary"></i> «{{ request('q') }}»
-                            <a href="{{ request()->fullUrlWithQuery(['q' => null, 'page' => null]) }}" class="text-muted hover-danger ms-1 text-decoration-none" aria-label="Eliminar filtro de búsqueda">&times;</a>
+                            <a href="{{ request()->fullUrlWithQuery(['q' => null, 'page' => null]) }}" class="filter-remove-btn" aria-label="Eliminar filtro de búsqueda">&times;</a>
                         </span>
                     @endif
 
                     @if(request('category'))
                         @php $currentCat = $categories->firstWhere('slug', request('category')); @endphp
-                        <span class="badge bg-light text-navy border rounded-pill px-3 py-2 d-inline-flex align-items-center gap-1">
+                        <span class="active-filter-badge">
                             <i class="bi bi-tag-fill text-primary"></i> {{ $currentCat?->name ?? request('category') }}
-                            <a href="{{ request()->fullUrlWithQuery(['category' => null, 'page' => null]) }}" class="text-muted hover-danger ms-1 text-decoration-none" aria-label="Eliminar filtro de categoría">&times;</a>
+                            <a href="{{ request()->fullUrlWithQuery(['category' => null, 'page' => null]) }}" class="filter-remove-btn" aria-label="Eliminar filtro de categoría">&times;</a>
                         </span>
                     @endif
 
                     @if(request('material'))
-                        <span class="badge bg-light text-navy border rounded-pill px-3 py-2 d-inline-flex align-items-center gap-1">
+                        <span class="active-filter-badge">
                             <i class="bi bi-feather text-primary"></i> {{ request('material') }}
-                            <a href="{{ request()->fullUrlWithQuery(['material' => null, 'page' => null]) }}" class="text-muted hover-danger ms-1 text-decoration-none" aria-label="Eliminar filtro de material">&times;</a>
+                            <a href="{{ request()->fullUrlWithQuery(['material' => null, 'page' => null]) }}" class="filter-remove-btn" aria-label="Eliminar filtro de material">&times;</a>
                         </span>
                     @endif
 
                     @if(request('firmness'))
-                        <span class="badge bg-light text-navy border rounded-pill px-3 py-2 d-inline-flex align-items-center gap-1">
+                        <span class="active-filter-badge">
                             <i class="bi bi-activity text-primary"></i> {{ request('firmness') }}
-                            <a href="{{ request()->fullUrlWithQuery(['firmness' => null, 'page' => null]) }}" class="text-muted hover-danger ms-1 text-decoration-none" aria-label="Eliminar filtro de firmeza">&times;</a>
+                            <a href="{{ request()->fullUrlWithQuery(['firmness' => null, 'page' => null]) }}" class="filter-remove-btn" aria-label="Eliminar filtro de firmeza">&times;</a>
                         </span>
                     @endif
 
                     @if(request('min_price') || request('max_price'))
-                        <span class="badge bg-light text-navy border rounded-pill px-3 py-2 d-inline-flex align-items-center gap-1">
+                        <span class="active-filter-badge">
                             <i class="bi bi-cash-stack text-primary"></i> {{ request('min_price', '0') }}€ — {{ request('max_price', '∞') }}€
-                            <a href="{{ request()->fullUrlWithQuery(['min_price' => null, 'max_price' => null, 'page' => null]) }}" class="text-muted hover-danger ms-1 text-decoration-none" aria-label="Eliminar filtro de precio">&times;</a>
+                            <a href="{{ request()->fullUrlWithQuery(['min_price' => null, 'max_price' => null, 'page' => null]) }}" class="filter-remove-btn" aria-label="Eliminar filtro de precio">&times;</a>
                         </span>
                     @endif
 
@@ -178,74 +168,91 @@
                     @endif
                 </div>
 
-                {{-- Results Count --}}
-                <div class="text-muted small fw-semibold">
-                    {{ __('messages.catalog.results_count', ['count' => $products->total()]) }}
+                {{-- Right: Results Count & Sort Dropdown --}}
+                <div class="d-flex align-items-center gap-3 ms-auto">
+                    <div class="text-muted small fw-medium tabular-nums">
+                        {{ __('messages.catalog.results_count', ['count' => $products->total()]) }}
+                    </div>
+
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle btn-sm rounded-pill px-3 fw-semibold text-navy bg-white border shadow-2xs" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-arrow-down-up me-1 text-primary"></i>{{ __('messages.catalog.sort') }}: <span class="text-navy fw-bold">{{ __('messages.catalog.sort.' . $currentSort) }}</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
+                            <li><a class="dropdown-item {{ $currentSort === 'newest' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'newest']) }}">{{ __('messages.catalog.sort.newest') }}</a></li>
+                            <li><a class="dropdown-item {{ $currentSort === 'price_asc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'price_asc']) }}">{{ __('messages.catalog.sort.price_asc') }}</a></li>
+                            <li><a class="dropdown-item {{ $currentSort === 'price_desc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'price_desc']) }}">{{ __('messages.catalog.sort.price_desc') }}</a></li>
+                            <li><a class="dropdown-item {{ $currentSort === 'name_asc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'name_asc']) }}">{{ __('messages.catalog.sort.name_asc') }}</a></li>
+                            <li><a class="dropdown-item {{ $currentSort === 'name_desc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'name_desc']) }}">{{ __('messages.catalog.sort.name_desc') }}</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
-            {{-- 3. Collapsible Secondary Filters Panel --}}
+            {{-- 4. Collapsible Secondary Filters Panel --}}
             <div class="collapse {{ $hasSecondaryFilters ? 'show' : '' }} mt-3 pt-3 border-top" id="secondaryFiltersPanel">
-                <form action="/catalog" method="GET" id="secondary-filter-form">
-                    {{-- Preserve search, category, sort --}}
-                    @if(request('q'))<input type="hidden" name="q" value="{{ request('q') }}">@endif
-                    @if(request('category'))<input type="hidden" name="category" value="{{ request('category') }}">@endif
-                    @if(request('sort'))<input type="hidden" name="sort" value="{{ request('sort') }}">@endif
+                <div class="p-3 rounded-3 secondary-filters-card">
+                    <form action="/catalog" method="GET" id="secondary-filter-form">
+                        {{-- Preserve search, category, sort --}}
+                        @if(request('q'))<input type="hidden" name="q" value="{{ request('q') }}">@endif
+                        @if(request('category'))<input type="hidden" name="category" value="{{ request('category') }}">@endif
+                        @if(request('sort'))<input type="hidden" name="sort" value="{{ request('sort') }}">@endif
 
-                    <div class="row g-3 align-items-end">
-                        {{-- Material Filter --}}
-                        <div class="col-md-3">
-                            <label for="catalog-material-select" class="form-label fw-semibold small text-muted mb-1">
-                                <i class="bi bi-feather me-1"></i>{{ __('messages.catalog.material') }}
-                            </label>
-                            <select name="material" id="catalog-material-select" class="form-select form-select-sm rounded-3">
-                                <option value="">{{ __('messages.catalog.all') }}</option>
-                                @foreach($materials as $material)
-                                    <option value="{{ $material }}" {{ request('material') == $material ? 'selected' : '' }}>{{ $material }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                        <div class="row g-3 align-items-end">
+                            {{-- Material Filter --}}
+                            <div class="col-12 col-sm-6 col-lg-3">
+                                <label for="catalog-material-select" class="form-label fw-semibold small text-muted mb-1 d-flex align-items-center gap-1">
+                                    <i class="bi bi-feather text-primary"></i> {{ __('messages.catalog.material') }}
+                                </label>
+                                <select name="material" id="catalog-material-select" class="form-select form-select-sm rounded-3">
+                                    <option value="">{{ __('messages.catalog.all') }}</option>
+                                    @foreach($materials as $material)
+                                        <option value="{{ $material }}" {{ request('material') == $material ? 'selected' : '' }}>{{ $material }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                        {{-- Firmness Filter --}}
-                        <div class="col-md-3">
-                            <label for="catalog-firmness-select" class="form-label fw-semibold small text-muted mb-1">
-                                <i class="bi bi-activity me-1"></i>{{ __('messages.catalog.firmness') }}
-                            </label>
-                            <select name="firmness" id="catalog-firmness-select" class="form-select form-select-sm rounded-3">
-                                <option value="">{{ __('messages.catalog.all_firmness') }}</option>
-                                @foreach($firmnesses as $firmness)
-                                    <option value="{{ $firmness }}" {{ request('firmness') == $firmness ? 'selected' : '' }}>{{ $firmness }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                            {{-- Firmness Filter --}}
+                            <div class="col-12 col-sm-6 col-lg-3">
+                                <label for="catalog-firmness-select" class="form-label fw-semibold small text-muted mb-1 d-flex align-items-center gap-1">
+                                    <i class="bi bi-activity text-primary"></i> {{ __('messages.catalog.firmness') }}
+                                </label>
+                                <select name="firmness" id="catalog-firmness-select" class="form-select form-select-sm rounded-3">
+                                    <option value="">{{ __('messages.catalog.all_firmness') }}</option>
+                                    @foreach($firmnesses as $firmness)
+                                        <option value="{{ $firmness }}" {{ request('firmness') == $firmness ? 'selected' : '' }}>{{ $firmness }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                        {{-- Price Range Filter --}}
-                        <div class="col-md-4">
-                            <label id="catalog-price-label" class="form-label fw-semibold small text-muted mb-1">
-                                <i class="bi bi-currency-euro me-1"></i>{{ __('messages.catalog.price_range') }}
-                            </label>
-                            <div class="d-flex gap-2 align-items-center" aria-labelledby="catalog-price-label">
-                                <input type="number" name="min_price" id="catalog-min-price" aria-label="Precio mínimo" class="form-control form-control-sm rounded-3 tabular-nums" placeholder="Mín" value="{{ request('min_price') }}" min="0" step="0.01">
-                                <span class="text-muted" aria-hidden="true">—</span>
-                                <input type="number" name="max_price" id="catalog-max-price" aria-label="Precio máximo" class="form-control form-control-sm rounded-3 tabular-nums" placeholder="Máx" value="{{ request('max_price') }}" min="0" step="0.01">
+                            {{-- Price Range Filter --}}
+                            <div class="col-12 col-sm-6 col-lg-3">
+                                <label id="catalog-price-label" class="form-label fw-semibold small text-muted mb-1 d-flex align-items-center gap-1">
+                                    <i class="bi bi-currency-euro text-primary"></i> {{ __('messages.catalog.price_range') }}
+                                </label>
+                                <div class="input-group input-group-sm" aria-labelledby="catalog-price-label">
+                                    <input type="number" name="min_price" id="catalog-min-price" aria-label="Precio mínimo" class="form-control rounded-start-3 tabular-nums" placeholder="Mín €" value="{{ request('min_price') }}" min="0" step="0.01">
+                                    <span class="input-group-text bg-white text-muted border-start-0 border-end-0 px-2">—</span>
+                                    <input type="number" name="max_price" id="catalog-max-price" aria-label="Precio máximo" class="form-control rounded-end-3 tabular-nums" placeholder="Máx €" value="{{ request('max_price') }}" min="0" step="0.01">
+                                </div>
+                            </div>
+
+                            {{-- Action Buttons --}}
+                            <div class="col-12 col-sm-6 col-lg-3 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary btn-sm rounded-3 fw-semibold flex-grow-1 text-nowrap py-2">
+                                    <i class="bi bi-funnel me-1"></i>{{ __('messages.catalog.apply_filters') }}
+                                </button>
+                                @if($hasSecondaryFilters)
+                                    <a href="{{ request()->fullUrlWithQuery(['material' => null, 'firmness' => null, 'min_price' => null, 'max_price' => null, 'page' => null]) }}" 
+                                       class="btn btn-outline-secondary btn-sm rounded-3 d-inline-flex align-items-center justify-content-center px-3" 
+                                       title="{{ __('messages.catalog.clear_filters') }}">
+                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                    </a>
+                                @endif
                             </div>
                         </div>
-
-                        {{-- Action Buttons --}}
-                        <div class="col-md-2 d-flex gap-2">
-                            <button type="submit" class="btn btn-primary btn-sm rounded-3 fw-semibold w-100">
-                                <i class="bi bi-funnel me-1"></i>{{ __('messages.catalog.apply_filters') }}
-                            </button>
-                            @if($hasSecondaryFilters)
-                                <a href="{{ request()->fullUrlWithQuery(['material' => null, 'firmness' => null, 'min_price' => null, 'max_price' => null, 'page' => null]) }}" 
-                                   class="btn btn-outline-secondary btn-sm rounded-3" 
-                                   title="{{ __('messages.catalog.clear_filters') }}">
-                                    <i class="bi bi-arrow-counterclockwise"></i>
-                                </a>
-                            @endif
-                        </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
 
@@ -316,3 +323,23 @@
         @endif
     </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterPanel = document.getElementById('secondaryFiltersPanel');
+    const filterChevron = document.getElementById('filtersChevron');
+    if (filterPanel && filterChevron) {
+        filterPanel.addEventListener('hidden.bs.collapse', function() {
+            filterChevron.style.transform = 'rotate(0deg)';
+        });
+        filterPanel.addEventListener('shown.bs.collapse', function() {
+            filterChevron.style.transform = 'rotate(180deg)';
+        });
+        if (filterPanel.classList.contains('show')) {
+            filterChevron.style.transform = 'rotate(180deg)';
+        }
+    }
+});
+</script>
+@endpush

@@ -53,7 +53,7 @@
         {{-- Card Header: Non-invasive Smart Value Banner --}}
         <div class="card-header border-0 py-3 px-4 d-flex flex-wrap justify-content-between align-items-center gap-3 bg-navy-sanctuary text-white">
             <div class="d-flex align-items-center gap-3">
-                <div class="d-inline-flex align-items-center justify-content-center bg-white bg-opacity-10 text-warning rounded-circle flex-shrink-0" style="width: 40px; height: 40px;">
+                <div class="d-inline-flex align-items-center justify-content-center bg-white bg-opacity-15 text-warning rounded-circle flex-shrink-0" style="width: 42px; height: 42px; box-shadow: 0 0 12px rgba(251, 191, 36, 0.25);">
                     <i class="bi bi-stars fs-5"></i>
                 </div>
                 <div>
@@ -61,14 +61,14 @@
                         <span class="advisor-badge-pill">
                             <i class="bi bi-cpu me-1"></i> {{ __('messages.firmness_guide.badge') }}
                         </span>
-                        <span class="text-white-50 small d-none d-sm-inline">&bull; {{ __('messages.firmness_guide.banner_subtitle') }}</span>
+                        <span class="text-white-75 small d-none d-sm-inline">&bull; {{ __('messages.firmness_guide.banner_subtitle') }}</span>
                     </div>
                     <h2 class="h6 fw-bold mb-0 text-white">
                         {{ __('messages.firmness_guide.banner_prompt') }}
                     </h2>
                 </div>
             </div>
-            <button class="btn btn-sm btn-outline-light rounded-pill px-3 py-1 fw-semibold d-inline-flex align-items-center gap-2 text-nowrap ms-auto" 
+            <button class="btn btn-sm btn-advisor-toggle rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 text-nowrap ms-auto" 
                     type="button" 
                     data-bs-toggle="collapse" 
                     data-bs-target="#advisorContentCollapse" 
