@@ -67,7 +67,7 @@ class AdminController extends Controller
         // Recent completed orders for reference
         $recentCompleted = Order::where('status', 'completed')
             ->with('user')
-            ->latest()
+            ->orderByDesc('updated_at')
             ->take(5)
             ->get();
 
@@ -280,6 +280,23 @@ class AdminController extends Controller
         }
 
         $order->update(['status' => $newStatus]);
+
+        // Sincronizar automáticamente el estado del envío logístico con el nuevo estado del pedido
+        if ($order->shipment) {
+            $now = now();
+            if ($newStatus === Order::STATUS_SHIPPED && $order->shipment->status === Shipment::STATUS_PRE_REGISTERED) {
+                $order->shipment->update([
+                    'status' => Shipment::STATUS_IN_TRANSIT,
+                    'shipped_at' => $order->shipment->shipped_at ?? $now,
+                ]);
+            } elseif (in_array($newStatus, [Order::STATUS_DELIVERED, Order::STATUS_COMPLETED]) && $order->shipment->status !== Shipment::STATUS_DELIVERED) {
+                $order->shipment->update([
+                    'status' => Shipment::STATUS_DELIVERED,
+                    'shipped_at' => $order->shipment->shipped_at ?? $now,
+                    'delivered_at' => $order->shipment->delivered_at ?? $now,
+                ]);
+            }
+        }
 
         return back()->with('success', __('messages.admin.status_updated', ['status' => Order::getStatusLabel($newStatus)]));
     }

@@ -3,15 +3,15 @@
 @section('title', __('messages.admin.dashboard.title'))
 
 @section('content')
-<div class="container py-4">
+<div class="container-fluid px-3 px-xl-4 py-4">
     <div class="row g-4">
         {{-- Navigation Sidebar --}}
-        <div class="col-lg-3">
+        <div class="col-lg-3 col-xl-2">
             @include('admin.partials.sidebar')
         </div>
 
         {{-- Main Dashboard Content --}}
-        <div class="col-lg-9">
+        <div class="col-lg-9 col-xl-10">
             {{-- Dashboard Header --}}
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
                 <div>
