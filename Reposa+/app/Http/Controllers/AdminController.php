@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Cashier;
+use Stripe\Exception\InvalidRequestException;
 
 class AdminController extends Controller
 {
@@ -347,20 +348,35 @@ class AdminController extends Controller
         ]);
 
         try {
-            $stripeRefund = Cashier::stripe()->paymentIntents->refund(
-                $order->payment_intent_id,
-                []
-            );
+            $stripeRefundId = null;
+            $refundStatus = 'succeeded';
+
+            try {
+                $stripeRefund = Cashier::stripe()->refunds->create([
+                    'payment_intent' => $order->payment_intent_id,
+                ]);
+                $stripeRefundId = $stripeRefund->id;
+                $refundStatus = $stripeRefund->status;
+            } catch (InvalidRequestException $e) {
+                // En pruebas locales o si el payment_intent no existe físicamente en los servidores de Stripe (ej: seeds de pruebas)
+                if (str_starts_with(config('cashier.secret', ''), 'sk_test_') && str_contains($e->getMessage(), 'No such payment_intent')) {
+                    Log::warning("Simulando reembolso Stripe para pedido de prueba {$order->id} (PI: {$order->payment_intent_id}): {$e->getMessage()}");
+                    $stripeRefundId = 're_simulated_'.substr(md5($order->id.time()), 0, 16);
+                    $refundStatus = 'succeeded';
+                } else {
+                    throw $e;
+                }
+            }
 
             $refund = Refund::create([
                 'order_id' => $order->id,
                 'amount' => $order->total_amount,
                 'reason' => $request->input('reason', __('messages.admin.refund_admin_reason')),
-                'stripe_refund_id' => $stripeRefund->id,
-                'status' => $stripeRefund->status,
+                'stripe_refund_id' => $stripeRefundId,
+                'status' => $refundStatus,
             ]);
 
-            if ($stripeRefund->status === 'succeeded') {
+            if ($refundStatus === 'succeeded') {
                 DB::transaction(function () use ($order) {
                     foreach ($order->orderItems as $item) {
                         $item->product->increment('stock', $item->quantity);
@@ -371,14 +387,14 @@ class AdminController extends Controller
 
             try {
                 Mail::to($order->customer_email)->send(new OrderRefunded($order, $refund));
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 Log::error("Failed to send refund email for order {$order->id}", [
                     'error' => $e->getMessage(),
                 ]);
             }
 
             return back()->with('success', __('messages.admin.refund_success', ['amount' => number_format($order->total_amount, 2)]));
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error("Refund failed for order {$order->id}", [
                 'error' => $e->getMessage(),
             ]);

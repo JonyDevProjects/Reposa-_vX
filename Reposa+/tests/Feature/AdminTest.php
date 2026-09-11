@@ -140,6 +140,42 @@ class AdminTest extends TestCase
         $response->assertSessionHas('error');
     }
 
+    public function test_admin_can_refund_completed_order_via_refund_endpoint(): void
+    {
+        Mail::fake();
+
+        $user = User::factory()->create(['email' => 'cliente@example.com']);
+        $product = Product::factory()->create(['stock' => 5]);
+        $order = Order::factory()->completed()->withPaymentIntent()->create([
+            'user_id' => $user->id,
+            'shipping_email' => 'cliente@example.com',
+            'total_amount' => 100.00,
+        ]);
+        OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'product_id' => $product->id,
+            'quantity' => 2,
+            'price_at_purchase' => 50.00,
+        ]);
+
+        $product->decrement('stock', 2);
+        $this->assertEquals(3, $product->fresh()->stock);
+
+        $response = $this->actingAs($this->admin)->post("/admin/orders/{$order->id}/refund", [
+            'reason' => 'Devolución aprobada por admin',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+        $this->assertEquals(Order::STATUS_REFUNDED, $order->fresh()->status);
+        $this->assertEquals(5, $product->fresh()->stock);
+        $this->assertDatabaseHas('refunds', [
+            'order_id' => $order->id,
+            'amount' => 100.00,
+            'status' => 'succeeded',
+        ]);
+    }
+
     public function test_admin_can_create_product(): void
     {
         $category = Category::factory()->create();
