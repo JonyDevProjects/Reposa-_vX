@@ -48,7 +48,8 @@ main ───────────────────────┴─
 | **1** | **Verificación del Repositorio y Estado de Integración** | Chequeo de árbol limpio en `develop` y comprobación rápida de salud de suites Unit y Feature en contenedor. | ✅ Completada |
 | **2** | **Automatización CI/CD en GitHub Actions** | Creación y ajuste de `.github/workflows/ci.yml` ejecutando secuencialmente Pint, Unit tests, Feature tests (MySQL+Redis), Vite build y Playwright E2E. | ✅ Completada |
 | **3** | **Consolidación del Hito Base v1.0.0 (Core Transaccional)** | Etiquetado semántico oficial `v1.0.0` certificando el backend transaccional y la pirámide de 119 pruebas automatizadas. | ✅ Completada |
-| **4** | **Ciclo de Refinamiento UI/UX — Tienda y Admin (Propuesta 1)** | Apertura de rama `release/v1.1.0`, microinteracciones storefront, realce de envío gratis, densidad `/admin/orders`, acceso 1 clic A6 y testing 100%. | ✅ Implementada (En Validación) |
+| **4.1** | **Estabilización Operativa Back-Office (Propuesta 1)** | Desviaciones D1 a D5 resueltas: logística bidireccional, comando `orders:reset-test-matrix`, PDF admin, fix error 500 Stripe y reembolsos directos (125 tests). | ✅ Completada |
+| **4.2** | **Rediseño del Catálogo Storefront (Propuesta 1)** | Divulgación progresiva: Asesor Anatómico colapsado bajo demanda, píldoras de categoría, búsqueda tolerante/semántica y filtros despejados. | ⏳ Planificada (Próxima) |
 | **5** | **Promoción de Release Final v1.1.0 a `main` (GitFlow)** | Fusión `--no-ff` a `main`, etiquetado oficial `v1.1.0-tfg-final` y back-merge hacia `develop`. | ⏳ Planificada |
 | **6** | **Preparación del Material de Soporte para la Defensa del TFG** | Confección de `docs/defensa-tfg/` con guion temporalizado (15 min), catálogo de diapositivas y argumentario defensivo. | ⏳ Planificada |
 
@@ -133,44 +134,55 @@ git push origin v1.0.0
 
 ---
 
-## Fase 4: Ciclo de Refinamiento UI/UX — Tienda y Admin (Hacia la Release v1.1.0)
+## Fase 4: Ciclo de Estabilización y Refinamiento UI/UX — Tienda y Admin (Hacia la Release v1.1.0)
 
-### 4.1 Fundamentación de la Propuesta 1
-Siguiendo las mejores prácticas de la disciplina, las mejoras estéticas y de ergonomía visual no deben mezclarse con las refactorizaciones de lógica de negocio o transaccionales. La rama de estabilización `release/v1.1.0` se abrirá específicamente para alojar estos ajustes sin alterar el modelo de dominio ni las reglas financieras.
+### 4.1 Contexto y Trazabilidad de la Iteración 4.1: Estabilización Operativa del Back-Office (Completada)
 
-```bash
-# Apertura de la rama de estabilización según GitFlow
-git checkout -b release/v1.1.0 develop
-```
+Durante la ejecución de las pruebas manuales e interactivas de la versión `release/v1.1.0`, surgieron desviaciones funcionales y de lógica transaccional en el panel de administración (`/admin/orders`) que trascendieron los meros retoques visuales. Se aplicó una iteración correctiva profunda para garantizar la integridad operativa:
 
-### 4.2 Catálogo de Ajustes UI/UX en el Storefront (Lado Usuario)
-1. **Feedback Háptico y Visual en Carrito y Checkout:**
-   - Refinamiento de microinteracciones en los botones de "Añadir al carrito" y "Comprar ahora" (animación sutil de confirmación visual y prevención de doble clic).
-   - Clarificación visual de la tarjeta de selección de método de envío en `/checkout`, destacando de forma más prominente el badge de "Envío Gratuito" al superar los 50.00€.
-2. **Ergonomía de Formularios y Estados de Carga:**
-   - Mejoras en los mensajes de validación inline para direcciones postales, asegurando contraste legible según normativa WCAG 2.1 AA.
-   - Skeletons de carga suaves en la transición entre la selección de método de pago y la redirección a Stripe Checkout.
-3. **Pulido Visual del Onboarding:**
-   - Afinado del diseño de la pantalla `/onboarding/shipping` para usuarios de Google OAuth, reduciendo el ruido visual y guiando el foco hacia el botón de confirmación.
+| Desviación Detectada | Causa Raíz | Solución Implementada | Commit |
+|---|---|---|:---:|
+| **D1: Desincronización Logística** | El avance del transportista en paquetería no actualizaba simétricamente el estado del pedido, y pedidos cancelados o entregados podían ser avanzados erróneamente. | Sincronización bidireccional estricta en `AdminController`, guardia de estados terminales en `advanceShipment` y soporte de estado `cancelled`/`Anulada` en `Shipment`. | `bde86ba` |
+| **D2: Inconsistencia en Datos de Prueba** | Falta de un entorno limpio para pruebas manuales repetibles tras múltiples transiciones. | Creación del comando Artisan `php artisan orders:reset-test-matrix` con 9 pedidos modelo (Stripe y Directos) cubriendo todo el ciclo de vida. | `5265e0e` |
+| **D3: Bloqueo de Facturación Admin** | La descarga de PDF en `CartController::downloadInvoice` exigía que el pedido perteneciera al usuario autenticado, impidiendo a los administradores descargar facturas de clientes. | Incorporación del método `isAdmin(): bool` en `User` y autorización explícita para administradores en el controlador de descargas. | `5265e0e` |
+| **D4: Error Fatal HTTP 500 en Stripe Refund** | Invocación de método inexistente `Cashier::stripe()->paymentIntents->refund(...)`. El fatal `\Error` de PHP escapaba del bloque `catch (\Exception $e)`. | Sustitución por `Cashier::stripe()->refunds->create(...)`, simulación en entorno de test local (`sk_test_`), y migración a `catch (\Throwable $e)`. | `61252fb` |
+| **D5: Bloqueo de Reembolsos en Pedidos Directos** | El botón de reembolso en la columna Acciones exigía `payment_intent_id`, dejando a los pedidos directos (efectivo/sin pasarela) completados sin opción de devolución. | Universalización del botón `[Reembolsar]` en **Acciones** para cualquier pedido `Entregado` o `Completado` (Stripe o Directo), con reposición de inventario y registro contable. | `a68941c` |
 
-### 4.3 Catálogo de Ajustes UI/UX en el Panel de Administración (Lado Admin)
-1. **Densidad Operativa en `/admin/orders`:**
-   - Reorganización de columnas en la tabla de pedidos para facilitar la lectura en monitores de alta resolución (priorización visual de ID, Cliente, Importe, Estado Logístico y Tracking).
-   - Acceso directo con un clic a la impresión de la etiqueta térmica A6 (10x15cm) desde la propia fila de la tabla sin requerir entrar en el detalle.
-2. **Feedback en Transición de Estados:**
-   - Confirmación mediante modal no invasivo o toast sereno al avanzar el estado de un pedido (`processing` $\rightarrow$ `shipped` $\rightarrow$ `delivered`), evitando clics accidentales.
-   - Filtros combinados rápidos por transportista (Correos Express) y rango de fechas.
+* **Resultado de la Iteración 4.1:** La pirámide de pruebas creció de 119 a **125 pruebas en Pest** (+6 tests de ciclo de vida y reembolsos en `OrderShipmentLifecycleSyncTest` y `AdminTest`), certificando 0 regresiones con **8/8 pruebas E2E en Playwright** y 100% de cumplimiento en **Laravel Pint**.
 
-### 4.4 Certificación de No-Regresión
-Tras aplicar los ajustes en archivos Blade y Sass/CSS:
-* Compilación obligatoria de assets: `npm run build`.
-* Verificación de la suite de 119 pruebas en `develop` / `release/v1.1.0`:
-  ```bash
-  docker exec reposaplus_app php artisan test --testsuite=Unit
-  docker exec reposaplus_app php artisan test --testsuite=Feature
-  npx playwright test
-  ```
-* *Punto de Control Crítico:* Los selectores probados por Playwright E2E (`#cart-count`, `.badge`, formularios de login/checkout) deben conservarse intactos.
+---
+
+### 4.2 Plan para la Iteración 4.2: Simplificación Cognitiva del Catálogo Storefront y Búsqueda Ágil (En Planificación)
+
+#### A. Diagnóstico de Fricción Heurística en la Vista del Catálogo (`/catalog`)
+Actualmente, la vista [`catalog/index.blade.php`](file:///Users/jonathanquishpe/JoniDev/Reposa+_TFG/Reposa+/resources/views/catalog/index.blade.php) presenta un nivel excesivo de **sobrecarga cognitiva** y fatiga de decisión para el usuario:
+1. **Pérdida de foco del producto (*Above the Fold*):** El "Selector Anatómico / Asesor de Firmeza" (`firmness-guide.blade.php`, 350+ líneas) se carga expandido por defecto (`collapse show`), acaparando prácticamente todo el primer viewport útil y obligando al comprador a hacer scroll para ver la primera almohada.
+2. **Parálisis por Análisis:** Entre el selector biomecánico de 3 pasos (postura, nivel 1-10 y diagnóstico), la barra lateral con 5 tipos de filtros (búsqueda, categorías, materiales, firmezas y rangos numéricos de precio) y el desplegable de ordenación en la cabecera, se produce una sensación de caos de configuración.
+3. **Búsqueda Rígida:** La búsqueda actual realiza un `LIKE %q%` estricto en JSON de nombre y descripción. Si un usuario busca *"dormir de lado"*, *"cuello"* o *"almohada dura"*, no obtiene coincidencias si esas palabras exactas no están en el título.
+
+#### B. Objetivos de Diseño y Arquitectura (Filosofía Impeccable: *Distill, Clarify & Layout*)
+* **Principio Rector:** **Divulgación Progresiva (*Progressive Disclosure*)**. El producto debe ser el protagonista indiscutible. Un comprador que simplemente quiere explorar almohadas debe ver el catálogo de inmediato sin barreras.
+* **Asesor Anatómico bajo Demanda:** El recomendador anatómico debe transformarse en una herramienta de asistencia inteligente **colapsada por defecto**, accesible mediante un llamador visualmente refinado y sereno (*"🧠 ¿Dudas sobre qué almohada necesitas? Descubre tu almohada ideal según tu postura"*).
+* **Navegación Rápida por Píldoras Horizontales (*Category Chips*):** Extraer las categorías principales a una botonera horizontal ágil (`Todas`, `Viscoelásticas`, `Cervicales`, `Ergonómicas`, `Fibra`) debajo del título para filtrado instantáneo en 1 clic sin fricción lateral.
+* **Búsqueda Prominente y Tolerante (Semántica / Multiatributo):**
+  - Barra de búsqueda limpia con botón de borrado rápido (`clear`).
+  - Extensión en `ProductController::index` para que busque no solo en nombre y descripción, sino también en atributos clave de descanso (postura recomendada, firmeza, materiales) permitiendo que términos como *"cervical"*, *"lado"*, *"suave"* o *"firme"* arrojen los productos óptimos.
+* **Filtros Secundarios Despejados (*Offcanvas / Collapsible Drawer*):**
+  - Mover los filtros secundarios (materiales, nivel numérico de firmeza, rango de precio) a un botón desplegable compacto `"Filtros"`, reduciendo el ruido visual lateral y maximizando el espacio para un grid de 3 o 4 columnas de productos en monitores estándar.
+  - Indicación clara de filtros activos mediante chips descartables (*tags*) y botón directo de `"Limpiar filtros"`.
+
+#### C. Matriz de Tareas de la Iteración 4.2
+1. **Tarea 4.2.1 — Refactorización Blade de `/catalog`:**
+   - Colapsar por defecto el Asesor Anatómico y rediseñar su tarjeta cabecera como un banner de valor no invasivo.
+   - Implementar la barra superior unificada con buscador y píldoras horizontales de categoría.
+   - Reestructurar el grid de productos para ocupar ancho completo o 9/12 con panel de filtros colapsable/offcanvas.
+2. **Tarea 4.2.2 — Optimización de Búsqueda y Filtros en `ProductController`:**
+   - Mejorar la query de búsqueda para contemplar coincidencias en campos JSON transducibles y atributos ergonómicos.
+   - Asegurar que la paginación y ordenación se mantengan fluidas con `withQueryString()`.
+3. **Tarea 4.2.3 — Verificación y Certificación:**
+   - Revisión visual y táctil en viewport móvil y escritorio.
+   - Ejecución de la suite completa de 125 pruebas en Pest y 8 pruebas en Playwright.
+   - Verificación de formateo con Laravel Pint.
 
 ---
 
