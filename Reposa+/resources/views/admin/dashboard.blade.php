@@ -279,7 +279,10 @@
                                 <tr>
                                     <td class="fw-bold tabular-nums text-primary">#{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</td>
                                     <td>
-                                        <span class="fw-semibold text-dark">{{ $order->user->name }}</span>
+                                        <span class="fw-semibold text-dark">{{ $order->customer_name }}</span>
+                                        @if($order->isGuest())
+                                            <span class="badge bg-secondary-subtle text-secondary border ms-1" style="font-size: 0.65rem;">Invitado</span>
+                                        @endif
                                     </td>
                                     <td class="text-muted small tabular-nums">{{ $order->created_at->format('d/m/Y H:i') }}</td>
                                     <td class="text-end fw-bold tabular-nums text-navy">{{ number_format($order->total_amount, 2) }}€</td>

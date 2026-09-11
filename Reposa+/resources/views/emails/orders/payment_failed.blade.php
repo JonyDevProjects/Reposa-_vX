@@ -1,7 +1,7 @@
 <x-mail::message>
 # {{ __('messages.email.payment_failed.title') }}
 
-{{ __('messages.email.payment_failed.hello', ['name' => $order->user->name]) }}
+{{ __('messages.email.payment_failed.hello', ['name' => $order->customer_name]) }}
 
 {{ __('messages.email.payment_failed.message', ['id' => $order->id]) }}
 

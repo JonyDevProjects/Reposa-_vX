@@ -195,7 +195,7 @@
                             @php $remainingForFree = 50.00 - $total; @endphp
                             <div class="p-2 px-3 rounded-3 bg-light border mb-3 d-flex align-items-center justify-content-between flex-wrap gap-2 small text-muted">
                                 <span><i class="bi bi-info-circle text-primary me-1"></i>Añade <strong>{{ number_format($remainingForFree, 2) }}€</strong> más para conseguir <strong>Envío Estándar Gratuito</strong>.</span>
-                                <a href="{{ route('catalog.index') }}" class="text-primary fw-semibold text-decoration-none">
+                                <a href="{{ route('catalog') }}" class="text-primary fw-semibold text-decoration-none">
                                     Añadir productos <i class="bi bi-arrow-right"></i>
                                 </a>
                             </div>

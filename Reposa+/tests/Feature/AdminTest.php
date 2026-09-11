@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Mail\OrderConfirmed;
+use App\Mail\OrderRefunded;
+use App\Mail\PaymentFailed;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -213,5 +216,58 @@ class AdminTest extends TestCase
 
         $response->assertRedirect();
         $this->assertDatabaseMissing('categories', ['id' => $category->id]);
+    }
+
+    public function test_admin_can_view_dashboard_with_guest_and_user_orders(): void
+    {
+        // 1 orden de usuario registrado completada
+        Order::factory()->completed()->create([
+            'user_id' => User::factory()->create()->id,
+        ]);
+
+        // 1 orden de invitado completada (user_id = null)
+        Order::factory()->completed()->create([
+            'user_id' => null,
+            'shipping_email' => 'invitado@test.com',
+            'shipping_name' => 'Invitado Especial',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get('/admin/dashboard');
+
+        $response->assertOk();
+        $response->assertSee('Invitado Especial');
+        $response->assertSee('Invitado');
+    }
+
+    public function test_order_emails_render_properly_for_guest_orders(): void
+    {
+        $guestOrder = Order::factory()->completed()->create([
+            'user_id' => null,
+            'shipping_email' => 'invitado@test.com',
+            'shipping_name' => 'Invitado Mails',
+        ]);
+
+        $product = Product::factory()->create();
+        OrderItem::factory()->create([
+            'order_id' => $guestOrder->id,
+            'product_id' => $product->id,
+            'quantity' => 1,
+            'price_at_purchase' => 49.99,
+        ]);
+
+        $refund = Refund::create([
+            'order_id' => $guestOrder->id,
+            'amount' => 49.99,
+            'reason' => 'Devolución de prueba',
+        ]);
+
+        $confirmedHtml = (new OrderConfirmed($guestOrder))->render();
+        $this->assertStringContainsString('Invitado Mails', $confirmedHtml);
+
+        $failedHtml = (new PaymentFailed($guestOrder, 'Fallo de pago'))->render();
+        $this->assertStringContainsString('Invitado Mails', $failedHtml);
+
+        $refundedHtml = (new OrderRefunded($guestOrder, $refund))->render();
+        $this->assertStringContainsString('Invitado Mails', $refundedHtml);
     }
 }
