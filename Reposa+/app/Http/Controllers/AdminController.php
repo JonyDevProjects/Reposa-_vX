@@ -295,6 +295,19 @@ class AdminController extends Controller
                     'shipped_at' => $order->shipment->shipped_at ?? $now,
                     'delivered_at' => $order->shipment->delivered_at ?? $now,
                 ]);
+            } elseif ($newStatus === Order::STATUS_CANCELLED && in_array($order->shipment->status, [Shipment::STATUS_PRE_REGISTERED, Shipment::STATUS_IN_TRANSIT])) {
+                $history = $order->shipment->tracking_history ?? [];
+                $history[] = [
+                    'timestamp' => $now->toIso8601String(),
+                    'status' => Shipment::STATUS_CANCELLED,
+                    'status_label' => Shipment::STATUS_LABELS[Shipment::STATUS_CANCELLED] ?? 'Envío cancelado',
+                    'description' => 'Expedición anulada por cancelación del pedido.',
+                    'location' => 'Centro de Control Logístico',
+                ];
+                $order->shipment->update([
+                    'status' => Shipment::STATUS_CANCELLED,
+                    'tracking_history' => $history,
+                ]);
             }
         }
 
@@ -362,6 +375,19 @@ class AdminController extends Controller
 
     public function advanceShipment(Shipment $shipment, ShippingServiceInterface $shippingService)
     {
+        if ($shipment->order && in_array($shipment->order->status, [
+            Order::STATUS_COMPLETED,
+            Order::STATUS_CANCELLED,
+            Order::STATUS_REFUNDED,
+            Order::STATUS_DELIVERED,
+        ])) {
+            return back()->with('error', 'No se puede avanzar el envío de un pedido cerrado, cancelado o entregado.');
+        }
+
+        if ($shipment->status === Shipment::STATUS_CANCELLED) {
+            return back()->with('error', 'No se puede avanzar un envío cancelado.');
+        }
+
         $oldStatus = $shipment->status;
         $updatedShipment = $shippingService->advanceTrackingStatus($shipment);
 

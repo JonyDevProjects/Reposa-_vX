@@ -158,6 +158,11 @@ class MockStandardCourierService implements ShippingServiceInterface
     public function advanceTrackingStatus(Shipment $shipment, ?string $targetStatus = null): Shipment
     {
         $current = $shipment->status;
+
+        if ($current === Shipment::STATUS_CANCELLED) {
+            return $shipment;
+        }
+
         $next = $targetStatus ?: match ($current) {
             Shipment::STATUS_PRE_REGISTERED => Shipment::STATUS_IN_TRANSIT,
             Shipment::STATUS_IN_TRANSIT => Shipment::STATUS_AT_HUB,
@@ -232,7 +237,7 @@ class MockStandardCourierService implements ShippingServiceInterface
 
         if ($next === Shipment::STATUS_DELIVERED && ! $shipment->delivered_at) {
             $shipment->delivered_at = $now;
-            if ($shipment->order->status === Order::STATUS_SHIPPED) {
+            if (in_array($shipment->order->status, [Order::STATUS_SHIPPED, Order::STATUS_PROCESSING, Order::STATUS_PENDING])) {
                 $shipment->order->update(['status' => Order::STATUS_DELIVERED]);
             }
         }

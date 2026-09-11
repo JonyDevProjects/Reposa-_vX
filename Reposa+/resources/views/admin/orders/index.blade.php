@@ -219,7 +219,7 @@
                                                     <i class="bi bi-upc me-1"></i>{{ $order->shipment->tracking_number }}
                                                 </div>
                                                 <div class="d-flex gap-1 mt-1">
-                                                    @if(!in_array($order->status, [\App\Models\Order::STATUS_COMPLETED, \App\Models\Order::STATUS_CANCELLED, \App\Models\Order::STATUS_REFUNDED]) && $order->shipment->status !== \App\Models\Shipment::STATUS_DELIVERED)
+                                                    @if(!in_array($order->status, [\App\Models\Order::STATUS_COMPLETED, \App\Models\Order::STATUS_CANCELLED, \App\Models\Order::STATUS_REFUNDED, \App\Models\Order::STATUS_DELIVERED]) && !in_array($order->shipment->status, [\App\Models\Shipment::STATUS_DELIVERED, \App\Models\Shipment::STATUS_CANCELLED]))
                                                         <form action="{{ route('admin.shipments.advance', $order->shipment) }}" method="POST" class="d-inline">
                                                             @csrf
                                                             <button type="submit" class="btn btn-sm btn-outline-primary py-0 px-2 fw-semibold" style="font-size: 0.68rem;" title="{{ __('messages.admin.orders.advance_status') }}">
@@ -227,9 +227,13 @@
                                                             </button>
                                                         </form>
                                                     @endif
-                                                    <a href="{{ route('admin.shipments.label', $order->shipment) }}" target="_blank" class="btn btn-sm btn-outline-dark bg-white shadow-2xs py-0 px-2 fw-semibold d-inline-flex align-items-center" style="font-size: 0.68rem;" title="Imprimir albarán térmico A6 (10x15cm) con código Code 128">
-                                                        <i class="bi bi-printer-fill text-primary me-1"></i>Etiqueta A6
-                                                    </a>
+                                                    @if($order->status !== \App\Models\Order::STATUS_CANCELLED && $order->shipment->status !== \App\Models\Shipment::STATUS_CANCELLED)
+                                                        <a href="{{ route('admin.shipments.label', $order->shipment) }}" target="_blank" class="btn btn-sm btn-outline-dark bg-white shadow-2xs py-0 px-2 fw-semibold d-inline-flex align-items-center" style="font-size: 0.68rem;" title="Imprimir albarán térmico A6 (10x15cm) con código Code 128">
+                                                            <i class="bi bi-printer-fill text-primary me-1"></i>Etiqueta A6
+                                                        </a>
+                                                    @else
+                                                        <span class="badge bg-secondary-subtle text-muted border px-2 py-0" style="font-size: 0.65rem; height: 20px; display: inline-flex; align-items: center;">Anulada</span>
+                                                    @endif
                                                 </div>
                                             </div>
                                         @else
