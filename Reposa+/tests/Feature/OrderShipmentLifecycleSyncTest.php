@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
 use App\Models\Shipment;
 use App\Models\User;
 use App\Services\Shipping\ShippingServiceInterface;
@@ -158,5 +160,69 @@ class OrderShipmentLifecycleSyncTest extends TestCase
         $response->assertSee('Avanzar');
         // Para cancelado debe mostrarse la insignia de Anulada
         $response->assertSee('Anulada');
+    }
+
+    public function test_admin_can_refund_direct_order_via_status_update_restocks_and_creates_refund_record(): void
+    {
+        $user = User::factory()->create();
+        $product = Product::factory()->create(['stock' => 10]);
+        $order = Order::factory()->completed()->create([
+            'user_id' => $user->id,
+            'payment_intent_id' => null,
+            'stripe_session_id' => null,
+            'total_amount' => 50.00,
+        ]);
+        OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'product_id' => $product->id,
+            'quantity' => 2,
+            'price_at_purchase' => 25.00,
+        ]);
+
+        $response = $this->actingAs($this->admin)->patch("/admin/orders/{$order->id}/status", [
+            'status' => Order::STATUS_REFUNDED,
+        ]);
+
+        $response->assertRedirect();
+        $this->assertEquals(Order::STATUS_REFUNDED, $order->fresh()->status);
+        $this->assertEquals(12, $product->fresh()->stock);
+        $this->assertDatabaseHas('refunds', [
+            'order_id' => $order->id,
+            'amount' => 50.00,
+            'status' => 'succeeded',
+        ]);
+    }
+
+    public function test_ui_differentiates_payment_badges_and_allows_refund_option_only_for_direct_orders(): void
+    {
+        // Pedido Directo Completado
+        Order::factory()->completed()->create([
+            'payment_intent_id' => null,
+            'stripe_session_id' => null,
+        ]);
+
+        // Pedido Stripe Pagado Completado
+        Order::factory()->completed()->create([
+            'payment_intent_id' => 'pi_test_stripe_123',
+            'stripe_session_id' => 'cs_test_session_123',
+        ]);
+
+        // Pedido Stripe Abandonado / Sin Cobro
+        Order::factory()->create([
+            'status' => Order::STATUS_PENDING,
+            'payment_intent_id' => null,
+            'stripe_session_id' => 'cs_test_unpaid_123',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get('/admin/orders');
+
+        $response->assertOk();
+        $response->assertSee('Directo');
+        $response->assertSee('Stripe');
+        $response->assertSee('Stripe (Sin cobro)');
+
+        $content = $response->getContent();
+        $this->assertStringContainsString('value="refunded"', $content);
+        $this->assertStringContainsString('Reembolsar', $content);
     }
 }

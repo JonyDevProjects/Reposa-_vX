@@ -49,13 +49,13 @@ class OrderTestMatrixSeeder extends Seeder
 
         // Matriz de 9 pedidos ejemplares
         $matrix = [
-            // 1. Pendiente - Pago con Stripe no finalizado
+            // 1. Pendiente - Pago con Stripe autorizado
             [
                 'customer_name' => 'Carlos Méndez',
                 'customer_email' => 'carlos.mendez@example.com',
                 'status' => Order::STATUS_PENDING,
                 'stripe' => true,
-                'paid' => false,
+                'paid' => true,
                 'shipment_status' => Shipment::STATUS_PRE_REGISTERED,
                 'days_ago' => 1,
             ],

@@ -311,6 +311,20 @@ class AdminController extends Controller
             }
         }
 
+        if ($newStatus === Order::STATUS_REFUNDED && ! $order->refunds()->where('status', 'succeeded')->exists()) {
+            DB::transaction(function () use ($order) {
+                foreach ($order->orderItems as $item) {
+                    $item->product->increment('stock', $item->quantity);
+                }
+                Refund::create([
+                    'order_id' => $order->id,
+                    'amount' => $order->total_amount,
+                    'reason' => 'Reembolso directo registrado por administración.',
+                    'status' => 'succeeded',
+                ]);
+            });
+        }
+
         return back()->with('success', __('messages.admin.status_updated', ['status' => Order::getStatusLabel($newStatus)]));
     }
 

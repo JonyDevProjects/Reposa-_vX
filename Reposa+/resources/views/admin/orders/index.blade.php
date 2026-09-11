@@ -167,9 +167,13 @@
                                     <td class="text-end tabular-nums text-nowrap">
                                         <div class="fw-bold text-navy">{{ number_format($order->total_amount, 2) }}€</div>
                                         <div style="font-size: 0.65rem;">
-                                            @if($order->payment_intent_id || $order->stripe_session_id)
+                                            @if($order->payment_intent_id)
                                                 <span class="badge bg-primary-subtle text-primary border" style="font-size: 0.6rem; padding: 1px 4px;">
                                                     <i class="bi bi-credit-card-2-front me-1"></i>Stripe
+                                                </span>
+                                            @elseif($order->stripe_session_id)
+                                                <span class="badge bg-warning-subtle text-warning border" style="font-size: 0.6rem; padding: 1px 4px;" title="Sesión Stripe sin cargo confirmado">
+                                                    <i class="bi bi-clock me-1"></i>Stripe (Sin cobro)
                                                 </span>
                                             @else
                                                 <span class="badge bg-light text-muted border" style="font-size: 0.6rem; padding: 1px 4px;">
@@ -190,7 +194,10 @@
                                         @php
                                             $terminalStatuses = [\App\Models\Order::STATUS_COMPLETED, \App\Models\Order::STATUS_CANCELLED, \App\Models\Order::STATUS_REFUNDED];
                                             $transitions = \App\Models\Order::getAllowedTransitions($order->status);
-                                            $selectableTransitions = array_diff($transitions, [\App\Models\Order::STATUS_REFUNDED]);
+                                            // Si tiene Stripe (payment_intent_id), el reembolso se realiza exclusivamente mediante el botón formal Reembolsar
+                                            $selectableTransitions = $order->payment_intent_id
+                                                ? array_diff($transitions, [\App\Models\Order::STATUS_REFUNDED])
+                                                : $transitions;
                                         @endphp
                                         @if(!in_array($order->status, $terminalStatuses) && !empty($selectableTransitions))
                                             <form action="{{ route('admin.orders.updateStatus', $order) }}" method="POST" class="d-inline">
