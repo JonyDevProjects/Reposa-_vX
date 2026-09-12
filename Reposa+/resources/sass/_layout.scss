@@ -1265,8 +1265,11 @@ body {
 
 // --- Reusable Empty State Styles ---
 .empty-state-card {
+    width: 100%;
     max-width: 680px;
+    min-width: 0;
     margin: 0 auto;
+    box-sizing: border-box;
 
     .empty-state-icon-aura {
         width: 88px;
@@ -1280,18 +1283,50 @@ body {
         &:hover {
             transform: scale(1.05);
         }
+
+        @media (max-width: 575.98px) {
+            width: 76px;
+            height: 76px;
+        }
     }
 
     .empty-state-icon {
         font-size: 2.5rem;
         line-height: 1;
+
+        @media (max-width: 575.98px) {
+            font-size: 2rem;
+        }
+    }
+
+    .badge {
+        white-space: normal !important;
+        max-width: 100%;
+        line-height: 1.45;
+        text-align: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .empty-state-desc {
+        width: 100%;
         max-width: 520px;
         font-size: 0.95rem;
         line-height: 1.6;
         color: var(--color-text-muted);
+
+        @media (max-width: 575.98px) {
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+    }
+
+    .btn,
+    .btn-cta-bold {
+        max-width: 100%;
+        white-space: normal;
+        word-break: break-word;
     }
 }
 

@@ -3,7 +3,7 @@
 @section('title', __('messages.cart.title'))
 
 @section('content')
-<div class="container py-5">
+<div class="container py-4 py-md-5">
     @php
         $totalItemsCount = $totals['items_count'] ?? $cartItems->sum('quantity');
         $freeShippingThreshold = $totals['free_shipping_threshold'] ?? 50.0;
@@ -36,7 +36,7 @@
     </div>
 
     @if($cartItems->isEmpty())
-        <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden w-100">
             <x-empty-state 
                 icon="bi-moon-stars"
                 :title="__('messages.cart.empty_title')"
