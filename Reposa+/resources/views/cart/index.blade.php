@@ -257,9 +257,14 @@
                             </div>
                         </div>
 
-                        <!-- CTA Checkout Action (Adaptativo para Invitados y Usuarios) -->
+                        <!-- Secondary Action: Volver al catálogo para continuar comprando -->
+                        <x-button href="{{ route('catalog') }}" variant="outline-primary" size="md" :pill="true" class="w-100 text-decoration-none py-2 mb-2" icon="bi-arrow-left">
+                            {{ __('messages.cart.continue_shopping') }}
+                        </x-button>
+
+                        <!-- CTA Checkout Action: Finalizar Pedido -->
                         <x-button href="{{ route('checkout.page') }}" size="lg" :pill="true" class="w-100 btn-cta-bold text-decoration-none py-3" icon="bi-shield-lock-fill">
-                            {{ __('messages.checkout.title') }}
+                            {{ __('messages.cart.finalize_order') }}
                         </x-button>
 
                         <!-- Trust Microcopy & Redirect Notice -->

@@ -202,6 +202,8 @@ return [
     'cart.free' => 'GRATIS',
     'cart.total' => 'Total',
     'cart.checkout' => 'FINALIZAR COMPRA',
+    'cart.finalize_order' => 'Finalizar Pedido',
+    'cart.continue_shopping' => 'Continuar Comprando',
     'cart.secure_payment' => 'Pago 100% Seguro',
     'cart.shipping_info' => 'Envío en 24-48h por Reposa+ Logística',
     'cart.free_shipping_threshold_remaining' => '¡Solo te faltan :amount€ para conseguir envío gratuito 24/48h!',

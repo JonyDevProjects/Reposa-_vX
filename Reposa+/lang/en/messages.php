@@ -202,6 +202,8 @@ return [
     'cart.free' => 'FREE',
     'cart.total' => 'Total',
     'cart.checkout' => 'PROCEED TO CHECKOUT',
+    'cart.finalize_order' => 'Complete Order',
+    'cart.continue_shopping' => 'Continue Shopping',
     'cart.secure_payment' => '100% Secure Payment',
     'cart.shipping_info' => 'Shipping in 24-48h by Reposa+ Logistics',
     'cart.free_shipping_threshold_remaining' => 'Only :amount€ left for free express 24/48h shipping!',
