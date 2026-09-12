@@ -4,18 +4,8 @@
         : collect(session()->get('cart', []))->sum('quantity');
 @endphp
 
-<!-- Mobile Bottom Navigation Bar (<768px Viewports) -->
 <nav class="mobile-nav-bar d-md-none" aria-label="{{ __('messages.mobile.nav_label') }}">
     <div class="mobile-nav-inner">
-        <!-- Home -->
-        <a href="/" 
-           class="mobile-nav-item {{ request()->is('/') ? 'active' : '' }}" 
-           aria-label="{{ __('messages.mobile.nav_home') }}"
-           @if(request()->is('/')) aria-current="page" @endif>
-            <i class="bi {{ request()->is('/') ? 'bi-house-door-fill' : 'bi-house-door' }} mobile-nav-icon"></i>
-            <span class="mobile-nav-label">{{ __('messages.mobile.nav_home') }}</span>
-        </a>
-
         <!-- Catalog -->
         <a href="/catalog" 
            class="mobile-nav-item {{ request()->is('catalog*') && !request()->has('q') ? 'active' : '' }}" 

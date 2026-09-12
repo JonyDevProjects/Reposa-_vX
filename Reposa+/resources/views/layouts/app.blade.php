@@ -22,28 +22,70 @@
     <a href="#main-content" class="skip-link btn btn-primary">
         {{ __('messages.layout.skip_to_content') ?? 'Saltar al contenido principal' }}
     </a>
+    @php
+        $navCartCount = Auth::check() 
+            ? \App\Models\CartItem::where('user_id', Auth::id())->sum('quantity')
+            : collect(session()->get('cart', []))->sum('quantity');
+    @endphp
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm">
         <div class="container">
-            <a class="navbar-brand fw-bold text-white d-inline-flex align-items-center" href="/">
-                <i class="bi bi-moon-stars-fill me-2 text-white"></i>Reposa+
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Abrir navegación">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <div class="d-flex align-items-center justify-content-between w-100 d-lg-contents">
+                <a class="navbar-brand fw-bold text-white d-inline-flex align-items-center" href="/">
+                    <i class="bi bi-moon-stars-fill me-2 text-white"></i>Reposa+
+                </a>
+
+                {{-- Mobile Controls: Language Switcher & Hamburger Toggler --}}
+                <div class="d-flex align-items-center gap-2 d-lg-none">
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-light border-0 text-white dropdown-toggle d-inline-flex align-items-center px-2 py-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-globe me-1"></i>{{ strtoupper(app()->getLocale()) }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                            <li><a class="dropdown-item {{ app()->getLocale() == 'es' ? 'active' : '' }}" href="{{ route('lang.switch', 'es') }}">Español</a></li>
+                            <li><a class="dropdown-item {{ app()->getLocale() == 'en' ? 'active' : '' }}" href="{{ route('lang.switch', 'en') }}">English</a></li>
+                        </ul>
+                    </div>
+
+                    <button class="navbar-toggler border-0 p-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Abrir navegación">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
+            </div>
+
+            {{-- Persistent Mobile Header Search Bar (<992px) --}}
+            <div class="w-100 d-lg-none mt-2 pb-1">
+                <form action="/catalog" method="GET" class="w-100" id="mobile-header-search-form">
+                    <div class="input-group input-group-sm rounded-pill overflow-hidden bg-white shadow-xs border">
+                        <span class="input-group-text bg-white border-0 ps-3 text-muted"><i class="bi bi-search text-primary"></i></span>
+                        <input type="text" name="q" id="mobile-header-search-input" class="form-control border-0 py-2 ps-1 pe-2 text-navy" placeholder="{{ __('messages.layout.search_placeholder') }}" value="{{ request('q') }}" aria-label="{{ __('messages.layout.search_placeholder') }}">
+                        @if(request('q'))
+                            <a href="{{ request()->fullUrlWithQuery(['q' => null, 'page' => null]) }}" class="btn btn-link text-muted pe-3 d-flex align-items-center text-decoration-none" aria-label="Limpiar búsqueda">
+                                <i class="bi bi-x-circle-fill text-secondary"></i>
+                            </a>
+                        @endif
+                    </div>
+                </form>
+            </div>
+
+            {{-- Collapsible Menu --}}
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/catalog">{{ __('messages.nav.catalog') }}</a>
+                        <a class="nav-link py-2" href="/catalog">{{ __('messages.nav.catalog') }}</a>
                     </li>
                 </ul>
-                <form action="/catalog" method="GET" class="d-flex my-2 my-lg-0 me-lg-3" style="max-width: 300px; width: 100%;">
+
+                {{-- Desktop Search Form (>=992px) --}}
+                <form action="/catalog" method="GET" class="d-none d-lg-flex me-3" style="max-width: 300px; width: 100%;">
                     <div class="input-group input-group-sm">
                         <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
                         <input type="text" name="q" class="form-control border-start-0" placeholder="{{ __('messages.layout.search_placeholder') }}" value="{{ request('q') }}" aria-label="{{ __('messages.layout.search_placeholder') }}">
                     </div>
                 </form>
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item dropdown">
+
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    {{-- Desktop Language Dropdown --}}
+                    <li class="nav-item dropdown d-none d-lg-block">
                         <a class="nav-link dropdown-toggle d-inline-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="bi bi-globe me-1"></i> {{ strtoupper(app()->getLocale()) }}
                         </a>
@@ -54,41 +96,36 @@
                     </li>
                     @guest
                         <li class="nav-item">
-                            <a class="nav-link" href="/login">{{ __('messages.nav.login') }}</a>
+                            <a class="nav-link py-2" href="/login">{{ __('messages.nav.login') }}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link btn btn-secondary text-white ms-lg-2 px-4" href="/register">{{ __('messages.nav.register') }}</a>
+                            <a class="nav-link btn btn-secondary text-white ms-lg-2 px-4 py-2 mt-2 mt-lg-0 text-center" href="/register">{{ __('messages.nav.register') }}</a>
                         </li>
                     @else
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle py-2" href="#" role="button" data-bs-toggle="dropdown">
                                 {{ Auth::user()->name }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="/profile">{{ __('messages.nav.profile') }}</a></li>
+                                <li><a class="dropdown-item py-2" href="/profile">{{ __('messages.nav.profile') }}</a></li>
                                 @if(Auth::user()->role === 'admin')
-                                    <li><a class="dropdown-item text-danger" href="{{ route('admin.dashboard') }}">{{ __('messages.layout.admin_panel') }}</a></li>
+                                    <li><a class="dropdown-item py-2 text-danger" href="{{ route('admin.dashboard') }}">{{ __('messages.layout.admin_panel') }}</a></li>
                                 @endif
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form action="/logout" method="POST">
                                         @csrf
-                                        <button type="submit" class="dropdown-item">{{ __('messages.nav.logout') }}</button>
+                                        <button type="submit" class="dropdown-item py-2">{{ __('messages.nav.logout') }}</button>
                                     </form>
                                 </li>
                             </ul>
                         </li>
                     @endguest
-                    <li class="nav-item">
+                    <li class="nav-item d-none d-lg-block">
                         <a class="nav-link position-relative ms-lg-3" href="/cart">
                             <i class="bi bi-cart3 fs-5"></i>
                             <span id="cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                @php
-                                    $cartCount = Auth::check() 
-                                        ? \App\Models\CartItem::where('user_id', Auth::id())->sum('quantity')
-                                        : collect(session()->get('cart', []))->sum('quantity');
-                                @endphp
-                                {{ $cartCount }}
+                                {{ $navCartCount }}
                             </span>
                         </a>
                     </li>

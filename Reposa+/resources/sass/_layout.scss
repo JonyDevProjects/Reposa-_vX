@@ -1742,6 +1742,14 @@ body {
             color: #ffffff !important;
         }
     }
+
+    @media (max-width: 767.98px) {
+        padding: 6px 13px;
+        font-size: 0.8125rem;
+        min-height: 38px;
+        scroll-snap-align: start;
+        flex-shrink: 0;
+    }
 }
 
 .category-chips-wrapper {
@@ -1753,7 +1761,8 @@ body {
 
     @media (max-width: 767.98px) {
         -webkit-overflow-scrolling: touch;
-        padding-right: 1rem;
+        scroll-snap-type: x proximity;
+        padding-right: 0.5rem;
     }
 }
 

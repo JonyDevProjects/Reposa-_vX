@@ -14,11 +14,11 @@
     @endphp
 
     {{-- Breadcrumb & Title Area --}}
-    <div class="bg-light py-4 border-bottom mb-4">
+    <div class="bg-light py-3 py-md-4 border-bottom mb-3 mb-md-4">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <div>
-                    <h1 class="h2 fw-bold mb-1 text-navy">{{ __('messages.catalog.title') }}</h1>
+                    <h1 class="fs-4 fs-md-2 fw-bold mb-1 text-navy">{{ __('messages.catalog.title') }}</h1>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0">
                             <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">{{ __('messages.catalog.breadcrumb.home') }}</a></li>
@@ -68,84 +68,93 @@
             </div>
 
             {{-- 3. Toolbar: Advanced Filters Toggle, Active Tags, Results Count & Sorting --}}
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pt-3 mt-3 border-top">
-                {{-- Left: Filter Toggle & Active Chips --}}
-                <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <button class="btn btn-sm {{ $hasSecondaryFilters ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-3 py-1 fw-semibold d-inline-flex align-items-center gap-2" 
+            <div class="pt-3 mt-3 border-top">
+                {{-- Badges & Results Count Row --}}
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2 mb-md-3">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        {{-- Active Filter Dismissible Chips --}}
+                        @if(request('q'))
+                            <span class="active-filter-badge">
+                                <i class="bi bi-search text-primary"></i> «{{ request('q') }}»
+                                <a href="{{ request()->fullUrlWithQuery(['q' => null, 'page' => null]) }}" class="filter-remove-btn" aria-label="Eliminar filtro de búsqueda">&times;</a>
+                            </span>
+                        @endif
+
+                        @if(request('category'))
+                            @php $currentCat = $categories->firstWhere('slug', request('category')); @endphp
+                            <span class="active-filter-badge">
+                                <i class="bi bi-tag-fill text-primary"></i> {{ $currentCat?->name ?? request('category') }}
+                                <a href="{{ request()->fullUrlWithQuery(['category' => null, 'page' => null]) }}" class="filter-remove-btn" aria-label="Eliminar filtro de categoría">&times;</a>
+                            </span>
+                        @endif
+
+                        @if(request('material'))
+                            <span class="active-filter-badge">
+                                <i class="bi bi-feather text-primary"></i> {{ request('material') }}
+                                <a href="{{ request()->fullUrlWithQuery(['material' => null, 'page' => null]) }}" class="filter-remove-btn" aria-label="Eliminar filtro de material">&times;</a>
+                            </span>
+                        @endif
+
+                        @if(request('firmness'))
+                            <span class="active-filter-badge">
+                                <i class="bi bi-activity text-primary"></i> {{ request('firmness') }}
+                                <a href="{{ request()->fullUrlWithQuery(['firmness' => null, 'page' => null]) }}" class="filter-remove-btn" aria-label="Eliminar filtro de firmeza">&times;</a>
+                            </span>
+                        @endif
+
+                        @if(request('min_price') || request('max_price'))
+                            <span class="active-filter-badge">
+                                <i class="bi bi-cash-stack text-primary"></i> {{ request('min_price', '0') }}€ — {{ request('max_price', '∞') }}€
+                                <a href="{{ request()->fullUrlWithQuery(['min_price' => null, 'max_price' => null, 'page' => null]) }}" class="filter-remove-btn" aria-label="Eliminar filtro de precio">&times;</a>
+                            </span>
+                        @endif
+
+                        @if($hasAnyFilter)
+                            <a href="/catalog" class="btn btn-link btn-sm text-danger text-decoration-none py-0 px-1 fw-semibold">
+                                <i class="bi bi-trash3 me-1"></i>{{ __('messages.catalog.clear_filters') }}
+                            </a>
+                        @endif
+                    </div>
+
+                    <div class="text-muted small fw-medium tabular-nums ms-auto">
+                        {{ __('messages.catalog.results_count', ['count' => $products->total()]) }}
+                    </div>
+                </div>
+
+                {{-- Action Controls Row (50/50 on Mobile, Side-by-side on Desktop) --}}
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm {{ $hasSecondaryFilters ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center justify-content-center gap-2 flex-grow-1 flex-md-grow-0" 
                             type="button" 
                             data-bs-toggle="collapse" 
                             data-bs-target="#secondaryFiltersPanel" 
                             aria-expanded="{{ $hasSecondaryFilters ? 'true' : 'false' }}" 
                             aria-controls="secondaryFiltersPanel"
-                            id="toggleFiltersBtn">
+                            id="toggleFiltersBtn"
+                            style="min-height: 44px;">
                         <i class="bi bi-sliders2"></i>
-                        <span>{{ __('messages.catalog.secondary_filters_toggle') }}</span>
+                        <span><span class="d-none d-sm-inline">{{ __('messages.catalog.secondary_filters_toggle') }}</span><span class="d-sm-none">Filtros</span></span>
                         @if($activeSecondaryCount > 0)
                             <span class="badge bg-white text-primary rounded-pill">{{ $activeSecondaryCount }}</span>
                         @endif
                         <i class="bi bi-chevron-down small" id="filtersChevron" style="transition: transform 0.2s ease; {{ $hasSecondaryFilters ? 'transform: rotate(180deg);' : '' }}"></i>
                     </button>
 
-                    {{-- Active Filter Dismissible Chips --}}
-                    @if(request('q'))
-                        <span class="active-filter-badge">
-                            <i class="bi bi-search text-primary"></i> «{{ request('q') }}»
-                            <a href="{{ request()->fullUrlWithQuery(['q' => null, 'page' => null]) }}" class="filter-remove-btn" aria-label="Eliminar filtro de búsqueda">&times;</a>
-                        </span>
-                    @endif
-
-                    @if(request('category'))
-                        @php $currentCat = $categories->firstWhere('slug', request('category')); @endphp
-                        <span class="active-filter-badge">
-                            <i class="bi bi-tag-fill text-primary"></i> {{ $currentCat?->name ?? request('category') }}
-                            <a href="{{ request()->fullUrlWithQuery(['category' => null, 'page' => null]) }}" class="filter-remove-btn" aria-label="Eliminar filtro de categoría">&times;</a>
-                        </span>
-                    @endif
-
-                    @if(request('material'))
-                        <span class="active-filter-badge">
-                            <i class="bi bi-feather text-primary"></i> {{ request('material') }}
-                            <a href="{{ request()->fullUrlWithQuery(['material' => null, 'page' => null]) }}" class="filter-remove-btn" aria-label="Eliminar filtro de material">&times;</a>
-                        </span>
-                    @endif
-
-                    @if(request('firmness'))
-                        <span class="active-filter-badge">
-                            <i class="bi bi-activity text-primary"></i> {{ request('firmness') }}
-                            <a href="{{ request()->fullUrlWithQuery(['firmness' => null, 'page' => null]) }}" class="filter-remove-btn" aria-label="Eliminar filtro de firmeza">&times;</a>
-                        </span>
-                    @endif
-
-                    @if(request('min_price') || request('max_price'))
-                        <span class="active-filter-badge">
-                            <i class="bi bi-cash-stack text-primary"></i> {{ request('min_price', '0') }}€ — {{ request('max_price', '∞') }}€
-                            <a href="{{ request()->fullUrlWithQuery(['min_price' => null, 'max_price' => null, 'page' => null]) }}" class="filter-remove-btn" aria-label="Eliminar filtro de precio">&times;</a>
-                        </span>
-                    @endif
-
-                    @if($hasAnyFilter)
-                        <a href="/catalog" class="btn btn-link btn-sm text-danger text-decoration-none py-0 px-1 fw-semibold">
-                            <i class="bi bi-trash3 me-1"></i>{{ __('messages.catalog.clear_filters') }}
-                        </a>
-                    @endif
-                </div>
-
-                {{-- Right: Results Count & Sort Dropdown --}}
-                <div class="d-flex align-items-center gap-3 ms-auto">
-                    <div class="text-muted small fw-medium tabular-nums">
-                        {{ __('messages.catalog.results_count', ['count' => $products->total()]) }}
-                    </div>
-
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle btn-sm rounded-pill px-3 fw-semibold text-navy bg-white border shadow-2xs" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-arrow-down-up me-1 text-primary"></i>{{ __('messages.catalog.sort') }}: <span class="text-navy fw-bold">{{ __('messages.catalog.sort.' . $currentSort) }}</span>
+                    <div class="dropdown flex-grow-1 flex-md-grow-0 ms-md-auto">
+                        <button class="btn btn-outline-secondary dropdown-toggle btn-sm rounded-pill px-2 px-sm-3 py-2 fw-semibold text-navy bg-white border shadow-2xs w-100 d-inline-flex align-items-center justify-content-center" 
+                                type="button" 
+                                data-bs-toggle="dropdown" 
+                                aria-expanded="false"
+                                style="min-height: 44px;">
+                            <i class="bi bi-arrow-down-up me-1 text-primary flex-shrink-0"></i>
+                            <span class="d-none d-sm-inline me-1">{{ __('messages.catalog.sort') }}:</span>
+                            <span class="text-navy fw-bold text-truncate">{{ __('messages.catalog.sort.' . $currentSort) }}</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
-                            <li><a class="dropdown-item {{ $currentSort === 'newest' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'newest']) }}">{{ __('messages.catalog.sort.newest') }}</a></li>
-                            <li><a class="dropdown-item {{ $currentSort === 'price_asc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'price_asc']) }}">{{ __('messages.catalog.sort.price_asc') }}</a></li>
-                            <li><a class="dropdown-item {{ $currentSort === 'price_desc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'price_desc']) }}">{{ __('messages.catalog.sort.price_desc') }}</a></li>
-                            <li><a class="dropdown-item {{ $currentSort === 'name_asc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'name_asc']) }}">{{ __('messages.catalog.sort.name_asc') }}</a></li>
-                            <li><a class="dropdown-item {{ $currentSort === 'name_desc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'name_desc']) }}">{{ __('messages.catalog.sort.name_desc') }}</a></li>
+                            <li><a class="dropdown-item py-2 {{ $currentSort === 'newest' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'newest']) }}">{{ __('messages.catalog.sort.newest') }}</a></li>
+                            <li><a class="dropdown-item py-2 {{ $currentSort === 'price_asc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'price_asc']) }}">{{ __('messages.catalog.sort.price_asc') }}</a></li>
+                            <li><a class="dropdown-item py-2 {{ $currentSort === 'price_desc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'price_desc']) }}">{{ __('messages.catalog.sort.price_desc') }}</a></li>
+                            <li><a class="dropdown-item py-2 {{ $currentSort === 'name_asc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'name_asc']) }}">{{ __('messages.catalog.sort.name_asc') }}</a></li>
+                            <li><a class="dropdown-item py-2 {{ $currentSort === 'name_desc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'name_desc']) }}">{{ __('messages.catalog.sort.name_desc') }}</a></li>
                         </ul>
                     </div>
                 </div>
@@ -248,7 +257,7 @@
                 </x-empty-state>
             </div>
         @else
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 g-4">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 g-3 g-md-4">
                 @foreach($products as $product)
                     <div class="col">
                         <x-product-card :product="$product" :favoriteIds="$favoriteIds" :searchQuery="request('q')" />
