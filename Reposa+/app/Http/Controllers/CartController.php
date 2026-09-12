@@ -247,7 +247,24 @@ class CartController extends Controller
         $userAddresses = $user ? $user->addresses()->get() : collect();
         $userPhone = $user?->profile?->phone;
 
-        return view('checkout.index', compact('cartItems', 'total', 'shippingRates', 'user', 'userAddresses', 'userPhone'));
+        $guestShipping = session('guest_shipping', []);
+        if (empty($guestShipping) && ! $user && session('guest_order_token')) {
+            $prevOrder = Order::where('guest_token', session('guest_order_token'))->latest()->first();
+            if ($prevOrder) {
+                $guestShipping = [
+                    'shipping_name' => $prevOrder->shipping_name,
+                    'shipping_email' => $prevOrder->shipping_email,
+                    'shipping_phone' => $prevOrder->shipping_phone,
+                    'shipping_street' => $prevOrder->shipping_street,
+                    'shipping_city' => $prevOrder->shipping_city,
+                    'shipping_zip_code' => $prevOrder->shipping_zip_code,
+                    'shipping_province' => $prevOrder->shipping_province,
+                    'shipping_service_type' => $prevOrder->shipping_service_type,
+                ];
+            }
+        }
+
+        return view('checkout.index', compact('cartItems', 'total', 'shippingRates', 'user', 'userAddresses', 'userPhone', 'guestShipping'));
     }
 
     protected function getCurrentCartItems()
@@ -327,6 +344,25 @@ class CartController extends Controller
             $shippingZip = $request->shipping_zip_code;
             $shippingProvince = $request->shipping_province ?? '';
             $serviceType = $request->input('shipping_service_type', 'standard_48h');
+
+            session([
+                'guest_shipping' => [
+                    'shipping_name' => $shippingName,
+                    'shipping_email' => $shippingEmail,
+                    'shipping_phone' => $shippingPhone,
+                    'shipping_street' => $shippingStreet,
+                    'shipping_city' => $shippingCity,
+                    'shipping_zip_code' => $shippingZip,
+                    'shipping_province' => $shippingProvince,
+                    'shipping_service_type' => $serviceType,
+                ],
+            ]);
+
+            if (session('guest_order_token')) {
+                Order::where('guest_token', session('guest_order_token'))
+                    ->where('status', 'pending')
+                    ->update(['status' => 'cancelled']);
+            }
         } else {
             if ($request->filled('address_id') && $request->address_id !== 'new') {
                 $address = $user->addresses()->find($request->address_id);
@@ -580,6 +616,7 @@ class CartController extends Controller
 
         if ($guestToken) {
             session(['guest_order_token' => $guestToken]);
+            session()->forget('guest_shipping');
         }
 
         try {
@@ -685,6 +722,19 @@ class CartController extends Controller
             $shippingZip = $validated['shipping_zip_code'];
             $shippingProvince = $validated['shipping_province'] ?? '';
             $serviceType = $validated['shipping_service_type'] ?? 'standard_48h';
+
+            session([
+                'guest_shipping' => [
+                    'shipping_name' => $shippingName,
+                    'shipping_email' => $shippingEmail,
+                    'shipping_phone' => $shippingPhone,
+                    'shipping_street' => $shippingStreet,
+                    'shipping_city' => $shippingCity,
+                    'shipping_zip_code' => $shippingZip,
+                    'shipping_province' => $shippingProvince,
+                    'shipping_service_type' => $serviceType,
+                ],
+            ]);
         } else {
             $mainAddress = $user->addresses()->where('is_main', true)->first() ?? $user->addresses()->first();
             $shippingName = $user->name;
@@ -881,6 +931,7 @@ class CartController extends Controller
             CartItem::where('user_id', $order->user_id)->delete();
         } else {
             session()->forget('cart');
+            session()->forget('guest_shipping');
         }
 
         if ($order->guest_token) {
@@ -908,6 +959,20 @@ class CartController extends Controller
 
         if ($order) {
             $order->update(['status' => 'cancelled']);
+            if (! Auth::check()) {
+                session([
+                    'guest_shipping' => [
+                        'shipping_name' => $order->shipping_name,
+                        'shipping_email' => $order->shipping_email,
+                        'shipping_phone' => $order->shipping_phone,
+                        'shipping_street' => $order->shipping_street,
+                        'shipping_city' => $order->shipping_city,
+                        'shipping_zip_code' => $order->shipping_zip_code,
+                        'shipping_province' => $order->shipping_province,
+                        'shipping_service_type' => $order->shipping_service_type,
+                    ],
+                ]);
+            }
         }
 
         return redirect('/cart')->with('error', __('messages.cart.payment_cancelled'));

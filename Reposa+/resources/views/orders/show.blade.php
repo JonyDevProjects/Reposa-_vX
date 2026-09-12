@@ -530,3 +530,13 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    try {
+        sessionStorage.removeItem('reposa_checkout_guest_shipping');
+        localStorage.removeItem('reposa_checkout_guest_shipping');
+    } catch (e) {}
+</script>
+@endpush
+

@@ -143,7 +143,7 @@
                                         {{ __('messages.auth.full_name') }} <span class="text-danger">*</span>
                                     </label>
                                     <input type="text" class="form-control rounded-3 @error('shipping_name') is-invalid @enderror" id="shipping_name" name="shipping_name" 
-                                           value="{{ old('shipping_name', Auth::user()?->name) }}" required
+                                           value="{{ old('shipping_name', Auth::user()?->name ?? ($guestShipping['shipping_name'] ?? '')) }}" required
                                            placeholder="Ej. María García López">
                                     <div class="invalid-feedback" id="feedback-shipping_name">
                                         {{ $errors->first('shipping_name') ?: __('messages.checkout.validation.name_required') }}
@@ -154,7 +154,7 @@
                                         {{ __('messages.auth.email') }} <span class="text-danger">*</span>
                                     </label>
                                     <input type="email" class="form-control rounded-3 @error('shipping_email') is-invalid @enderror" id="shipping_email" name="shipping_email" 
-                                           value="{{ old('shipping_email', Auth::user()?->email) }}" required
+                                           value="{{ old('shipping_email', Auth::user()?->email ?? ($guestShipping['shipping_email'] ?? '')) }}" required
                                            placeholder="maria@ejemplo.com">
                                     <div class="invalid-feedback" id="feedback-shipping_email">
                                         {{ $errors->first('shipping_email') ?: __('messages.checkout.validation.email_required') }}
@@ -165,7 +165,7 @@
                                         {{ __('messages.auth.street') }} <span class="text-danger">*</span>
                                     </label>
                                     <input type="text" class="form-control rounded-3 @error('shipping_street') is-invalid @enderror" id="shipping_street" name="shipping_street" 
-                                           value="{{ old('shipping_street') }}" required
+                                           value="{{ old('shipping_street', $guestShipping['shipping_street'] ?? '') }}" required
                                            placeholder="{{ __('messages.auth.street_placeholder') }}">
                                     <div class="invalid-feedback" id="feedback-shipping_street">
                                         {{ $errors->first('shipping_street') ?: __('messages.checkout.validation.street_required') }}
@@ -176,7 +176,7 @@
                                         {{ __('messages.auth.city') }} <span class="text-danger">*</span>
                                     </label>
                                     <input type="text" class="form-control rounded-3 @error('shipping_city') is-invalid @enderror" id="shipping_city" name="shipping_city" 
-                                           value="{{ old('shipping_city') }}" required
+                                           value="{{ old('shipping_city', $guestShipping['shipping_city'] ?? '') }}" required
                                            placeholder="{{ __('messages.auth.city_placeholder') }}">
                                     <div class="invalid-feedback" id="feedback-shipping_city">
                                         {{ $errors->first('shipping_city') ?: __('messages.checkout.validation.city_required') }}
@@ -187,7 +187,7 @@
                                         {{ __('messages.auth.zip_code') }} <span class="text-danger">*</span>
                                     </label>
                                     <input type="text" class="form-control rounded-3 @error('shipping_zip_code') is-invalid @enderror" id="shipping_zip_code" name="shipping_zip_code" 
-                                           value="{{ old('shipping_zip_code') }}" required
+                                           value="{{ old('shipping_zip_code', $guestShipping['shipping_zip_code'] ?? '') }}" required
                                            placeholder="{{ __('messages.auth.zip_code_placeholder') }}">
                                     <div class="invalid-feedback" id="feedback-shipping_zip_code">
                                         {{ $errors->first('shipping_zip_code') ?: __('messages.checkout.validation.zip_code_required') }}
@@ -198,7 +198,7 @@
                                         {{ __('messages.auth.province') }}
                                     </label>
                                     <input type="text" class="form-control rounded-3 @error('shipping_province') is-invalid @enderror" id="shipping_province" name="shipping_province" 
-                                           value="{{ old('shipping_province') }}"
+                                           value="{{ old('shipping_province', $guestShipping['shipping_province'] ?? '') }}"
                                            placeholder="{{ __('messages.auth.province_placeholder') }}">
                                     @error('shipping_province')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -209,7 +209,7 @@
                                         {{ __('messages.auth.phone') }} <span class="text-danger">*</span>
                                     </label>
                                     <input type="tel" class="form-control rounded-3 @error('shipping_phone') is-invalid @enderror" id="shipping_phone" name="shipping_phone" 
-                                           value="{{ old('shipping_phone', $userPhone) }}" required
+                                           value="{{ old('shipping_phone', $userPhone ?? ($guestShipping['shipping_phone'] ?? '')) }}" required
                                            placeholder="{{ __('messages.auth.phone_placeholder') }}">
                                     <div class="invalid-feedback" id="feedback-shipping_phone">
                                         {{ $errors->first('shipping_phone') ?: __('messages.checkout.validation.phone_required') }}
@@ -253,9 +253,16 @@
                             </div>
                         @endif
 
+                        @php
+                            $selectedServiceId = old('shipping_service_type', $guestShipping['shipping_service_type'] ?? ($shippingRates[0]['id'] ?? 'standard_48h'));
+                            $selectedRate = collect($shippingRates)->firstWhere('id', $selectedServiceId) ?? ($shippingRates[0] ?? ['cost' => 0.0, 'id' => 'standard_48h']);
+                        @endphp
                         <div class="d-flex flex-column gap-3">
                             @foreach($shippingRates as $rate)
-                                @php $isFree = ($rate['cost'] == 0); @endphp
+                                @php 
+                                    $isFree = ($rate['cost'] == 0); 
+                                    $isChecked = ($rate['id'] === $selectedRate['id']);
+                                @endphp
                                 <div class="p-3 rounded-3 border {{ $isFree ? 'border-success border-2 bg-success-subtle bg-opacity-25 shadow-2xs' : 'bg-light border-light-subtle' }} d-flex align-items-center justify-content-between gap-3 shipping-rate-card transition-all"
                                      style="{{ $isFree ? 'border-color: rgba(5, 150, 105, 0.45) !important;' : '' }}">
                                     <div class="form-check flex-grow-1">
@@ -264,7 +271,7 @@
                                                id="ship_{{ $rate['id'] }}" 
                                                value="{{ $rate['id'] }}" 
                                                data-cost="{{ $rate['cost'] }}"
-                                               {{ $loop->first ? 'checked' : '' }}
+                                               {{ $isChecked ? 'checked' : '' }}
                                                onchange="updateShippingTotal({{ $rate['cost'] }})">
                                         <label class="form-check-label w-100 cursor-pointer" for="ship_{{ $rate['id'] }}">
                                             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
@@ -388,7 +395,7 @@
 
                         {{-- Desglose de costes --}}
                         @php
-                            $defaultShippingCost = $shippingRates[0]['cost'] ?? 0.0;
+                            $defaultShippingCost = $selectedRate['cost'] ?? ($shippingRates[0]['cost'] ?? 0.0);
                             $subtotalNet = round($total / 1.21, 2);
                             $taxVat = round($total - $subtotalNet, 2);
                         @endphp
@@ -612,6 +619,8 @@
                 if (shippingNotice) shippingNotice.classList.add('d-none');
                 if (btnSubmitFeedback) btnSubmitFeedback.classList.add('d-none');
 
+                saveGuestDataToStorage();
+
                 const isStripe = document.getElementById('payment_stripe')?.checked;
                 setTimeout(function () {
                     submitBtn.disabled = true;
@@ -621,6 +630,65 @@
                 }, 10);
             });
         }
+
+        // Persistencia en sessionStorage para usuarios invitados (evita pérdida al regresar de Stripe)
+        const GUEST_STORAGE_KEY = 'reposa_checkout_guest_shipping';
+        const isAuthUser = {{ Auth::check() ? 'true' : 'false' }};
+
+        function saveGuestDataToStorage() {
+            if (isAuthUser) return;
+            const data = {
+                shipping_name: document.getElementById('shipping_name')?.value || '',
+                shipping_email: document.getElementById('shipping_email')?.value || '',
+                shipping_street: document.getElementById('shipping_street')?.value || '',
+                shipping_city: document.getElementById('shipping_city')?.value || '',
+                shipping_zip_code: document.getElementById('shipping_zip_code')?.value || '',
+                shipping_province: document.getElementById('shipping_province')?.value || '',
+                shipping_phone: document.getElementById('shipping_phone')?.value || '',
+                shipping_service_type: document.querySelector('input[name="shipping_service_type"]:checked')?.value || '',
+            };
+            try {
+                sessionStorage.setItem(GUEST_STORAGE_KEY, JSON.stringify(data));
+            } catch (e) {}
+        }
+
+        function restoreGuestDataFromStorage() {
+            if (isAuthUser) return;
+            try {
+                const raw = sessionStorage.getItem(GUEST_STORAGE_KEY);
+                if (!raw) return;
+                const data = JSON.parse(raw);
+                ['shipping_name', 'shipping_email', 'shipping_street', 'shipping_city', 'shipping_zip_code', 'shipping_province', 'shipping_phone'].forEach(fieldId => {
+                    const el = document.getElementById(fieldId);
+                    if (el && !el.value && data[fieldId]) {
+                        el.value = data[fieldId];
+                    }
+                });
+                if (data.shipping_service_type) {
+                    const rateRadio = document.querySelector(`input[name="shipping_service_type"][value="${data.shipping_service_type}"]`);
+                    if (rateRadio && !rateRadio.checked) {
+                        rateRadio.checked = true;
+                        const cost = parseFloat(rateRadio.getAttribute('data-cost') || 0);
+                        updateShippingTotal(cost);
+                    }
+                }
+            } catch (e) {}
+        }
+
+        restoreGuestDataFromStorage();
+        saveGuestDataToStorage();
+
+        ['shipping_name', 'shipping_email', 'shipping_street', 'shipping_city', 'shipping_zip_code', 'shipping_province', 'shipping_phone'].forEach(fieldId => {
+            const el = document.getElementById(fieldId);
+            if (el) {
+                el.addEventListener('input', saveGuestDataToStorage);
+                el.addEventListener('change', saveGuestDataToStorage);
+            }
+        });
+
+        document.querySelectorAll('input[name="shipping_service_type"]').forEach(radio => {
+            radio.addEventListener('change', saveGuestDataToStorage);
+        });
     });
 </script>
 @endsection

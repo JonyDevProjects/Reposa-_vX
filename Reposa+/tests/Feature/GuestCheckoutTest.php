@@ -278,4 +278,89 @@ class GuestCheckoutTest extends TestCase
         $labelResponse->assertViewIs('admin.shipments.label');
         $labelResponse->assertSee($shipment->tracking_number);
     }
+
+    public function test_guest_shipping_details_are_persisted_in_session_on_checkout(): void
+    {
+        $response = $this->withSession([
+            'cart' => [
+                $this->product->id => ['quantity' => 1],
+            ],
+        ])->post('/checkout', [
+            'shipping_name' => 'Carlos Santana',
+            'shipping_email' => 'carlos@example.com',
+            'shipping_phone' => '+34 655 443 322',
+            'shipping_street' => 'Gran Vía 42, 3º D',
+            'shipping_city' => 'Barcelona',
+            'shipping_zip_code' => '08001',
+            'shipping_province' => 'Barcelona',
+            'shipping_service_type' => 'express_24h',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('orders', [
+            'shipping_name' => 'Carlos Santana',
+            'shipping_email' => 'carlos@example.com',
+            'shipping_street' => 'Gran Vía 42, 3º D',
+        ]);
+    }
+
+    public function test_guest_shipping_details_are_prefilled_on_checkout_page_when_returning(): void
+    {
+        $response = $this->withSession([
+            'cart' => [
+                $this->product->id => ['quantity' => 1],
+            ],
+            'guest_shipping' => [
+                'shipping_name' => 'Ana Belén Martínez',
+                'shipping_email' => 'anabelen@example.com',
+                'shipping_phone' => '+34 611 223 344',
+                'shipping_street' => 'Calle Velázquez 50',
+                'shipping_city' => 'Sevilla',
+                'shipping_zip_code' => '41001',
+                'shipping_province' => 'Sevilla',
+                'shipping_service_type' => 'express_24h',
+            ],
+        ])->get('/checkout');
+
+        $response->assertStatus(200);
+        $response->assertSee('Ana Belén Martínez');
+        $response->assertSee('anabelen@example.com');
+        $response->assertSee('Calle Velázquez 50');
+        $response->assertSee('Sevilla');
+        $response->assertSee('41001');
+        $response->assertSee('+34 611 223 344');
+    }
+
+    public function test_guest_shipping_details_are_preserved_on_stripe_cancel(): void
+    {
+        $guestToken = 'guest-cancel-token-12345';
+        $order = Order::create([
+            'user_id' => null,
+            'guest_token' => $guestToken,
+            'shipping_name' => 'Lucía Ferrero',
+            'shipping_email' => 'lucia@example.com',
+            'shipping_phone' => '622 334 455',
+            'shipping_street' => 'Rambla Catalunya 10',
+            'shipping_city' => 'Barcelona',
+            'shipping_zip_code' => '08007',
+            'shipping_province' => 'Barcelona',
+            'shipping_country' => 'ES',
+            'shipping_service_type' => 'standard_48h',
+            'shipping_cost' => 0.00,
+            'total_amount' => 59.99,
+            'status' => 'pending',
+        ]);
+
+        $response = $this->withSession([
+            'guest_order_token' => $guestToken,
+        ])->get('/checkout/stripe/cancel');
+
+        $response->assertRedirect('/cart');
+        $this->assertEquals('cancelled', $order->fresh()->status);
+        $this->assertEquals('Lucía Ferrero', session('guest_shipping')['shipping_name']);
+        $this->assertEquals('lucia@example.com', session('guest_shipping')['shipping_email']);
+        $this->assertEquals('Rambla Catalunya 10', session('guest_shipping')['shipping_street']);
+        $this->assertEquals('Barcelona', session('guest_shipping')['shipping_city']);
+        $this->assertEquals('08007', session('guest_shipping')['shipping_zip_code']);
+    }
 }
