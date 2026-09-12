@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
+use App\Services\Cart\CartCalculator;
 use App\Services\Shipping\ShippingServiceInterface;
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -23,27 +24,19 @@ use PHPUnit\Framework\TestCase;
 
 class CartController extends Controller
 {
+    public function __construct(
+        protected ?CartCalculator $calculator = null
+    ) {
+        $this->calculator = $calculator ?? new CartCalculator;
+    }
+
     public function index()
     {
-        if (Auth::check()) {
-            $cartItems = CartItem::where('user_id', Auth::id())->with('product')->get();
-        } else {
-            $sessionCart = session()->get('cart', []);
-            $cartItems = collect($sessionCart)->map(function ($item, $productId) {
-                return (object) [
-                    'id' => $productId,
-                    'product_id' => $productId,
-                    'quantity' => $item['quantity'],
-                    'product' => Product::find($productId),
-                ];
-            });
-        }
+        $cartItems = $this->getCurrentCartItems();
+        $totals = $this->calculator->calculateTotals($cartItems);
+        $total = $totals['total'];
 
-        $total = $cartItems->sum(function ($item) {
-            return $item->product->price * $item->quantity;
-        });
-
-        return view('cart.index', compact('cartItems', 'total'));
+        return view('cart.index', compact('cartItems', 'total', 'totals'));
     }
 
     public function add(Product $product)
@@ -119,25 +112,87 @@ class CartController extends Controller
     {
         $request->validate(['quantity' => 'required|integer|min:1']);
 
+        $requestedQty = (int) $request->quantity;
+
         if (Auth::check()) {
             $cartItem = CartItem::findOrFail($id);
             $product = Product::find($cartItem->product_id);
 
-            if ($product && $request->quantity > $product->stock) {
-                return back()->with('error', __('messages.cart.only_left', ['count' => $product->stock, 'name' => $product->name]));
+            if ($product && $requestedQty > $product->stock) {
+                $errorMsg = __('messages.cart.only_left', ['count' => $product->stock, 'name' => $product->name]);
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $errorMsg,
+                        'error_code' => 'exceeds_stock',
+                        'max_stock' => $product->stock,
+                        'current_quantity' => $cartItem->quantity,
+                    ], 422);
+                }
+
+                return back()->with('error', $errorMsg);
             }
 
-            $cartItem->update(['quantity' => $request->quantity]);
+            $cartItem->update(['quantity' => $requestedQty]);
+            $updatedItemQty = $cartItem->quantity;
+            $unitPrice = $product ? (float) $product->price : 0.0;
+            $productStock = $product ? (int) $product->stock : 0;
+            $productName = $product ? $product->name : '';
         } else {
             $cart = session()->get('cart', []);
-            if (isset($cart[$id])) {
-                $product = Product::find($id);
-                if ($product && $request->quantity > $product->stock) {
-                    return back()->with('error', __('messages.cart.only_left', ['count' => $product->stock, 'name' => $product->name]));
+            if (! isset($cart[$id])) {
+                if ($request->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => __('messages.cart.empty')], 404);
                 }
-                $cart[$id]['quantity'] = $request->quantity;
-                session()->put('cart', $cart);
+
+                return back()->with('error', __('messages.cart.empty'));
             }
+
+            $product = Product::find($id);
+            if ($product && $requestedQty > $product->stock) {
+                $errorMsg = __('messages.cart.only_left', ['count' => $product->stock, 'name' => $product->name]);
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $errorMsg,
+                        'error_code' => 'exceeds_stock',
+                        'max_stock' => $product->stock,
+                        'current_quantity' => $cart[$id]['quantity'],
+                    ], 422);
+                }
+
+                return back()->with('error', $errorMsg);
+            }
+
+            $cart[$id]['quantity'] = $requestedQty;
+            session()->put('cart', $cart);
+            $updatedItemQty = $requestedQty;
+            $unitPrice = $product ? (float) $product->price : 0.0;
+            $productStock = $product ? (int) $product->stock : 0;
+            $productName = $product ? $product->name : '';
+        }
+
+        if ($request->wantsJson()) {
+            $cartItems = $this->getCurrentCartItems();
+            $totals = $this->calculator->calculateTotals($cartItems);
+            $lineSubtotal = $this->calculator->calculateLineSubtotal($unitPrice, $updatedItemQty);
+
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.cart.updated'),
+                'item' => [
+                    'id' => $id,
+                    'quantity' => $updatedItemQty,
+                    'unit_price' => $unitPrice,
+                    'unit_price_formatted' => number_format($unitPrice, 2, ',', '.').' €',
+                    'subtotal' => $lineSubtotal,
+                    'subtotal_formatted' => number_format($lineSubtotal, 2, ',', '.').' €',
+                    'stock' => $productStock,
+                    'name' => $productName,
+                ],
+                'totals' => $totals,
+                'cart_count' => $totals['items_count'],
+            ]);
         }
 
         return back()->with('success', __('messages.cart.updated'));
@@ -154,6 +209,19 @@ class CartController extends Controller
                 unset($cart[$id]);
                 session()->put('cart', $cart);
             }
+        }
+
+        if (request()->wantsJson()) {
+            $cartItems = $this->getCurrentCartItems();
+            $totals = $this->calculator->calculateTotals($cartItems);
+
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.cart.removed'),
+                'totals' => $totals,
+                'cart_count' => $totals['items_count'],
+                'is_empty' => $cartItems->isEmpty(),
+            ]);
         }
 
         return back()->with('success', __('messages.cart.removed'));

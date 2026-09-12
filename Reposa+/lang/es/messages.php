@@ -544,8 +544,11 @@ return [
     'cart.payment_success' => '¡Pago realizado con éxito! Tu pedido ha sido confirmado.',
     'cart.session_not_found' => 'No se encontró la sesión de pago.',
     'cart.payment_not_completed' => 'El pago no fue completado.',
-    'cart.payment_cancelled' => 'El pago fue cancelado. Tu carrito se mantiene intacto.',
     'cart.stock_insufficient' => 'Stock insuficiente para ":name". Disponible: :available, solicitado: :requested.',
+    'cart.quantity_min_one' => 'La cantidad mínima debe ser al menos 1.',
+    'cart.stock_max_reached' => 'Has alcanzado el stock máximo disponible (:count uds.).',
+    'cart.quantity_min_reached' => 'La cantidad mínima permitida es 1 ud.',
+    'cart.updating' => 'Actualizando cesta...',
 
     // Controllers — Admin messages
     'admin.product_created' => 'Producto creado correctamente.',
