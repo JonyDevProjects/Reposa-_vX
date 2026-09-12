@@ -54,6 +54,13 @@ body {
     }
 }
 
+// --- Display Helpers ---
+@media (min-width: 992px) {
+    .d-lg-contents {
+        display: contents !important;
+    }
+}
+
 // --- Containers & Fluid Scaffolding ---
 .container-tight {
     width: 100%;

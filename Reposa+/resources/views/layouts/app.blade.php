@@ -34,7 +34,7 @@
                     <i class="bi bi-moon-stars-fill me-2 text-white"></i>Reposa+
                 </a>
 
-                {{-- Mobile Controls: Language Switcher, Admin Quick Access & Hamburger Toggler --}}
+                {{-- Mobile Controls: Language Switcher & Admin Quick Access --}}
                 <div class="d-flex align-items-center gap-2 d-lg-none">
                     @auth
                         @if(Auth::user()->role === 'admin')
@@ -53,10 +53,6 @@
                             <li><a class="dropdown-item {{ app()->getLocale() == 'en' ? 'active' : '' }}" href="{{ route('lang.switch', 'en') }}">English</a></li>
                         </ul>
                     </div>
-
-                    <button class="navbar-toggler border-0 p-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Abrir navegación">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
                 </div>
             </div>
 
