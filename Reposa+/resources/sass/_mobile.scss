@@ -4,12 +4,6 @@
 // Targets: <768px Viewports, Touch Targets (>=48px), Safe Areas & Performance
 // =============================================================================
 
-// --- Base Body Safe Area & Mobile Nav Spacing ---
-@media (max-width: 767.98px) {
-    body {
-        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
-    }
-}
 
 // --- Mobile Bottom Navigation Bar (<768px Viewports) ---
 .mobile-nav-bar {
