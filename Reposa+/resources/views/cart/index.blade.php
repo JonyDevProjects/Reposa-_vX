@@ -52,7 +52,7 @@
             <!-- Left Column: Cart Items (Defensive & Robust Layout) -->
             <div class="col-lg-8">
                 <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4">
-                    <div class="table-responsive">
+                    <div class="table-responsive cart-table-responsive">
                         <table class="table table-hover align-middle mb-0 cart-table">
                             <thead class="table-light text-muted small">
                                 <tr>
@@ -72,7 +72,7 @@
                                     data-stock="{{ $item->product->stock }}"
                                     data-update-url="{{ route('cart.update', $item->id) }}">
                                     <!-- Product Info & Safe Clamping -->
-                                    <td class="ps-4 py-3">
+                                    <td class="ps-4 py-3 cell-product">
                                         <div class="d-flex align-items-center gap-3">
                                             <a href="{{ route('products.show', $item->product) }}" class="flex-shrink-0 d-block overflow-hidden rounded-3 border border-light-subtle bg-light" style="width: 64px; height: 64px;">
                                                 <img src="{{ $item->product->image_url ?: '/images/product-placeholder.svg' }}" 
@@ -83,8 +83,8 @@
                                                      height="64"
                                                      loading="lazy">
                                             </a>
-                                            <div class="min-w-0 flex-grow-1 pe-2" style="max-width: 320px;">
-                                                <h3 class="h6 mb-1 fw-bold text-truncate-2">
+                                            <div class="min-w-0 flex-grow-1 pe-2 cart-product-meta">
+                                                <h3 class="h6 mb-1 fw-bold text-truncate-2 cart-item-title">
                                                     <a href="{{ route('products.show', $item->product) }}" class="text-navy text-decoration-none hover-primary">
                                                         {{ $item->product->name }}
                                                     </a>
@@ -101,12 +101,15 @@
                                                         </span>
                                                     @endif
                                                 </div>
+                                                <div class="text-muted small tabular-nums d-md-none mt-1" style="font-size: 0.78rem;">
+                                                    {{ number_format($item->product->price, 2, ',', '.') }}€ / ud.
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
 
                                     <!-- Quantity Selector with Real-time Stepper -->
-                                    <td class="py-3 text-center">
+                                    <td class="py-3 text-center cell-quantity">
                                         <form action="{{ route('cart.update', $item->id) }}" method="POST" class="d-inline-flex flex-column align-items-center justify-content-center js-qty-form mb-0">
                                             @csrf
                                             <div class="input-group input-group-sm quantity-input-group rounded-pill overflow-hidden border shadow-2xs bg-white" style="width: 120px;">
@@ -150,22 +153,23 @@
                                     </td>
 
                                     <!-- Unit Price -->
-                                    <td class="py-3 text-end tabular-nums text-muted small d-none d-md-table-cell">
+                                    <td class="py-3 text-end tabular-nums text-muted small d-none d-md-table-cell cell-unit-price">
                                         {{ number_format($item->product->price, 2, ',', '.') }}€
                                     </td>
 
                                     <!-- Subtotal -->
-                                    <td class="py-3 text-end pe-4 fw-bold tabular-nums text-navy fs-6 js-item-subtotal" id="item-subtotal-{{ $item->id }}">
+                                    <td class="py-3 text-end pe-4 fw-bold tabular-nums text-navy fs-6 js-item-subtotal cell-subtotal" id="item-subtotal-{{ $item->id }}">
                                         {{ number_format($item->product->price * $item->quantity, 2, ',', '.') }}€
                                     </td>
 
                                     <!-- Delete Item Button -->
-                                    <td class="py-3 text-center pe-3">
+                                    <td class="py-3 text-center pe-3 cell-remove">
                                         <form action="{{ route('cart.remove', $item->id) }}" method="POST" class="js-remove-form mb-0" data-confirm-msg="{{ __('messages.cart.remove_confirm') }}">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" 
-                                                    class="btn btn-sm btn-link text-danger p-1 text-decoration-none js-remove-btn" 
+                                                    class="btn btn-sm btn-light text-danger rounded-circle p-2 d-inline-flex align-items-center justify-content-center js-remove-btn" 
+                                                    style="width: 36px; height: 36px;"
                                                     title="{{ __('messages.cart.remove_tooltip') }}"
                                                     aria-label="Eliminar {{ $item->product->name }} del carrito">
                                                 <i class="bi bi-trash3 fs-6"></i>
@@ -305,6 +309,97 @@
     0% { transform: scale(1); }
     50% { transform: scale(1.08); color: var(--bs-primary); }
     100% { transform: scale(1); }
+}
+
+@media (min-width: 768px) {
+    .cart-product-meta {
+        max-width: 320px;
+    }
+}
+
+/* Mobile Narrow Screen Card Transformation */
+@media (max-width: 767.98px) {
+    .cart-table-responsive {
+        overflow-x: visible !important;
+    }
+    .cart-table thead {
+        display: none !important;
+    }
+    .cart-table, 
+    .cart-table tbody {
+        display: block !important;
+        width: 100% !important;
+    }
+    .cart-table tr.cart-item-row {
+        display: grid !important;
+        grid-template-columns: 1fr auto !important;
+        grid-template-rows: auto auto !important;
+        row-gap: 0.875rem !important;
+        column-gap: 0.75rem !important;
+        padding: 1.125rem 1rem !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+        background-color: #ffffff !important;
+        position: relative;
+        --bs-table-accent-bg: transparent !important;
+        --bs-table-bg: transparent !important;
+        --bs-table-hover-bg: transparent !important;
+    }
+    .cart-table tr.cart-item-row:hover {
+        background-color: #fafbfc !important;
+    }
+    .cart-table tr.cart-item-row:last-child {
+        border-bottom: none !important;
+    }
+    .cart-table tr.cart-item-row > td {
+        display: block !important;
+        padding: 0 !important;
+        border: none !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+    }
+    .cart-table tr.cart-item-row td.cell-product {
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+    }
+    .cart-table tr.cart-item-row td.cell-remove {
+        grid-column: 2 !important;
+        grid-row: 1 !important;
+        text-align: right !important;
+        align-self: start !important;
+    }
+    .cart-table tr.cart-item-row td.cell-quantity {
+        grid-column: 1 !important;
+        grid-row: 2 !important;
+        text-align: left !important;
+        justify-self: start !important;
+        align-self: center !important;
+    }
+    .cart-table tr.cart-item-row td.cell-quantity .js-qty-form {
+        align-items: flex-start !important;
+    }
+    .cart-table tr.cart-item-row td.cell-unit-price {
+        display: none !important;
+    }
+    .cart-table tr.cart-item-row td.cell-subtotal {
+        grid-column: 2 !important;
+        grid-row: 2 !important;
+        text-align: right !important;
+        align-self: center !important;
+        font-size: 1.15rem !important;
+        font-weight: 700 !important;
+        padding-right: 0 !important;
+        white-space: nowrap !important;
+    }
+    .cart-product-meta {
+        max-width: none !important;
+    }
+    .cart-item-title {
+        text-transform: none !important;
+        font-size: 0.95rem !important;
+        letter-spacing: normal !important;
+        line-height: 1.35 !important;
+    }
 }
 </style>
 @endsection
