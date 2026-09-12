@@ -114,48 +114,58 @@
                         </li>
                     @else
                         @if(Auth::user()->role === 'admin')
-                            {{-- Direct Admin Panel Button on Desktop --}}
-                            <li class="nav-item d-none d-lg-block me-2">
-                                <a class="btn btn-sm btn-warning text-dark fw-bold rounded-pill px-3 py-1 shadow-xs d-inline-flex align-items-center" href="{{ route('admin.dashboard') }}">
+                            {{-- Admin View: Direct Admin Panel Button & Quick Logout (No customer profile view) --}}
+                            <li class="nav-item d-none d-lg-flex align-items-center">
+                                <a class="btn btn-sm btn-warning text-dark fw-bold rounded-pill px-3 py-1 shadow-xs d-inline-flex align-items-center me-2" href="{{ route('admin.dashboard') }}">
                                     <i class="bi bi-shield-shaded me-1"></i> {{ __('messages.layout.admin_panel') }}
                                 </a>
+                                <form action="/logout" method="POST" class="d-inline mb-0">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-outline-light rounded-pill px-2 py-1 text-white d-inline-flex align-items-center" title="{{ __('messages.nav.logout') }}" aria-label="{{ __('messages.nav.logout') }}">
+                                        <i class="bi bi-box-arrow-right me-1"></i><span class="d-none d-xl-inline small">{{ __('messages.nav.logout') }}</span>
+                                    </button>
+                                </form>
                             </li>
-                        @endif
 
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle py-2 d-inline-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
-                                @if(Auth::user()->role === 'admin')
-                                    <i class="bi bi-person-badge-fill me-1 text-warning"></i>
-                                @else
+                            {{-- Mobile/Tablet Collapsed Menu for Admin --}}
+                            <li class="nav-item d-lg-none">
+                                <a class="nav-link py-2 fw-semibold text-warning d-flex align-items-center" href="{{ route('admin.dashboard') }}">
+                                    <i class="bi bi-speedometer2 me-2"></i>{{ __('messages.layout.admin_panel') }}
+                                </a>
+                            </li>
+                            <li class="nav-item d-lg-none">
+                                <form action="/logout" method="POST">
+                                    @csrf
+                                    <button type="submit" class="nav-link text-danger py-2 border-0 bg-transparent d-flex align-items-center w-100">
+                                        <i class="bi bi-box-arrow-right me-2"></i>{{ __('messages.nav.logout') }}
+                                    </button>
+                                </form>
+                            </li>
+                        @else
+                            {{-- Customer View: Dropdown with Profile & Logout --}}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle py-2 d-inline-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
                                     <i class="bi bi-person-circle me-1"></i>
-                                @endif
-                                {{ Auth::user()->name }}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                @if(Auth::user()->role === 'admin')
-                                    <li>
-                                        <a class="dropdown-item py-2 fw-semibold text-primary" href="{{ route('admin.dashboard') }}">
-                                            <i class="bi bi-speedometer2 me-2 text-warning"></i>{{ __('messages.layout.admin_panel') }}
-                                        </a>
-                                    </li>
-                                @else
+                                    {{ Auth::user()->name }}
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                                     <li>
                                         <a class="dropdown-item py-2" href="/profile">
                                             <i class="bi bi-person me-2"></i>{{ __('messages.nav.profile') }}
                                         </a>
                                     </li>
-                                @endif
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form action="/logout" method="POST">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item py-2 text-danger d-flex align-items-center">
-                                            <i class="bi bi-box-arrow-right me-2"></i>{{ __('messages.nav.logout') }}
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form action="/logout" method="POST">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item py-2 text-danger d-flex align-items-center">
+                                                <i class="bi bi-box-arrow-right me-2"></i>{{ __('messages.nav.logout') }}
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endif
                     @endguest
                     <li class="nav-item d-none d-lg-block">
                         <a class="nav-link position-relative ms-lg-3" href="/cart">

@@ -41,8 +41,8 @@
                     <i class="bi bi-file-earmark-pdf-fill me-1 text-danger" aria-hidden="true"></i>{{ __('messages.orders.show.download_invoice') }}
                 </a>
                 @if(auth()->check())
-                    <a href="{{ route('profile') }}#orders" class="btn btn-outline-light btn-sm text-nowrap">
-                        <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>{{ __('messages.orders.show.back_to_orders') }}
+                    <a href="{{ auth()->user()->role === 'admin' ? route('admin.orders') : route('profile') . '#orders' }}" class="btn btn-outline-light btn-sm text-nowrap">
+                        <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>{{ auth()->user()->role === 'admin' ? __('messages.admin.sidebar.orders') : __('messages.orders.show.back_to_orders') }}
                     </a>
                 @else
                     <a href="{{ url('/catalog') }}" class="btn btn-outline-light btn-sm text-nowrap">
@@ -460,8 +460,8 @@
                         </a>
 
                         @if(auth()->check())
-                            <a href="{{ route('profile') }}#orders" class="btn btn-outline-secondary">
-                                <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>{{ __('messages.orders.show.back_to_orders') }}
+                            <a href="{{ auth()->user()->role === 'admin' ? route('admin.orders') : route('profile') . '#orders' }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>{{ auth()->user()->role === 'admin' ? __('messages.admin.sidebar.orders') : __('messages.orders.show.back_to_orders') }}
                             </a>
                         @else
                             <a href="{{ url('/catalog') }}" class="btn btn-outline-secondary">
