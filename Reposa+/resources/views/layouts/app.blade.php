@@ -104,10 +104,13 @@
                     </li>
                     @guest
                         <li class="nav-item">
-                            <a class="nav-link py-2" href="/login">{{ __('messages.nav.login') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link btn btn-secondary text-white ms-lg-2 px-4 py-2 mt-2 mt-lg-0 text-center" href="/register">{{ __('messages.nav.register') }}</a>
+                            <a class="nav-link py-2 px-2 d-inline-flex align-items-center ms-lg-2 {{ request()->is('login*') || request()->is('register*') ? 'active' : '' }}" 
+                               href="/login" 
+                               title="{{ __('messages.nav.login') }}" 
+                               aria-label="{{ __('messages.nav.login') }}">
+                                <i class="bi bi-person fs-5"></i>
+                                <span class="d-lg-none ms-2">{{ __('messages.nav.login') }}</span>
+                            </a>
                         </li>
                     @else
                         @if(Auth::user()->role === 'admin')
