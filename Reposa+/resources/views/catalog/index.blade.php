@@ -14,36 +14,8 @@
         $currentSort = request('sort', 'newest');
     @endphp
 
-    {{-- Breadcrumb & Title Area --}}
-    <div class="bg-light py-3 py-md-4 border-bottom mb-3 mb-md-4">
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                <div>
-                    <h1 class="fs-4 fs-md-2 fw-bold mb-1 text-navy">{{ __('messages.catalog.title') }}</h1>
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">{{ __('messages.catalog.breadcrumb.home') }}</a></li>
-                            <li class="breadcrumb-item active text-navy fw-medium" aria-current="page">{{ __('messages.catalog.breadcrumb.catalog') }}</li>
-                            @if(request('q'))
-                                <li class="breadcrumb-item active text-primary fw-medium">«{{ request('q') }}»</li>
-                            @endif
-                        </ol>
-                    </nav>
-                </div>
-                
-                {{-- Quick Clear Link if any filter is active --}}
-                @if($hasAnyFilter)
-                    <div>
-                        <a href="/catalog" class="btn btn-outline-danger btn-sm rounded-pill px-3 shadow-xs">
-                            <i class="bi bi-trash3 me-1"></i>{{ __('messages.catalog.clear_filters') }}
-                        </a>
-                    </div>
-                @endif
-            </div>
-        </div>
-    </div>
-
-    <div class="container pb-5">
+    <div class="container pt-3 pt-md-4 pb-5">
+        <h1 class="visually-hidden">{{ __('messages.catalog.title') }}</h1>
         {{-- Catalog Filter Hub & Toolbar --}}
         <div class="card border-0 shadow-sm rounded-4 p-3 p-md-4 mb-4 bg-white catalog-hub-card">
             {{-- Toolbar: Filters Toggle, Results Count & Sorting --}}
