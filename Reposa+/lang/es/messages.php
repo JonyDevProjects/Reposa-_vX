@@ -692,6 +692,7 @@ return [
         'nav_search' => 'Buscar',
         'nav_cart' => 'Cesta',
         'nav_profile' => 'Perfil',
+        'nav_admin' => 'Admin',
         'nav_login' => 'Entrar',
         'search_modal_title' => 'Buscar en Reposa+',
         'search_modal_input_placeholder' => 'Busca por modelo, material, firmeza...',

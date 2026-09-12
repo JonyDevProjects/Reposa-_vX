@@ -34,10 +34,16 @@
             @endif
         </a>
     </div>
-    <div class="card-footer bg-light py-2 px-3 border-top">
+    <div class="card-footer bg-light py-2 px-3 border-top d-flex align-items-center justify-content-between">
         <a href="{{ url('/catalog') }}" class="text-decoration-none text-muted small d-flex align-items-center gap-1 hover-navy">
             <i class="bi bi-arrow-left-short fs-6"></i>
             <span>{{ __('messages.admin.sidebar.storefront') }}</span>
         </a>
+        <form action="{{ route('logout') }}" method="POST" class="d-inline mb-0">
+            @csrf
+            <button type="submit" class="btn btn-link text-danger p-0 small text-decoration-none d-flex align-items-center" title="{{ __('messages.nav.logout') }}">
+                <i class="bi bi-box-arrow-right me-1"></i><span>{{ __('messages.nav.logout') }}</span>
+            </button>
+        </form>
     </div>
 </div>

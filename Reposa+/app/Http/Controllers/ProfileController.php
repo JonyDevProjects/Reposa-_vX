@@ -11,6 +11,11 @@ class ProfileController extends Controller
     public function index()
     {
         $user = auth()->user();
+
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+
         $user->load(['profile', 'addresses', 'orders', 'orderSummary', 'favorites.categories']);
 
         $recommendedProducts = Product::where('stock', '>', 0)

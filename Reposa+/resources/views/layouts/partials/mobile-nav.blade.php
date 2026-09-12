@@ -41,23 +41,33 @@
             <span class="mobile-nav-label">{{ __('messages.mobile.nav_cart') }}</span>
         </a>
 
-        <!-- Profile / Auth -->
+        <!-- Profile / Auth / Admin -->
         @guest
             <a href="/login" 
                class="mobile-nav-item {{ request()->is('login*') || request()->is('register*') ? 'active' : '' }}" 
                aria-label="{{ __('messages.mobile.nav_login') }}"
-               @if(request()->is('login*')) aria-current="page" @endif>
+               @if(request()->is('login*') || request()->is('register*')) aria-current="page" @endif>
                 <i class="bi bi-person mobile-nav-icon"></i>
                 <span class="mobile-nav-label">{{ __('messages.mobile.nav_login') }}</span>
             </a>
         @else
-            <a href="/profile" 
-               class="mobile-nav-item {{ request()->is('profile*') ? 'active' : '' }}" 
-               aria-label="{{ __('messages.mobile.nav_profile') }}"
-               @if(request()->is('profile*')) aria-current="page" @endif>
-                <i class="bi {{ request()->is('profile*') ? 'bi-person-check-fill' : 'bi-person-check' }} mobile-nav-icon"></i>
-                <span class="mobile-nav-label">{{ __('messages.mobile.nav_profile') }}</span>
-            </a>
+            @if(Auth::user()->role === 'admin')
+                <a href="{{ route('admin.dashboard') }}" 
+                   class="mobile-nav-item {{ request()->is('admin*') ? 'active' : '' }}" 
+                   aria-label="{{ __('messages.layout.admin_panel') }}"
+                   @if(request()->is('admin*')) aria-current="page" @endif>
+                    <i class="bi {{ request()->is('admin*') ? 'bi-speedometer2 text-warning' : 'bi-speedometer2' }} mobile-nav-icon"></i>
+                    <span class="mobile-nav-label {{ request()->is('admin*') ? 'fw-bold text-primary' : '' }}">{{ __('messages.mobile.nav_admin') }}</span>
+                </a>
+            @else
+                <a href="/profile" 
+                   class="mobile-nav-item {{ request()->is('profile*') ? 'active' : '' }}" 
+                   aria-label="{{ __('messages.mobile.nav_profile') }}"
+                   @if(request()->is('profile*')) aria-current="page" @endif>
+                    <i class="bi {{ request()->is('profile*') ? 'bi-person-check-fill' : 'bi-person-check' }} mobile-nav-icon"></i>
+                    <span class="mobile-nav-label">{{ __('messages.mobile.nav_profile') }}</span>
+                </a>
+            @endif
         @endguest
     </div>
 </nav>

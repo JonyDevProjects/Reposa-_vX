@@ -34,8 +34,16 @@
                     <i class="bi bi-moon-stars-fill me-2 text-white"></i>Reposa+
                 </a>
 
-                {{-- Mobile Controls: Language Switcher & Hamburger Toggler --}}
+                {{-- Mobile Controls: Language Switcher, Admin Quick Access & Hamburger Toggler --}}
                 <div class="d-flex align-items-center gap-2 d-lg-none">
+                    @auth
+                        @if(Auth::user()->role === 'admin')
+                            <a href="{{ route('admin.dashboard') }}" class="btn btn-sm btn-warning text-dark fw-bold rounded-pill px-2 py-1 shadow-xs d-inline-flex align-items-center" aria-label="{{ __('messages.layout.admin_panel') }}">
+                                <i class="bi bi-shield-shaded me-1"></i>Admin
+                            </a>
+                        @endif
+                    @endauth
+
                     <div class="dropdown">
                         <button class="btn btn-sm btn-outline-light border-0 text-white dropdown-toggle d-inline-flex align-items-center px-2 py-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-globe me-1"></i>{{ strtoupper(app()->getLocale()) }}
@@ -70,13 +78,13 @@
             {{-- Collapsible Menu --}}
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
+                    <li class="nav-item d-none d-md-block">
                         <a class="nav-link py-2" href="/catalog">{{ __('messages.nav.catalog') }}</a>
                     </li>
                 </ul>
 
                 {{-- Desktop Search Form (>=992px) --}}
-                <form action="/catalog" method="GET" class="d-none d-lg-flex me-3" style="max-width: 300px; width: 100%;">
+                <form action="/catalog" method="GET" class="d-none d-lg-flex me-3" style="min-width: 220px; max-width: 280px; width: 100%;">
                     <div class="input-group input-group-sm">
                         <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
                         <input type="text" name="q" class="form-control border-start-0" placeholder="{{ __('messages.layout.search_placeholder') }}" value="{{ request('q') }}" aria-label="{{ __('messages.layout.search_placeholder') }}">
@@ -102,20 +110,45 @@
                             <a class="nav-link btn btn-secondary text-white ms-lg-2 px-4 py-2 mt-2 mt-lg-0 text-center" href="/register">{{ __('messages.nav.register') }}</a>
                         </li>
                     @else
+                        @if(Auth::user()->role === 'admin')
+                            {{-- Direct Admin Panel Button on Desktop --}}
+                            <li class="nav-item d-none d-lg-block me-2">
+                                <a class="btn btn-sm btn-warning text-dark fw-bold rounded-pill px-3 py-1 shadow-xs d-inline-flex align-items-center" href="{{ route('admin.dashboard') }}">
+                                    <i class="bi bi-shield-shaded me-1"></i> {{ __('messages.layout.admin_panel') }}
+                                </a>
+                            </li>
+                        @endif
+
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle py-2" href="#" role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle py-2 d-inline-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                                @if(Auth::user()->role === 'admin')
+                                    <i class="bi bi-person-badge-fill me-1 text-warning"></i>
+                                @else
+                                    <i class="bi bi-person-circle me-1"></i>
+                                @endif
                                 {{ Auth::user()->name }}
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item py-2" href="/profile">{{ __('messages.nav.profile') }}</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                                 @if(Auth::user()->role === 'admin')
-                                    <li><a class="dropdown-item py-2 text-danger" href="{{ route('admin.dashboard') }}">{{ __('messages.layout.admin_panel') }}</a></li>
+                                    <li>
+                                        <a class="dropdown-item py-2 fw-semibold text-primary" href="{{ route('admin.dashboard') }}">
+                                            <i class="bi bi-speedometer2 me-2 text-warning"></i>{{ __('messages.layout.admin_panel') }}
+                                        </a>
+                                    </li>
+                                @else
+                                    <li>
+                                        <a class="dropdown-item py-2" href="/profile">
+                                            <i class="bi bi-person me-2"></i>{{ __('messages.nav.profile') }}
+                                        </a>
+                                    </li>
                                 @endif
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form action="/logout" method="POST">
                                         @csrf
-                                        <button type="submit" class="dropdown-item py-2">{{ __('messages.nav.logout') }}</button>
+                                        <button type="submit" class="dropdown-item py-2 text-danger d-flex align-items-center">
+                                            <i class="bi bi-box-arrow-right me-2"></i>{{ __('messages.nav.logout') }}
+                                        </button>
                                     </form>
                                 </li>
                             </ul>

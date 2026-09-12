@@ -692,6 +692,7 @@ return [
         'nav_search' => 'Search',
         'nav_cart' => 'Cart',
         'nav_profile' => 'Profile',
+        'nav_admin' => 'Admin',
         'nav_login' => 'Log In',
         'search_modal_title' => 'Search Reposa+',
         'search_modal_input_placeholder' => 'Search by model, material, firmness...',
