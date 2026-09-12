@@ -738,6 +738,15 @@ return [
     'checkout.items' => 'Products',
     'checkout.shipping_free_threshold' => 'Free express shipping applied!',
     'checkout.guarantee_text' => 'Official 100-night trial guarantee and free returns.',
+    'checkout.form_required_notice' => 'Please complete all required (*) shipping and recipient details before proceeding to payment.',
+    'checkout.form_errors_header' => 'You must complete the shipping and recipient details before proceeding to payment:',
+    'checkout.btn_missing_data_hint' => 'Please complete the required shipping details above before paying.',
+    'checkout.validation.name_required' => 'Please enter the recipient full name.',
+    'checkout.validation.email_required' => 'Please enter a valid email address.',
+    'checkout.validation.street_required' => 'Please enter the delivery address (street, number, floor).',
+    'checkout.validation.city_required' => 'Please enter the delivery city.',
+    'checkout.validation.zip_code_required' => 'Please enter the postal code.',
+    'checkout.validation.phone_required' => 'Please enter a contact phone number for the courier.',
 
     // Guest Account Claim (1-Click)
     'orders.claim_account_title' => 'Save your account in 1 click',

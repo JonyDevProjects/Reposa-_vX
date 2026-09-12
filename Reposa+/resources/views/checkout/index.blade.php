@@ -18,7 +18,30 @@
         </div>
     @endif
 
-    <form action="{{ route('checkout') }}" method="POST" id="checkout-form" novalidate>
+    @if($errors->any())
+        <div class="alert alert-danger border-0 rounded-4 p-3 mb-4 shadow-sm" role="alert" id="checkout-server-errors">
+            <div class="d-flex align-items-center gap-2 mb-2 fw-bold text-danger">
+                <i class="bi bi-exclamation-triangle-fill fs-5 flex-shrink-0"></i>
+                <span>{{ __('messages.checkout.form_errors_header') }}</span>
+            </div>
+            <ul class="mb-0 ps-3 small text-danger-emphasis">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <div class="alert alert-danger border-0 rounded-4 p-3 mb-4 shadow-sm d-none" role="alert" id="checkout-client-errors">
+        <div class="d-flex align-items-center gap-2 mb-2 fw-bold text-danger">
+            <i class="bi bi-exclamation-triangle-fill fs-5 flex-shrink-0"></i>
+            <span>{{ __('messages.checkout.form_errors_header') }}</span>
+        </div>
+        <ul class="mb-0 ps-3 small text-danger-emphasis" id="checkout-client-errors-list">
+        </ul>
+    </div>
+
+    <form action="{{ route('checkout') }}" method="POST" id="checkout-form" class="needs-validation" novalidate>
         @csrf
         <div class="row g-4 align-items-start">
             {{-- Columna izquierda: Datos de Envío y Opciones --}}
@@ -73,6 +96,14 @@
                             @endauth
                         </div>
 
+                        {{-- Aviso inline cuando faltan campos obligatorios --}}
+                        <div id="shipping-required-notice" class="alert alert-warning border border-warning-subtle rounded-3 p-3 mb-3 d-none">
+                            <div class="d-flex align-items-center gap-2 small fw-semibold text-dark">
+                                <i class="bi bi-exclamation-circle-fill fs-5 text-warning flex-shrink-0"></i>
+                                <span>{{ __('messages.checkout.form_required_notice') }}</span>
+                            </div>
+                        </div>
+
                         {{-- Si está autenticado y tiene direcciones guardadas --}}
                         @auth
                             @if($userAddresses->isNotEmpty())
@@ -111,57 +142,78 @@
                                     <label for="shipping_name" class="form-label small fw-semibold text-muted">
                                         {{ __('messages.auth.full_name') }} <span class="text-danger">*</span>
                                     </label>
-                                    <input type="text" class="form-control rounded-3" id="shipping_name" name="shipping_name" 
+                                    <input type="text" class="form-control rounded-3 @error('shipping_name') is-invalid @enderror" id="shipping_name" name="shipping_name" 
                                            value="{{ old('shipping_name', Auth::user()?->name) }}" required
                                            placeholder="Ej. María García López">
+                                    <div class="invalid-feedback" id="feedback-shipping_name">
+                                        {{ $errors->first('shipping_name') ?: __('messages.checkout.validation.name_required') }}
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="shipping_email" class="form-label small fw-semibold text-muted">
                                         {{ __('messages.auth.email') }} <span class="text-danger">*</span>
                                     </label>
-                                    <input type="email" class="form-control rounded-3" id="shipping_email" name="shipping_email" 
+                                    <input type="email" class="form-control rounded-3 @error('shipping_email') is-invalid @enderror" id="shipping_email" name="shipping_email" 
                                            value="{{ old('shipping_email', Auth::user()?->email) }}" required
                                            placeholder="maria@ejemplo.com">
+                                    <div class="invalid-feedback" id="feedback-shipping_email">
+                                        {{ $errors->first('shipping_email') ?: __('messages.checkout.validation.email_required') }}
+                                    </div>
                                 </div>
                                 <div class="col-md-12">
                                     <label for="shipping_street" class="form-label small fw-semibold text-muted">
                                         {{ __('messages.auth.street') }} <span class="text-danger">*</span>
                                     </label>
-                                    <input type="text" class="form-control rounded-3" id="shipping_street" name="shipping_street" 
-                                           value="{{ old('shipping_street') }}"
+                                    <input type="text" class="form-control rounded-3 @error('shipping_street') is-invalid @enderror" id="shipping_street" name="shipping_street" 
+                                           value="{{ old('shipping_street') }}" required
                                            placeholder="{{ __('messages.auth.street_placeholder') }}">
+                                    <div class="invalid-feedback" id="feedback-shipping_street">
+                                        {{ $errors->first('shipping_street') ?: __('messages.checkout.validation.street_required') }}
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="shipping_city" class="form-label small fw-semibold text-muted">
                                         {{ __('messages.auth.city') }} <span class="text-danger">*</span>
                                     </label>
-                                    <input type="text" class="form-control rounded-3" id="shipping_city" name="shipping_city" 
-                                           value="{{ old('shipping_city') }}"
+                                    <input type="text" class="form-control rounded-3 @error('shipping_city') is-invalid @enderror" id="shipping_city" name="shipping_city" 
+                                           value="{{ old('shipping_city') }}" required
                                            placeholder="{{ __('messages.auth.city_placeholder') }}">
+                                    <div class="invalid-feedback" id="feedback-shipping_city">
+                                        {{ $errors->first('shipping_city') ?: __('messages.checkout.validation.city_required') }}
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="shipping_zip_code" class="form-label small fw-semibold text-muted">
                                         {{ __('messages.auth.zip_code') }} <span class="text-danger">*</span>
                                     </label>
-                                    <input type="text" class="form-control rounded-3" id="shipping_zip_code" name="shipping_zip_code" 
-                                           value="{{ old('shipping_zip_code') }}"
+                                    <input type="text" class="form-control rounded-3 @error('shipping_zip_code') is-invalid @enderror" id="shipping_zip_code" name="shipping_zip_code" 
+                                           value="{{ old('shipping_zip_code') }}" required
                                            placeholder="{{ __('messages.auth.zip_code_placeholder') }}">
+                                    <div class="invalid-feedback" id="feedback-shipping_zip_code">
+                                        {{ $errors->first('shipping_zip_code') ?: __('messages.checkout.validation.zip_code_required') }}
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="shipping_province" class="form-label small fw-semibold text-muted">
                                         {{ __('messages.auth.province') }}
                                     </label>
-                                    <input type="text" class="form-control rounded-3" id="shipping_province" name="shipping_province" 
+                                    <input type="text" class="form-control rounded-3 @error('shipping_province') is-invalid @enderror" id="shipping_province" name="shipping_province" 
                                            value="{{ old('shipping_province') }}"
                                            placeholder="{{ __('messages.auth.province_placeholder') }}">
+                                    @error('shipping_province')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="col-md-6">
                                     <label for="shipping_phone" class="form-label small fw-semibold text-muted">
                                         {{ __('messages.auth.phone') }} <span class="text-danger">*</span>
                                     </label>
-                                    <input type="tel" class="form-control rounded-3" id="shipping_phone" name="shipping_phone" 
+                                    <input type="tel" class="form-control rounded-3 @error('shipping_phone') is-invalid @enderror" id="shipping_phone" name="shipping_phone" 
                                            value="{{ old('shipping_phone', $userPhone) }}" required
                                            placeholder="{{ __('messages.auth.phone_placeholder') }}">
+                                    <div class="invalid-feedback" id="feedback-shipping_phone">
+                                        {{ $errors->first('shipping_phone') ?: __('messages.checkout.validation.phone_required') }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -374,6 +426,10 @@
                             <i id="btn-submit-icon" class="bi bi-credit-card me-2"></i><span id="btn-submit-text">{{ __('messages.checkout.btn_place_order') }}</span>
                         </button>
 
+                        <div id="btn-submit-feedback" class="alert alert-danger py-2 px-3 small rounded-3 mb-3 d-none text-center shadow-2xs">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ __('messages.checkout.btn_missing_data_hint') }}
+                        </div>
+
                         <p class="text-center text-muted small mb-3" style="font-size: 0.78rem;">
                             <i class="bi bi-shield-check text-success me-1"></i>{{ __('messages.checkout.guarantee_text') }}
                         </p>
@@ -385,6 +441,19 @@
         </div>
     </form>
 </div>
+
+<style>
+@keyframes checkoutShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+}
+.animate-shake {
+    animation: checkoutShake 0.45s ease-in-out;
+    border: 1px solid #dc3545 !important;
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.15) !important;
+}
+</style>
 
 <script>
     const itemsTotal = {{ (float) $total }};
@@ -415,11 +484,134 @@
     document.addEventListener('DOMContentLoaded', function () {
         const checkoutForm = document.getElementById('checkout-form');
         const submitBtn = document.getElementById('btn-submit-order');
+        const shippingNotice = document.getElementById('shipping-required-notice');
+        const clientErrorsAlert = document.getElementById('checkout-client-errors');
+        const clientErrorsList = document.getElementById('checkout-client-errors-list');
+        const btnSubmitFeedback = document.getElementById('btn-submit-feedback');
+        const shippingCard = document.querySelector('#guest-address-fields')?.closest('.card');
+
+        const addressRadios = document.querySelectorAll('input[name="address_id"]');
+        const guestFieldsContainer = document.getElementById('guest-address-fields');
+
+        function syncAddressFieldRequirements() {
+            const selectedAddr = document.querySelector('input[name="address_id"]:checked');
+            const isUsingSaved = selectedAddr && selectedAddr.value !== 'new';
+            const inputs = guestFieldsContainer?.querySelectorAll('input[name^="shipping_"]');
+            if (inputs) {
+                inputs.forEach(inp => {
+                    if (isUsingSaved) {
+                        inp.removeAttribute('required');
+                        inp.classList.remove('is-invalid');
+                    } else if (inp.id !== 'shipping_province') {
+                        inp.setAttribute('required', 'required');
+                    }
+                });
+            }
+        }
+        addressRadios.forEach(radio => radio.addEventListener('change', syncAddressFieldRequirements));
+
+        const fieldDefinitions = [
+            { id: 'shipping_name', name: "{{ __('messages.auth.full_name') }}", minLength: 2 },
+            { id: 'shipping_email', name: "{{ __('messages.auth.email') }}", isEmail: true },
+            { id: 'shipping_street', name: "{{ __('messages.auth.street') }}", minLength: 3 },
+            { id: 'shipping_city', name: "{{ __('messages.auth.city') }}", minLength: 2 },
+            { id: 'shipping_zip_code', name: "{{ __('messages.auth.zip_code') }}", minLength: 3 },
+            { id: 'shipping_phone', name: "{{ __('messages.auth.phone') }}", minLength: 6 },
+        ];
+
+        fieldDefinitions.forEach(field => {
+            const input = document.getElementById(field.id);
+            if (input) {
+                input.addEventListener('input', function () {
+                    if (this.value.trim().length > 0) {
+                        this.classList.remove('is-invalid');
+                        const anyInvalidLeft = fieldDefinitions.some(f => {
+                            const inp = document.getElementById(f.id);
+                            return inp && inp.classList.contains('is-invalid');
+                        });
+                        if (!anyInvalidLeft) {
+                            if (shippingNotice) shippingNotice.classList.add('d-none');
+                            if (clientErrorsAlert) clientErrorsAlert.classList.add('d-none');
+                            if (btnSubmitFeedback) btnSubmitFeedback.classList.add('d-none');
+                            if (shippingCard) shippingCard.classList.remove('animate-shake');
+                        }
+                    }
+                });
+            }
+        });
+
         if (checkoutForm && submitBtn) {
             checkoutForm.addEventListener('submit', function (e) {
-                if (!checkoutForm.checkValidity()) {
-                    return;
+                const selectedAddr = document.querySelector('input[name="address_id"]:checked');
+                const isUsingSaved = selectedAddr && selectedAddr.value !== 'new';
+
+                if (!isUsingSaved) {
+                    let hasErrors = false;
+                    let firstInvalidEl = null;
+                    const errorMessages = [];
+
+                    fieldDefinitions.forEach(field => {
+                        const input = document.getElementById(field.id);
+                        if (!input) return;
+
+                        const val = input.value.trim();
+                        let isFieldValid = true;
+
+                        if (!val || (field.minLength && val.length < field.minLength)) {
+                            isFieldValid = false;
+                            errorMessages.push(`El campo ${field.name.toLowerCase()} es obligatorio.`);
+                        } else if (field.isEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+                            isFieldValid = false;
+                            errorMessages.push(`El campo ${field.name.toLowerCase()} debe ser un correo válido.`);
+                        }
+
+                        if (!isFieldValid) {
+                            hasErrors = true;
+                            input.classList.add('is-invalid');
+                            if (!firstInvalidEl) {
+                                firstInvalidEl = input;
+                            }
+                        } else {
+                            input.classList.remove('is-invalid');
+                        }
+                    });
+
+                    if (hasErrors) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        if (clientErrorsAlert && clientErrorsList) {
+                            clientErrorsList.innerHTML = errorMessages.map(msg => `<li>${msg}</li>`).join('');
+                            clientErrorsAlert.classList.remove('d-none');
+                        }
+
+                        if (shippingNotice) {
+                            shippingNotice.classList.remove('d-none');
+                        }
+
+                        if (btnSubmitFeedback) {
+                            btnSubmitFeedback.classList.remove('d-none');
+                        }
+
+                        if (shippingCard) {
+                            shippingCard.classList.remove('animate-shake');
+                            void shippingCard.offsetWidth;
+                            shippingCard.classList.add('animate-shake');
+                        }
+
+                        if (firstInvalidEl) {
+                            firstInvalidEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            setTimeout(() => firstInvalidEl.focus(), 350);
+                        }
+
+                        return false;
+                    }
                 }
+
+                if (clientErrorsAlert) clientErrorsAlert.classList.add('d-none');
+                if (shippingNotice) shippingNotice.classList.add('d-none');
+                if (btnSubmitFeedback) btnSubmitFeedback.classList.add('d-none');
+
                 const isStripe = document.getElementById('payment_stripe')?.checked;
                 setTimeout(function () {
                     submitBtn.disabled = true;

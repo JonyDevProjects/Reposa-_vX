@@ -738,6 +738,15 @@ return [
     'checkout.items' => 'Productos',
     'checkout.shipping_free_threshold' => '¡Envío express gratuito aplicado!',
     'checkout.guarantee_text' => 'Garantía oficial de 100 noches de prueba y devoluciones gratuitas.',
+    'checkout.form_required_notice' => 'Por favor, completa todos los campos obligatorios (*) de datos de envío y destinatario antes de proceder al pago.',
+    'checkout.form_errors_header' => 'Es necesario completar los datos de envío y destinatario antes de proceder al pago:',
+    'checkout.btn_missing_data_hint' => 'Completa los datos obligatorios de envío arriba antes de pagar.',
+    'checkout.validation.name_required' => 'Por favor, introduce el nombre completo del destinatario.',
+    'checkout.validation.email_required' => 'Por favor, introduce un correo electrónico válido.',
+    'checkout.validation.street_required' => 'Por favor, introduce la dirección de entrega (calle, número, piso).',
+    'checkout.validation.city_required' => 'Por favor, introduce la localidad o ciudad de entrega.',
+    'checkout.validation.zip_code_required' => 'Por favor, introduce el código postal.',
+    'checkout.validation.phone_required' => 'Por favor, introduce un teléfono de contacto para el transportista.',
 
     // Reclamación de cuenta para invitados (1-clic)
     'orders.claim_account_title' => 'Guarda tu cuenta en 1 clic',
