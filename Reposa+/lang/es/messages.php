@@ -547,6 +547,8 @@ return [
     'cart.session_not_found' => 'No se encontró la sesión de pago.',
     'cart.payment_not_completed' => 'El pago no fue completado.',
     'cart.payment_cancelled' => 'Has cancelado el proceso de pago. Tu carrito sigue guardado.',
+    'trust.100_nights' => '100 noches de prueba garantizadas',
+    'trust.free_shipping' => 'Envío express peninsular gratuito',
     'cart.stock_insufficient' => 'Stock insuficiente para ":name". Disponible: :available, solicitado: :requested.',
     'cart.quantity_min_one' => 'La cantidad mínima debe ser al menos 1.',
     'cart.stock_max_reached' => 'Has alcanzado el stock máximo disponible (:count uds.).',

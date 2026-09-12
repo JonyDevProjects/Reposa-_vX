@@ -547,6 +547,8 @@ return [
     'cart.session_not_found' => 'Payment session not found.',
     'cart.payment_not_completed' => 'Payment was not completed.',
     'cart.payment_cancelled' => 'Payment process was cancelled. Your cart is preserved.',
+    'trust.100_nights' => '100-night trial guaranteed',
+    'trust.free_shipping' => 'Free mainland express shipping',
     'cart.stock_insufficient' => 'Insufficient stock for ":name". Available: :available, requested: :requested.',
     'cart.quantity_min_one' => 'The minimum quantity must be at least 1.',
     'cart.stock_max_reached' => 'You have reached the maximum available stock (:count pcs.).',

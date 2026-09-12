@@ -427,31 +427,42 @@
         <div class="col-lg-4">
             <div class="sticky-top" style="top: 96px;">
                 {{-- Resumen de la Compra --}}
+                @php
+                    $shippingCost = (float) ($order->shipping_cost ?? 0.0);
+                    $total = (float) $order->total_amount;
+                    $itemsTotal = max(0, $total - $shippingCost);
+                    $subtotalNet = round($itemsTotal / 1.21, 2);
+                    $taxVat = round($itemsTotal - $subtotalNet, 2);
+                @endphp
                 <section class="order-summary-card" aria-labelledby="order-summary-title">
                     <h2 id="order-summary-title" class="summary-title">
                         {{ __('messages.orders.show.summary_title') }}
                     </h2>
 
                     <div class="summary-line">
-                        <span>{{ __('messages.orders.show.subtotal') }}</span>
-                        <span class="summary-val">{{ number_format($order->total_amount, 2) }}€</span>
+                        <span>{{ __('messages.cart.subtotal_net') }}</span>
+                        <span class="summary-val tabular-nums">{{ number_format($subtotalNet, 2) }}€</span>
                     </div>
 
                     <div class="summary-line">
                         <span>{{ __('messages.orders.show.shipping') }}</span>
-                        <span class="badge bg-success-subtle text-success fw-bold">
-                            {{ __('messages.orders.show.shipping_free') }}
-                        </span>
+                        @if($shippingCost == 0)
+                            <span class="badge bg-success-subtle text-success fw-bold">
+                                {{ __('messages.orders.show.shipping_free') }}
+                            </span>
+                        @else
+                            <span class="summary-val tabular-nums fw-semibold">{{ number_format($shippingCost, 2) }}€</span>
+                        @endif
                     </div>
 
                     <div class="summary-line">
                         <span>{{ __('messages.orders.show.vat_included') }}</span>
-                        <span class="summary-val">{{ number_format($order->total_amount * 0.21 / 1.21, 2) }}€</span>
+                        <span class="summary-val tabular-nums">{{ number_format($taxVat, 2) }}€</span>
                     </div>
 
                     <div class="summary-total-line">
                         <span class="total-label">{{ __('messages.orders.show.order_total') }}</span>
-                        <span class="total-amount">{{ number_format($order->total_amount, 2) }}€</span>
+                        <span class="total-amount tabular-nums">{{ number_format($total, 2) }}€</span>
                     </div>
 
                     <div class="d-grid gap-2">
