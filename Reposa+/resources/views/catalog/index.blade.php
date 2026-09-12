@@ -47,17 +47,17 @@
         {{-- Catalog Filter Hub & Toolbar --}}
         <div class="card border-0 shadow-sm rounded-4 p-3 p-md-4 mb-4 bg-white catalog-hub-card">
             {{-- Toolbar: Filters Toggle, Results Count & Sorting --}}
-            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="d-flex align-items-center justify-content-between gap-2">
                 {{-- Action Controls: Filters Button --}}
-                <div class="d-flex align-items-center gap-2">
-                    <button class="btn btn-sm {{ $hasActiveFilters ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center justify-content-center gap-2" 
+                <div class="flex-grow-1 flex-sm-grow-0">
+                    <button class="btn btn-sm {{ $hasActiveFilters ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center justify-content-center gap-2 w-100" 
                             type="button" 
                             data-bs-toggle="collapse" 
                             data-bs-target="#secondaryFiltersPanel" 
                             aria-expanded="{{ $hasActiveFilters ? 'true' : 'false' }}" 
                             aria-controls="secondaryFiltersPanel"
                             id="toggleFiltersBtn"
-                            style="min-height: 44px;">
+                            style="height: 44px; min-height: 44px;">
                         <i class="bi bi-sliders2"></i>
                         <span>{{ __('messages.catalog.secondary_filters_toggle') }}</span>
                         @if($activeFilterCount > 0)
@@ -68,17 +68,17 @@
                 </div>
 
                 {{-- Results Count & Sorting --}}
-                <div class="d-flex align-items-center gap-3 ms-auto">
-                    <div class="text-muted small fw-medium tabular-nums d-none d-sm-inline">
+                <div class="d-flex align-items-center gap-2 gap-md-3 flex-grow-1 flex-sm-grow-0 ms-sm-auto justify-content-end">
+                    <div class="text-muted small fw-medium tabular-nums d-none d-md-inline text-nowrap">
                         {{ __('messages.catalog.results_count', ['count' => $products->total()]) }}
                     </div>
 
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle btn-sm rounded-pill px-2 px-sm-3 py-2 fw-semibold text-navy bg-white border shadow-2xs d-inline-flex align-items-center justify-content-center" 
+                    <div class="dropdown flex-grow-1 flex-sm-grow-0" style="min-width: 0;">
+                        <button class="btn btn-outline-secondary dropdown-toggle btn-sm rounded-pill px-2 px-sm-3 py-2 fw-semibold text-navy bg-white border shadow-2xs d-inline-flex align-items-center justify-content-center w-100" 
                                 type="button" 
                                 data-bs-toggle="dropdown" 
                                 aria-expanded="false"
-                                style="min-height: 44px;">
+                                style="height: 44px; min-height: 44px;">
                             <i class="bi bi-arrow-down-up me-1 text-primary flex-shrink-0"></i>
                             <span class="d-none d-sm-inline me-1">{{ __('messages.catalog.sort') }}:</span>
                             <span class="text-navy fw-bold text-truncate">{{ __('messages.catalog.sort.' . $currentSort) }}</span>
