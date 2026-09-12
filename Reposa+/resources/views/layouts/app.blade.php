@@ -34,18 +34,16 @@
                     <i class="bi bi-moon-stars-fill me-2 text-white"></i>Reposa+
                 </a>
 
-                {{-- Mobile Controls: Language Switcher & Admin Quick Access --}}
+                {{-- Mobile & Intermediate Controls (<992px): Catalog, Language, Login/User, Cart --}}
                 <div class="d-flex align-items-center gap-2 d-lg-none">
-                    @auth
-                        @if(Auth::user()->role === 'admin')
-                            <a href="{{ route('admin.dashboard') }}" class="btn btn-sm btn-warning text-dark fw-bold rounded-pill px-2 py-1 shadow-xs d-inline-flex align-items-center" aria-label="{{ __('messages.layout.admin_panel') }}">
-                                <i class="bi bi-shield-shaded me-1"></i>Admin
-                            </a>
-                        @endif
-                    @endauth
+                    {{-- Tablet Catalog link (768px - 991px where bottom nav is hidden) --}}
+                    <a href="/catalog" class="nav-link text-white py-1 px-2 d-none d-md-inline-flex d-lg-none align-items-center opacity-90 fw-medium me-1" title="{{ __('messages.nav.catalog') }}">
+                        <i class="bi bi-grid me-1"></i>{{ __('messages.nav.catalog') }}
+                    </a>
 
+                    {{-- Language Switcher --}}
                     <div class="dropdown">
-                        <button class="btn btn-sm btn-outline-light border-0 text-white dropdown-toggle d-inline-flex align-items-center px-2 py-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="btn btn-sm btn-outline-light border-0 text-white dropdown-toggle d-inline-flex align-items-center px-2 py-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Idioma">
                             <i class="bi bi-globe me-1"></i>{{ strtoupper(app()->getLocale()) }}
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
@@ -53,6 +51,60 @@
                             <li><a class="dropdown-item {{ app()->getLocale() == 'en' ? 'active' : '' }}" href="{{ route('lang.switch', 'en') }}">English</a></li>
                         </ul>
                     </div>
+
+                    {{-- Auth / Login Icon --}}
+                    @guest
+                        <a href="/login" 
+                           class="nav-link text-white px-2 py-1 d-inline-flex align-items-center justify-content-center {{ request()->is('login*') || request()->is('register*') ? 'active' : '' }}" 
+                           title="{{ __('messages.nav.login') }}" 
+                           aria-label="{{ __('messages.nav.login') }}"
+                           style="min-height: 38px; min-width: 38px;">
+                            <i class="bi bi-person fs-5"></i>
+                        </a>
+                    @else
+                        @if(Auth::user()->role === 'admin')
+                            <a href="{{ route('admin.dashboard') }}" class="btn btn-sm btn-warning text-dark fw-bold rounded-pill px-2 py-1 shadow-xs d-inline-flex align-items-center" aria-label="{{ __('messages.layout.admin_panel') }}" title="{{ __('messages.layout.admin_panel') }}">
+                                <i class="bi bi-shield-shaded me-1"></i>Admin
+                            </a>
+                            <form action="/logout" method="POST" class="d-inline mb-0">
+                                @csrf
+                                <button type="submit" class="btn btn-sm btn-outline-light border-0 rounded-pill px-1 py-1 text-white d-inline-flex align-items-center" title="{{ __('messages.nav.logout') }}" aria-label="{{ __('messages.nav.logout') }}" style="min-height: 38px; min-width: 38px;">
+                                    <i class="bi bi-box-arrow-right fs-5"></i>
+                                </button>
+                            </form>
+                        @else
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-light border-0 text-white dropdown-toggle d-inline-flex align-items-center px-1 py-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="{{ Auth::user()->name }}" style="min-height: 38px; min-width: 38px;">
+                                    <i class="bi bi-person-circle fs-5"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                    <li class="dropdown-header text-truncate fw-semibold" style="max-width: 200px;">{{ Auth::user()->name }}</li>
+                                    <li><a class="dropdown-item py-2" href="/profile"><i class="bi bi-person me-2"></i>{{ __('messages.nav.profile') }}</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form action="/logout" method="POST" class="m-0">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item py-2 text-danger d-flex align-items-center">
+                                                <i class="bi bi-box-arrow-right me-2"></i>{{ __('messages.nav.logout') }}
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        @endif
+                    @endguest
+
+                    {{-- Cart Icon with Reactive Badge --}}
+                    <a class="nav-link text-white position-relative px-2 py-1 ms-1 d-inline-flex align-items-center justify-content-center" 
+                       href="/cart" 
+                       aria-label="{{ __('messages.nav.cart') ?? 'Cesta' }}"
+                       title="{{ __('messages.nav.cart') ?? 'Cesta' }}"
+                       style="min-height: 38px; min-width: 38px;">
+                        <i class="bi bi-cart3 fs-5"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger js-cart-badge" style="font-size: 0.65rem;">
+                            {{ $navCartCount }}
+                        </span>
+                    </a>
                 </div>
             </div>
 
@@ -105,7 +157,6 @@
                                title="{{ __('messages.nav.login') }}" 
                                aria-label="{{ __('messages.nav.login') }}">
                                 <i class="bi bi-person fs-5"></i>
-                                <span class="d-lg-none ms-2">{{ __('messages.nav.login') }}</span>
                             </a>
                         </li>
                     @else
@@ -119,21 +170,6 @@
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-outline-light rounded-pill px-2 py-1 text-white d-inline-flex align-items-center" title="{{ __('messages.nav.logout') }}" aria-label="{{ __('messages.nav.logout') }}">
                                         <i class="bi bi-box-arrow-right me-1"></i><span class="d-none d-xl-inline small">{{ __('messages.nav.logout') }}</span>
-                                    </button>
-                                </form>
-                            </li>
-
-                            {{-- Mobile/Tablet Collapsed Menu for Admin --}}
-                            <li class="nav-item d-lg-none">
-                                <a class="nav-link py-2 fw-semibold text-warning d-flex align-items-center" href="{{ route('admin.dashboard') }}">
-                                    <i class="bi bi-speedometer2 me-2"></i>{{ __('messages.layout.admin_panel') }}
-                                </a>
-                            </li>
-                            <li class="nav-item d-lg-none">
-                                <form action="/logout" method="POST">
-                                    @csrf
-                                    <button type="submit" class="nav-link text-danger py-2 border-0 bg-transparent d-flex align-items-center w-100">
-                                        <i class="bi bi-box-arrow-right me-2"></i>{{ __('messages.nav.logout') }}
                                     </button>
                                 </form>
                             </li>
