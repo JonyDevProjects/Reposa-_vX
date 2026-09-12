@@ -432,7 +432,8 @@ return [
     'catalog.filters' => 'Filters',
     'catalog.search_smart_placeholder' => 'Search by posture, firmness or material (e.g. side sleeper, cervical, soft)...',
     'catalog.category_chips_all' => 'All pillows',
-    'catalog.secondary_filters_toggle' => 'Advanced filters',
+    'catalog.category_all' => 'All categories',
+    'catalog.secondary_filters_toggle' => 'Filters',
     'catalog.filter_active_tag' => 'Active filters',
     'catalog.clear_search' => 'Clear search',
 

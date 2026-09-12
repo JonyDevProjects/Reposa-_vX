@@ -432,7 +432,8 @@ return [
     'catalog.filters' => 'Filtros',
     'catalog.search_smart_placeholder' => 'Buscar por postura, firmeza o material (ej. de lado, cervical, suave)...',
     'catalog.category_chips_all' => 'Todas las almohadas',
-    'catalog.secondary_filters_toggle' => 'Filtros avanzados',
+    'catalog.category_all' => 'Todas las categorías',
+    'catalog.secondary_filters_toggle' => 'Filtros',
     'catalog.filter_active_tag' => 'Filtros activos',
     'catalog.clear_search' => 'Borrar búsqueda',
 
