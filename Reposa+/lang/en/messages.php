@@ -546,6 +546,7 @@ return [
     'cart.payment_success' => 'Payment completed successfully! Your order has been confirmed.',
     'cart.session_not_found' => 'Payment session not found.',
     'cart.payment_not_completed' => 'Payment was not completed.',
+    'cart.payment_cancelled' => 'Payment process was cancelled. Your cart is preserved.',
     'cart.stock_insufficient' => 'Insufficient stock for ":name". Available: :available, requested: :requested.',
     'cart.quantity_min_one' => 'The minimum quantity must be at least 1.',
     'cart.stock_max_reached' => 'You have reached the maximum available stock (:count pcs.).',
