@@ -686,6 +686,22 @@
             }
         });
 
+        function resetSubmitButton() {
+            if (!submitBtn) return;
+            submitBtn.disabled = false;
+            const isStripe = document.getElementById('payment_stripe')?.checked !== false;
+            const iconClass = isStripe ? 'bi bi-credit-card me-2' : 'bi bi-shield-lock-fill me-2';
+            const labelText = isStripe ? "{{ __('messages.checkout.btn_place_order') }}" : "{{ __('messages.checkout.direct_order') }}";
+            submitBtn.innerHTML = `<i id="btn-submit-icon" class="${iconClass}"></i><span id="btn-submit-text">${labelText}</span>`;
+        }
+
+        resetSubmitButton();
+
+        window.addEventListener('pageshow', function (event) {
+            resetSubmitButton();
+            restoreGuestDataFromStorage();
+        });
+
         document.querySelectorAll('input[name="shipping_service_type"]').forEach(radio => {
             radio.addEventListener('change', saveGuestDataToStorage);
         });
