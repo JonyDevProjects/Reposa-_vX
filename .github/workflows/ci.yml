@@ -69,6 +69,8 @@ jobs:
       - name: Preparar entorno para tests unitarios
         run: |
           cp .env.testing .env || cp .env.example .env
+          sed -i 's/DB_CONNECTION=mysql/DB_CONNECTION=sqlite/' .env
+          sed -i 's/DB_DATABASE=reposaplus_testing/DB_DATABASE=:memory:/' .env
           php artisan key:generate --force
 
       - name: Ejecutar Suite Unitaria en Memoria
@@ -118,6 +120,7 @@ jobs:
       - name: Preparar entorno de base de datos
         run: |
           cp .env.testing .env
+          sed -i 's/DB_HOST=mysql-dev/DB_HOST=127.0.0.1/' .env
           php artisan key:generate --force
         env:
           DB_HOST: 127.0.0.1
@@ -227,6 +230,13 @@ jobs:
       - name: Preparar entorno, base de datos y seeds
         run: |
           cp .env.testing .env
+          sed -i 's/DB_HOST=mysql-dev/DB_HOST=127.0.0.1/' .env
+          sed -i 's|APP_URL=.*|APP_URL=http://127.0.0.1:8000|' .env
+          echo "GOOGLE_CLIENT_ID=932690824736-4q6h6ajtauj6suulp1bgdkhgvam2dv1l.apps.googleusercontent.com" >> .env
+          echo "GOOGLE_CLIENT_SECRET=mock-google-client-secret-ci" >> .env
+          echo "GOOGLE_REDIRECT_URI=http://127.0.0.1:8000/auth/google/callback" >> .env
+          echo "STRIPE_KEY=pk_test_51U9Fu2K0VMwtlVDADl5i8DATOeLvL63oNGJVmsCvPZvs0Z4PFLDwnFwzBVjfBEvdyo6jFZBf4mzKtICyIjx99t7b00br7JMPmo" >> .env
+          echo "STRIPE_SECRET=sk_test_51U9Fu2K0VMwtlVDAQ9rpBMlSkde7NhH5HSZYLfOz32EMdqrU05DfYTksrMRtAmWHTz32rjKKHwq0MJoR7F69xKrw00jAS7Og8q" >> .env
           php artisan key:generate --force
           php artisan migrate:fresh --seed --force
           php artisan storage:link || true
@@ -236,17 +246,11 @@ jobs:
           DB_DATABASE: reposaplus_testing
           DB_USERNAME: root
           DB_PASSWORD: secret
-          GOOGLE_CLIENT_ID: "932690824736-4q6h6ajtauj6suulp1bgdkhgvam2dv1l.apps.googleusercontent.com"
-          GOOGLE_CLIENT_SECRET: "mock-google-client-secret-ci"
-          GOOGLE_REDIRECT_URI: "http://127.0.0.1:8000/auth/google/callback"
-          STRIPE_KEY: "pk_test_51U9Fu2K0VMwtlVDADl5i8DATOeLvL63oNGJVmsCvPZvs0Z4PFLDwnFwzBVjfBEvdyo6jFZBf4mzKtICyIjx99t7b00br7JMPmo"
-          STRIPE_SECRET: "sk_test_51U9Fu2K0VMwtlVDAQ9rpBMlSkde7NhH5HSZYLfOz32EMdqrU05DfYTksrMRtAmWHTz32rjKKHwq0MJoR7F69xKrw00jAS7Og8q"
-          APP_URL: "http://127.0.0.1:8000"
 
       - name: Iniciar servidor local Laravel
         run: |
-          php artisan serve --host=127.0.0.1 --port=8000 &
-          timeout 30s bash -c 'until curl -s http://127.0.0.1:8000 > /dev/null; do sleep 1; done'
+          php artisan serve --host=127.0.0.1 --port=8000 > /tmp/laravel-serve.log 2>&1 &
+          timeout 30s bash -c 'until curl -s http://127.0.0.1:8000 > /dev/null; do sleep 1; done' || (cat /tmp/laravel-serve.log && exit 1)
         env:
           DB_HOST: 127.0.0.1
           DB_PORT: 3306

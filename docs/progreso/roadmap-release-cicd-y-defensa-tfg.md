@@ -46,10 +46,11 @@ main ───────────────────────┴─
 | Fase | Denominación / Objetivo | Entregables Clave | Estado |
 |:---:|---|---|:---:|
 | **1** | **Verificación del Repositorio y Estado de Integración** | Chequeo de árbol limpio en `develop` y comprobación rápida de salud de suites Unit y Feature en contenedor. | ✅ Completada |
-| **2** | **Automatización CI/CD en GitHub Actions** | Creación y ajuste de `.github/workflows/ci.yml` ejecutando secuencialmente Pint, Unit tests, Feature tests (MySQL+Redis), Vite build y Playwright E2E. | ✅ Completada |
+| **2** | **Automatización CI/CD en GitHub Actions** | Creación y ajuste de `.github/workflows/ci.yml` ejecutando los 5 jobs especificados (Pint, Unit tests, Feature tests con MySQL 8 + Redis, Vite build y Playwright E2E). | ✅ Completada |
 | **3** | **Consolidación del Hito Base v1.0.0 (Core Transaccional)** | Etiquetado semántico oficial `v1.0.0` certificando el backend transaccional y la pirámide de 119 pruebas automatizadas. | ✅ Completada |
 | **4.1** | **Estabilización Operativa Back-Office (Propuesta 1)** | Desviaciones D1 a D5 resueltas: logística bidireccional, comando `orders:reset-test-matrix`, PDF admin, fix error 500 Stripe y reembolsos directos (125 tests). | ✅ Completada |
 | **4.2** | **Rediseño del Catálogo Storefront (Propuesta 1)** | Divulgación progresiva: Asesor Anatómico colapsado bajo demanda, píldoras de categoría, búsqueda tolerante/semántica y filtros despejados. | ✅ Completada |
+| **4.3** | **Refinamiento Reactivo y Resiliencia en Carrito y Checkout** | Cálculo en tiempo real con debounce y límites de stock, layout móvil, validación shake y scroll, persistencia en doble capa + BFCache, desglose fiscal transparente y 570/570 i18n (141 tests). | ✅ Completada |
 | **5** | **Promoción de Release Final v1.1.0 a `main` (GitFlow)** | Fusión `--no-ff` a `main`, etiquetado oficial `v1.1.0-tfg-final` y back-merge hacia `develop`. | ⏳ Planificada |
 | **6** | **Preparación del Material de Soporte para la Defensa del TFG** | Confección de `docs/defensa-tfg/` con guion temporalizado (15 min), catálogo de diapositivas y argumentario defensivo. | ⏳ Planificada |
 
@@ -179,6 +180,38 @@ Originalmente, la vista [`catalog/index.blade.php`](file:///Users/jonathanquishp
 
 ---
 
+### 4.3 Trazabilidad de la Iteración 4.3: Refinamiento Reactivo y Resiliencia en Carrito y Checkout (Completada)
+
+#### A. Diagnóstico de Experiencia de Usuario y Desafíos de Resiliencia
+Tras la simplificación del catálogo en la Iteración 4.2, la auditoría heurística sobre el embudo final de conversión (Carrito y Pasarela de Checkout) identificó puntos críticos de fricción interactiva, fragilidad de sesión y pequeñas inconsistencias fiscales:
+1. **Falta de Reactividad en Cantidades:** El ajuste de unidades en `/cart` requería recargas síncronas o carecía de debounce adaptativo, generando riesgos de desincronización de stock y saltos bruscos en el cálculo de gastos de envío (umbral de 50€).
+2. **Degradación Visual en Dispositivos Móviles:** La estructura tabular clásica de `/cart` desbordaba horizontalmente en viewports estrechos (<380px) y el estado vacío carecía de centrado y proporciones ergonómicas.
+3. **Pérdida de Contexto en Cancelaciones de Stripe y BFCache:** Al retroceder desde Stripe Checkout o navegar hacia atrás en el navegador, el mecanismo de *Back-Forward Cache* (BFCache) congelaba los botones de envío en estado deshabilitado (*loading*) y los datos de envío del invitado se disipaban en la vista.
+4. **Validación Silenciosa o Rígida en Checkout:** La detección de errores en el formulario de envío no proporcionaba suficiente anclaje cognitivo visual, dificultando la identificación rápida de campos faltantes.
+5. **Transparencia Fiscal y Cobertura de Internacionalización:** Discrepancias menores en la presentación de la base imponible frente al total con IVA en la confirmación `/orders/{id}`, junto a cadenas huérfanas sin traducir en el catálogo de idiomas.
+
+#### B. Soluciones de Ingeniería e Interacción Implementadas
+
+| Área Técnica | Desafío Abordado | Solución Implementada | Commits |
+|---|---|---|:---:|
+| **Motor de Cálculo y Reactividad** | Latencia y sobrecarga en actualización de líneas de carrito. | Creación del servicio desacoplado `CartCalculator`, controlador AJAX optimizado con debounce de 300ms, actualización reactiva del DOM (subtotal, IVA, selector de envío gratis y total) y validación estricta de límites de stock con badges informativos. | `2b9a3c9` |
+| **Responsive Design en Carrito** | Desbordamiento horizontal en pantallas móviles estrechas. | Transformación CSS fluida de filas de tabla en tarjetas móviles (`card-layout`), centrado vertical/horizontal de estados vacíos sin margen negativo, reducción de paddings en contenedores y reubicación de acciones táctiles. | `63f8554`<br>`0342db1` |
+| **Ergonomía de Conversión (CTAs)** | Ambigüedad en llamadas a la acción en el carrito. | Sustitución del texto del CTA principal por el imperativo claro *"Finalizar Pedido"* e incorporación de botón secundario simétrico *"Continuar Comprando"*. | `d091cfd` |
+| **Validación Multinivel en Checkout** | Errores de validación inadvertidos o fuera de vista. | Incorporación de microinteracción con animación CSS `@keyframes shake` en el contenedor de errores, scroll suave adaptativo `scrollIntoView({ behavior: 'smooth', block: 'center' })` y autofoco accesible en el primer campo inválido. | `ebaea07` |
+| **Persistencia Resiliente de Invitados** | Pérdida de dirección tras redirección o cancelación de Stripe. | Arquitectura de persistencia en doble capa: almacenamiento en sesión de servidor Laravel sincronizado con `sessionStorage` en el cliente, rellenado automático de campos de invitado y preservación total al abortar el pago. | `f3d6d9f`<br>`99fdd99` |
+| **Neutralización del BFCache** | Botón de envío bloqueado y estado congelado al pulsar "Atrás". | Suscripción al evento nativo del navegador `window.addEventListener('pageshow', ...)` verificando `event.persisted`, restaurando inmediatamente el estado del botón de compra, limpiando spinners y recuperando los datos del formulario. | `85a7030` |
+| **Desglose Fiscal Transparente** | Desalineación de conceptos en vista de confirmación `/orders/{id}`. | Homogeneización de la fórmula fiscal: Base Imponible + Cuota IVA (21%) + Coste de Envío = Total del Pedido, con badges de garantía y políticas post-venta debidamente tipificadas. | `11afb2c` |
+| **Auditoría Exhaustiva de i18n** | Claves sin traducir en español e inglés detectadas en vistas clave. | Resolución y normalización de la totalidad de claves del proyecto (570/570 strings bilingües verificados), garantizando navegación 100% localizada en ES y EN sin placeholders crudos. | `822c365` |
+
+#### C. Certificación de Calidad y Resultados
+* **Pirámide de Pruebas Pest:** Crecimiento de la suite a **141 pruebas automatizadas** (27 Unit + 114 Feature, 679 aserciones) ejecutadas en **~3.3s** (100% superadas, 0 fallos).
+* **Pruebas End-to-End Playwright:** **8/8 pruebas E2E** ejecutadas satisfactoriamente en entorno real (**11.5s**, 100% de éxito).
+* **Compilación de Assets:** Vite compilando limpiamente bundles de producción (`npm run build`).
+* **Internacionalización:** Cobertura del 100% (570/570 claves validadas).
+* **Base de Conocimiento:** Registro de evidencias y decisiones arquitectónicas en Engram (`#308` a `#317` en `reposaplus-tfg`).
+
+---
+
 ## Fase 5: Promoción de Release Final v1.1.0 a `main` (GitFlow Release)
 
 ### 5.1 Protocolo de Fusión y Etiquetado Oficial
@@ -248,3 +281,5 @@ docs/defensa-tfg/
 | Fecha | Autor | Versión | Resumen de Cambios |
 |---|---|:---:|---|
 | **10/09/2026** | Jonathan Quispe | `v1.0.0` | Definición formal del roadmap de CI/CD, ciclo de releases bajo GitFlow (Propuesta 1: v1.0.0 core transaccional + v1.1.0 refinamiento UI/UX) y material de soporte para la defensa del TFG. |
+| **15/09/2026** | Jonathan Quispe | `v1.1.0` | Registro y cierre de la Iteración 4.3: Refinamiento reactivo en carrito (`CartCalculator`), resiliencia móvil, persistencia de invitados con neutralización de BFCache (`pageshow`), validación multinivel con shake/scroll, homologación fiscal en `/orders/{id}` y certificación de 141 tests Pest y 8/8 Playwright E2E. |
+
