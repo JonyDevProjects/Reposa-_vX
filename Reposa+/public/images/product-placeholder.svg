@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B1329" />
+      <stop offset="50%" stop-color="#141E3C" />
+      <stop offset="100%" stop-color="#182447" />
+    </linearGradient>
+
+    <!-- Indigo Sanctuary Aura -->
+    <radialGradient id="auraGlow" cx="50%" cy="45%" r="48%">
+      <stop offset="0%" stop-color="#6366F1" stop-opacity="0.32" />
+      <stop offset="60%" stop-color="#4F46E5" stop-opacity="0.12" />
+      <stop offset="100%" stop-color="#0B1329" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Pillow Mesh Gradient -->
+    <linearGradient id="pillowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EEF2FF" stop-opacity="0.16" />
+      <stop offset="100%" stop-color="#C7D2FE" stop-opacity="0.04" />
+    </linearGradient>
+
+    <!-- Accent Stroke Gradient -->
+    <linearGradient id="strokeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#818CF8" stop-opacity="0.2" />
+      <stop offset="50%" stop-color="#C7D2FE" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#818CF8" stop-opacity="0.2" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="300" fill="url(#bgGrad)" />
+
+  <!-- Soft Ambient Glow -->
+  <circle cx="200" cy="135" r="130" fill="url(#auraGlow)" />
+
+  <!-- Abstract Ergonomic Pillow Contour -->
+  <g transform="translate(0, 5)">
+    <!-- Back pillow depth shadow -->
+    <path d="M 105 145 C 105 110, 145 98, 200 98 C 255 98, 295 110, 295 145 C 295 178, 255 190, 200 190 C 145 190, 105 178, 105 145 Z" 
+          fill="url(#pillowGrad)" 
+          stroke="url(#strokeGrad)" 
+          stroke-width="1.5" />
+
+    <!-- Front anatomical contour curve -->
+    <path d="M 120 148 C 140 135, 170 142, 200 142 C 230 142, 260 135, 280 148" 
+          fill="none" 
+          stroke="#A5B4FC" 
+          stroke-width="1.2" 
+          stroke-linecap="round" 
+          stroke-dasharray="3 3" 
+          opacity="0.45" />
+
+    <!-- Reposa+ Moon and Stars Emblem -->
+    <g transform="translate(186, 116) scale(1.15)">
+      <!-- Crescent Moon -->
+      <path d="M 8.5 1 C 5.5 1.8 3.2 4.3 2.6 7.4 C 1.9 10.9 3.5 14.5 6.6 16.3 C 9.7 18.1 13.6 17.5 16 15 C 12 15.2 8.5 12.5 8.2 8.5 C 7.9 5.2 9.7 2.3 12.6 1.1 C 11.3 0.9 9.9 0.9 8.5 1 Z" 
+            fill="#E0E7FF" 
+            opacity="0.95" />
+      
+      <!-- Sparkle Star 1 -->
+      <path d="M 18 3 L 18.6 4.4 L 20 5 L 18.6 5.6 L 18 7 L 17.4 5.6 L 16 5 L 17.4 4.4 Z" 
+            fill="#FBBF24" 
+            opacity="0.9" />
+
+      <!-- Sparkle Star 2 -->
+      <circle cx="21" cy="11" r="1" fill="#C7D2FE" opacity="0.8" />
+      <!-- Sparkle Star 3 -->
+      <circle cx="1" cy="7" r="0.8" fill="#C7D2FE" opacity="0.7" />
+    </g>
+  </g>
+
+  <!-- Typographic Branding -->
+  <text x="200" y="222" 
+        font-family="system-ui, -apple-system, 'Plus Jakarta Sans', 'Inter', sans-serif" 
+        font-size="14" 
+        font-weight="700" 
+        letter-spacing="4" 
+        fill="#FFFFFF" 
+        text-anchor="middle" 
+        opacity="0.95">REPOSA+</text>
+
+  <text x="200" y="240" 
+        font-family="system-ui, -apple-system, 'Inter', sans-serif" 
+        font-size="10" 
+        font-weight="500" 
+        letter-spacing="1.5" 
+        fill="#94A3B8" 
+        text-anchor="middle" 
+        opacity="0.8">INGENIERÍA ANATÓMICA</text>
+</svg>

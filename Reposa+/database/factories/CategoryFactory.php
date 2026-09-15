@@ -4,33 +4,49 @@ namespace Database\Factories;
 
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<Category>
  */
 class CategoryFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected static array $names = [
+        'Cervical' => 'Cervical',
+        'Anti-ronquidos' => 'Anti-snoring',
+        'Viscoelástica' => 'Viscoelastic',
+        'Látex' => 'Latex',
+        'Espuma con memoria' => 'Memory Foam',
+        'Térmica' => 'Thermal',
+        'Viaje' => 'Travel',
+        'Infantil' => 'Kids',
+    ];
+
     public function definition(): array
     {
-        $name = $this->faker->unique()->randomElement([
-            'Cervical',
-            'Anti-ronquidos',
-            'Viscoelástica',
-            'Látex',
-            'Espuma con memoria',
-            'Térmica',
-            'Viaje',
-            'Infantil'
-        ]);
+        $nameEs = $this->faker->unique(true)->randomElement(array_keys(self::$names));
+        $slug = Str::slug($nameEs);
+
+        if (Category::where('slug', $slug)->exists()) {
+            $nameEs = $nameEs.' '.$this->faker->numberBetween(10, 999);
+            $slug = Str::slug($nameEs);
+        }
 
         return [
-            'name' => $name,
-            'slug' => \Illuminate\Support\Str::slug($name),
+            'name' => $nameEs,
+            'slug' => $slug,
         ];
+    }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (Category $category) {
+            $nameEs = is_array($category->name) ? reset($category->name) : $category->name;
+            $nameEn = self::$names[$nameEs] ?? $nameEs;
+
+            $category->setTranslation('name', 'es', $nameEs);
+            $category->setTranslation('name', 'en', $nameEn);
+            $category->save();
+        });
     }
 }

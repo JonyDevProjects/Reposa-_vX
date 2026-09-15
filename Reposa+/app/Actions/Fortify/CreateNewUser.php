@@ -3,6 +3,7 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -32,12 +33,33 @@ class CreateNewUser implements CreatesNewUsers
                 Rule::unique(User::class),
             ],
             'password' => $this->passwordRules(),
+            'street' => ['required', 'string', 'max:255'],
+            'city' => ['required', 'string', 'max:255'],
+            'zip_code' => ['required', 'string', 'max:20'],
+            'phone' => ['required', 'string', 'max:30'],
+            'province' => ['nullable', 'string', 'max:100'],
         ])->validate();
 
-        return User::create([
-            'name' => $input['name'],
-            'email' => $input['email'],
-            'password' => Hash::make($input['password']),
-        ]);
+        return DB::transaction(function () use ($input) {
+            $user = User::create([
+                'name' => $input['name'],
+                'email' => $input['email'],
+                'password' => Hash::make($input['password']),
+            ]);
+
+            $user->addresses()->create([
+                'street' => $input['street'],
+                'city' => $input['city'],
+                'zip_code' => $input['zip_code'],
+                'is_main' => true,
+            ]);
+
+            $user->profile()->create([
+                'full_name' => $input['name'],
+                'phone' => $input['phone'],
+            ]);
+
+            return $user;
+        });
     }
 }

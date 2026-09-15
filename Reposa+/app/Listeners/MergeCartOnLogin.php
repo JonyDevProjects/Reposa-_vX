@@ -2,8 +2,8 @@
 
 namespace App\Listeners;
 
-use Illuminate\Auth\Events\Login;
 use App\Models\CartItem;
+use Illuminate\Auth\Events\Login;
 
 class MergeCartOnLogin
 {
@@ -23,18 +23,18 @@ class MergeCartOnLogin
         $user = $event->user;
         $sessionCart = session()->get('cart', []);
 
-        if (!empty($sessionCart)) {
+        if (! empty($sessionCart)) {
             foreach ($sessionCart as $productId => $item) {
                 $cartItem = CartItem::where('user_id', $user->id)
-                                    ->where('product_id', $productId)
-                                    ->first();
+                    ->where('product_id', $productId)
+                    ->first();
                 if ($cartItem) {
                     $cartItem->increment('quantity', $item['quantity']);
                 } else {
                     CartItem::create([
                         'user_id' => $user->id,
                         'product_id' => $productId,
-                        'quantity' => $item['quantity']
+                        'quantity' => $item['quantity'],
                     ]);
                 }
             }

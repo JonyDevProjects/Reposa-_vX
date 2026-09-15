@@ -17,21 +17,18 @@ class OrderConfirmed extends Mailable implements ShouldQueue
 
     public $order;
 
-    /**
-     * Create a new message instance.
-     */
+    public $invoiceUrl;
+
     public function __construct(Order $order)
     {
         $this->order = $order;
+        $this->invoiceUrl = route('orders.invoice', $order);
     }
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Order Confirmed',
+            subject: __('messages.mail.order_confirmed_subject', ['id' => $this->order->id]),
         );
     }
 

@@ -2,39 +2,105 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Product;
-use App\Models\Order;
+use App\Mail\OrderRefunded;
 use App\Models\Category;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\Refund;
+use App\Models\Shipment;
+use App\Models\TopFavoritedProduct;
+use App\Services\Shipping\ShippingServiceInterface;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Laravel\Cashier\Cashier;
+use Stripe\Exception\InvalidRequestException;
 
 class AdminController extends Controller
 {
     public function dashboard()
     {
         $totalOrders = Order::count();
-        $totalRevenue = Order::sum('total_amount');
+        $paidStatuses = [Order::STATUS_PROCESSING, Order::STATUS_SHIPPED, Order::STATUS_DELIVERED, Order::STATUS_COMPLETED];
+        $totalRevenue = Order::whereIn('status', $paidStatuses)->sum('total_amount');
         $totalProducts = Product::count();
         $recentOrders = Order::with('user')->latest()->take(5)->get();
-        
-        // Analítica de demanda: Top Almohadas con mayores expectativas de compra
-        $topExpectedProducts = \App\Models\TopFavoritedProduct::orderBy('favorited_by_count', 'desc')
-                                      ->where('favorited_by_count', '>', 0)
-                                      ->take(5)
-                                      ->get();
 
-        return view('admin.dashboard', compact('totalOrders', 'totalRevenue', 'totalProducts', 'recentOrders', 'topExpectedProducts'));
+        // Orders by status
+        $ordersByStatus = Order::select('status', DB::raw('count(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        // Monthly sales for the last 6 months (Chart.js)
+        $monthlySales = Order::whereIn('status', $paidStatuses)
+            ->where('created_at', '>=', now()->subMonths(5)->startOfMonth())
+            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month, SUM(total_amount) as total")
+            ->groupBy('month')
+            ->orderBy('month')
+            ->pluck('total', 'month');
+
+        $chartLabels = collect();
+        $chartData = collect();
+        for ($i = 5; $i >= 0; $i--) {
+            $key = now()->subMonths($i)->format('Y-m');
+            $chartLabels->push(now()->subMonths($i)->format('M Y'));
+            $chartData->push((float) ($monthlySales[$key] ?? 0));
+        }
+
+        // Top selling products
+        $topSellingProducts = OrderItem::select('product_id', DB::raw('SUM(quantity) as total_sold'))
+            ->whereHas('order', fn ($q) => $q->whereIn('status', $paidStatuses))
+            ->groupBy('product_id')
+            ->orderByDesc('total_sold')
+            ->with('product')
+            ->take(5)
+            ->get();
+
+        // Top favorited products
+        $topExpectedProducts = TopFavoritedProduct::orderBy('favorited_by_count', 'desc')
+            ->where('favorited_by_count', '>', 0)
+            ->take(5)
+            ->get();
+
+        // Recent completed orders for reference
+        $recentCompleted = Order::where('status', 'completed')
+            ->with('user')
+            ->orderByDesc('updated_at')
+            ->take(5)
+            ->get();
+
+        return view('admin.dashboard', compact(
+            'totalOrders', 'totalRevenue', 'totalProducts', 'recentOrders',
+            'ordersByStatus', 'chartLabels', 'chartData',
+            'topSellingProducts', 'topExpectedProducts', 'recentCompleted'
+        ));
     }
 
-    public function products()
+    public function products(Request $request)
     {
-        $products = Product::with('categories')->paginate(10);
-        return view('admin.products.index', compact('products'));
+        $query = Product::with('categories');
+
+        if ($request->filled('q')) {
+            $q = trim($request->q);
+            $query->where(function ($sub) use ($q) {
+                $sub->where('name', 'like', "%{$q}%")
+                    ->orWhere('description', 'like', "%{$q}%");
+            });
+        }
+
+        $products = $query->latest('id')->paginate(15)->withQueryString();
+        $totalProductsCount = Product::count();
+
+        return view('admin.products.index', compact('products', 'totalProductsCount'));
     }
 
     public function createProduct()
     {
         $categories = Category::all();
+
         return view('admin.products.create', compact('categories'));
     }
 
@@ -47,21 +113,22 @@ class AdminController extends Controller
             'stock' => 'required|integer|min:0',
             'image_url' => 'nullable|url',
             'categories' => 'array',
-            'categories.*' => 'exists:categories,id'
+            'categories.*' => 'exists:categories,id',
         ]);
 
         $product = Product::create($request->except('categories'));
-        
+
         if ($request->has('categories')) {
             $product->categories()->attach($request->categories);
         }
 
-        return redirect()->route('admin.products')->with('success', 'Producto creado correctamente.');
+        return redirect()->route('admin.products')->with('success', __('messages.admin.product_created'));
     }
 
     public function editProduct(Product $product)
     {
         $categories = Category::all();
+
         return view('admin.products.edit', compact('product', 'categories'));
     }
 
@@ -74,36 +141,82 @@ class AdminController extends Controller
             'stock' => 'required|integer|min:0',
             'image_url' => 'nullable|url',
             'categories' => 'array',
-            'categories.*' => 'exists:categories,id'
+            'categories.*' => 'exists:categories,id',
         ]);
 
         $product->update($request->except('categories'));
-        
+
         if ($request->has('categories')) {
             $product->categories()->sync($request->categories);
         } else {
             $product->categories()->detach();
         }
 
-        return redirect()->route('admin.products')->with('success', 'Producto actualizado correctamente.');
+        return redirect()->route('admin.products')->with('success', __('messages.admin.product_updated'));
     }
 
     public function deleteProduct(Product $product)
     {
         $product->delete();
-        return back()->with('success', 'Producto eliminado.');
+
+        return back()->with('success', __('messages.admin.product_deleted'));
     }
 
-    public function orders()
+    public function orders(Request $request)
     {
-        $orders = Order::with('user', 'orderItems.product')->latest()->paginate(15);
-        return view('admin.orders.index', compact('orders'));
+        $query = Order::with(['user', 'orderItems.product', 'shipment'])->latest();
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('carrier')) {
+            $query->whereHas('shipment', function ($s) use ($request) {
+                $s->where('carrier', 'like', "%{$request->carrier}%");
+            });
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        if ($request->filled('q')) {
+            $q = trim($request->q);
+            $query->where(function ($sub) use ($q) {
+                if (is_numeric($q)) {
+                    $sub->where('id', (int) $q);
+                } else {
+                    $sub->whereHas('user', function ($u) use ($q) {
+                        $u->where('name', 'like', "%{$q}%")
+                            ->orWhere('email', 'like', "%{$q}%");
+                    })
+                        ->orWhere('shipping_name', 'like', "%{$q}%")
+                        ->orWhere('shipping_email', 'like', "%{$q}%")
+                        ->orWhereHas('shipment', function ($s) use ($q) {
+                            $s->where('tracking_number', 'like', "%{$q}%");
+                        });
+                }
+            });
+        }
+
+        $orders = $query->paginate(20)->withQueryString();
+        $statusCounts = Order::select('status', DB::raw('count(*) as count'))
+            ->groupBy('status')
+            ->pluck('count', 'status');
+        $totalOrdersCount = Order::count();
+
+        return view('admin.orders.index', compact('orders', 'statusCounts', 'totalOrdersCount'));
     }
 
     // Gestión de Categorías
     public function categories()
     {
         $categories = Category::withCount('products')->get();
+
         return view('admin.categories.index', compact('categories'));
     }
 
@@ -123,7 +236,7 @@ class AdminController extends Controller
             'slug' => Str::slug($request->name),
         ]);
 
-        return redirect()->route('admin.categories')->with('success', 'Categoría creada correctamente.');
+        return redirect()->route('admin.categories')->with('success', __('messages.admin.category_created'));
     }
 
     public function editCategory(Category $category)
@@ -142,23 +255,189 @@ class AdminController extends Controller
             'slug' => Str::slug($request->name),
         ]);
 
-        return redirect()->route('admin.categories')->with('success', 'Categoría actualizada correctamente.');
+        return redirect()->route('admin.categories')->with('success', __('messages.admin.category_updated'));
     }
 
     public function deleteCategory(Category $category)
     {
         $category->delete();
-        return back()->with('success', 'Categoría eliminada.');
+
+        return back()->with('success', __('messages.admin.category_deleted'));
     }
 
     public function updateOrderStatus(Request $request, Order $order)
     {
         $request->validate([
-            'status' => 'required|in:pending,processing,shipped,delivered,cancelled'
+            'status' => 'required|in:'.implode(',', array_keys(Order::STATUSES)),
         ]);
 
-        $order->update(['status' => $request->status]);
+        $newStatus = $request->status;
 
-        return back()->with('success', 'Estado del pedido actualizado.');
+        if (! Order::canTransition($order->status, $newStatus)) {
+            $current = Order::getStatusLabel($order->status);
+            $target = Order::getStatusLabel($newStatus);
+
+            return back()->with('error', __('messages.admin.status_invalid_transition', ['current' => $current, 'target' => $target]));
+        }
+
+        $order->update(['status' => $newStatus]);
+
+        // Sincronizar automáticamente el estado del envío logístico con el nuevo estado del pedido
+        if ($order->shipment) {
+            $now = now();
+            if ($newStatus === Order::STATUS_SHIPPED && $order->shipment->status === Shipment::STATUS_PRE_REGISTERED) {
+                $order->shipment->update([
+                    'status' => Shipment::STATUS_IN_TRANSIT,
+                    'shipped_at' => $order->shipment->shipped_at ?? $now,
+                ]);
+            } elseif (in_array($newStatus, [Order::STATUS_DELIVERED, Order::STATUS_COMPLETED]) && $order->shipment->status !== Shipment::STATUS_DELIVERED) {
+                $order->shipment->update([
+                    'status' => Shipment::STATUS_DELIVERED,
+                    'shipped_at' => $order->shipment->shipped_at ?? $now,
+                    'delivered_at' => $order->shipment->delivered_at ?? $now,
+                ]);
+            } elseif ($newStatus === Order::STATUS_CANCELLED && in_array($order->shipment->status, [Shipment::STATUS_PRE_REGISTERED, Shipment::STATUS_IN_TRANSIT])) {
+                $history = $order->shipment->tracking_history ?? [];
+                $history[] = [
+                    'timestamp' => $now->toIso8601String(),
+                    'status' => Shipment::STATUS_CANCELLED,
+                    'status_label' => Shipment::STATUS_LABELS[Shipment::STATUS_CANCELLED] ?? 'Envío cancelado',
+                    'description' => 'Expedición anulada por cancelación del pedido.',
+                    'location' => 'Centro de Control Logístico',
+                ];
+                $order->shipment->update([
+                    'status' => Shipment::STATUS_CANCELLED,
+                    'tracking_history' => $history,
+                ]);
+            }
+        }
+
+        if ($newStatus === Order::STATUS_REFUNDED && ! $order->refunds()->where('status', 'succeeded')->exists()) {
+            DB::transaction(function () use ($order) {
+                foreach ($order->orderItems as $item) {
+                    $item->product->increment('stock', $item->quantity);
+                }
+                Refund::create([
+                    'order_id' => $order->id,
+                    'amount' => $order->total_amount,
+                    'reason' => 'Reembolso directo registrado por administración.',
+                    'status' => 'succeeded',
+                ]);
+            });
+        }
+
+        return back()->with('success', __('messages.admin.status_updated', ['status' => Order::getStatusLabel($newStatus)]));
+    }
+
+    public function refundOrder(Request $request, Order $order)
+    {
+        if (! in_array($order->status, [Order::STATUS_COMPLETED, Order::STATUS_DELIVERED])) {
+            return back()->with('error', __('messages.admin.refund_only_completed'));
+        }
+
+        if ($order->refunds()->where('status', 'succeeded')->exists()) {
+            return back()->with('error', __('messages.admin.refund_already_done'));
+        }
+
+        $request->validate([
+            'reason' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $stripeRefundId = null;
+            $refundStatus = 'succeeded';
+
+            if ($order->payment_intent_id) {
+                try {
+                    $stripeRefund = Cashier::stripe()->refunds->create([
+                        'payment_intent' => $order->payment_intent_id,
+                    ]);
+                    $stripeRefundId = $stripeRefund->id;
+                    $refundStatus = $stripeRefund->status;
+                } catch (InvalidRequestException $e) {
+                    // En pruebas locales o si el payment_intent no existe físicamente en los servidores de Stripe (ej: seeds de pruebas)
+                    if (str_starts_with(config('cashier.secret', ''), 'sk_test_') && str_contains($e->getMessage(), 'No such payment_intent')) {
+                        Log::warning("Simulando reembolso Stripe para pedido de prueba {$order->id} (PI: {$order->payment_intent_id}): {$e->getMessage()}");
+                        $stripeRefundId = 're_simulated_'.substr(md5($order->id.time()), 0, 16);
+                        $refundStatus = 'succeeded';
+                    } else {
+                        throw $e;
+                    }
+                }
+            } else {
+                // Pedido con pago directo: registro contable de reembolso administrativo
+                $stripeRefundId = 'direct_refund_'.substr(md5($order->id.time()), 0, 16);
+                $refundStatus = 'succeeded';
+            }
+
+            $refund = Refund::create([
+                'order_id' => $order->id,
+                'amount' => $order->total_amount,
+                'reason' => $request->input('reason', __('messages.admin.refund_admin_reason')),
+                'stripe_refund_id' => $stripeRefundId,
+                'status' => $refundStatus,
+            ]);
+
+            if ($refundStatus === 'succeeded') {
+                DB::transaction(function () use ($order) {
+                    foreach ($order->orderItems as $item) {
+                        $item->product->increment('stock', $item->quantity);
+                    }
+                    $order->update(['status' => Order::STATUS_REFUNDED]);
+                });
+            }
+
+            try {
+                Mail::to($order->customer_email)->send(new OrderRefunded($order, $refund));
+            } catch (\Throwable $e) {
+                Log::error("Failed to send refund email for order {$order->id}", [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            return back()->with('success', __('messages.admin.refund_success', ['amount' => number_format($order->total_amount, 2)]));
+        } catch (\Throwable $e) {
+            Log::error("Refund failed for order {$order->id}", [
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', __('messages.admin.refund_error', ['error' => $e->getMessage()]));
+        }
+    }
+
+    public function advanceShipment(Shipment $shipment, ShippingServiceInterface $shippingService)
+    {
+        if ($shipment->order && in_array($shipment->order->status, [
+            Order::STATUS_COMPLETED,
+            Order::STATUS_CANCELLED,
+            Order::STATUS_REFUNDED,
+            Order::STATUS_DELIVERED,
+        ])) {
+            return back()->with('error', 'No se puede avanzar el envío de un pedido cerrado, cancelado o entregado.');
+        }
+
+        if ($shipment->status === Shipment::STATUS_CANCELLED) {
+            return back()->with('error', 'No se puede avanzar un envío cancelado.');
+        }
+
+        $oldStatus = $shipment->status;
+        $updatedShipment = $shippingService->advanceTrackingStatus($shipment);
+
+        if ($oldStatus === $updatedShipment->status) {
+            return back()->with('info', 'El envío ya se encuentra en su estado final ('.$updatedShipment->status_label.').');
+        }
+
+        return back()->with('success', __('messages.admin.shipment_advanced', [
+            'tracking' => $updatedShipment->tracking_number,
+            'status' => $updatedShipment->status_label,
+        ]));
+    }
+
+    public function viewShipmentLabel(Shipment $shipment, ShippingServiceInterface $shippingService)
+    {
+        $labelData = $shippingService->generateLabel($shipment);
+        $order = $shipment->order;
+
+        return view('admin.shipments.label', compact('shipment', 'labelData', 'order'));
     }
 }

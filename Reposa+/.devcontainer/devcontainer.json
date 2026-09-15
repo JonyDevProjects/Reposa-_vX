@@ -1,0 +1,29 @@
+{
+  "name": "Reposa+ Dev",
+  "dockerComposeFile": ["../docker-compose.dev.yml"],
+  "service": "app",
+  "workspaceFolder": "/var/www/html",
+
+  "forwardPorts": [8000, 3306],
+  "postCreateCommand": "composer install --no-interaction && cp -n .env.dev .env && php artisan key:generate --force",
+  "postStartCommand": "php artisan migrate:fresh --seed --force 2>/dev/null || true",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bmewburn.vscode-intelephense-client",
+        "onecentlin.laravel-blade",
+        "ms-azuretools.vscode-docker",
+        "nicolebt.laravel5-snippets"
+      ],
+      "settings": {
+        "php.validate.executablePath": "/usr/local/bin/php",
+        "editor.formatOnSave": true
+      }
+    }
+  },
+
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {}
+  }
+}

@@ -146,5 +146,13 @@ return [
     'url' => 'El campo :attribute debe ser una URL válida.',
     'ulid' => 'El campo :attribute debe ser un ULID válido.',
     'uuid' => 'El campo :attribute debe ser un UUID válido.',
-    'attributes' => [],
+    'attributes' => [
+        'shipping_name' => 'nombre completo',
+        'shipping_email' => 'correo electrónico',
+        'shipping_street' => 'dirección de entrega',
+        'shipping_city' => 'ciudad / municipio',
+        'shipping_zip_code' => 'código postal',
+        'shipping_province' => 'provincia',
+        'shipping_phone' => 'teléfono móvil de contacto',
+    ],
 ];

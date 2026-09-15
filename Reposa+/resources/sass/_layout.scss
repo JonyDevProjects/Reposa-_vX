@@ -1,0 +1,1859 @@
+// =============================================================================
+// Reposa+ Spatial Rhythm & Layout System (8px Grid Hierarchy)
+// Phase 3: Layout - Decoupled Containers & Harmonious Spacing
+// =============================================================================
+
+// --- Base Body & App Shell ---
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-canvas);
+    color: var(--color-text-primary);
+}
+
+.main-content {
+    flex: 1 0 auto;
+    width: 100%;
+}
+
+// --- Skip Navigation Link (A11y Floor) ---
+.skip-link {
+    position: absolute;
+    top: -100px;
+    left: var(--space-4);
+    z-index: 1050;
+    transition: top 0.2s ease;
+
+    &:focus,
+    &:focus-visible {
+        top: var(--space-4);
+        outline: var(--focus-outline);
+        outline-offset: 2px;
+    }
+}
+
+// --- Section Rhythm & Vertical Cadence (8px Scale) ---
+.section-spacing {
+    padding-top: var(--space-7);    // 48px
+    padding-bottom: var(--space-7); // 48px
+
+    @media (min-width: 992px) {
+        padding-top: var(--space-8);    // 64px
+        padding-bottom: var(--space-8); // 64px
+    }
+}
+
+.section-spacing-compact {
+    padding-top: var(--space-5);    // 24px
+    padding-bottom: var(--space-5); // 24px
+
+    @media (min-width: 992px) {
+        padding-top: var(--space-6);    // 32px
+        padding-bottom: var(--space-6); // 32px
+    }
+}
+
+// --- Display Helpers ---
+@media (min-width: 992px) {
+    .d-lg-contents {
+        display: contents !important;
+    }
+}
+
+// --- Containers & Fluid Scaffolding ---
+.container-tight {
+    width: 100%;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+}
+
+.container-standard {
+    width: 100%;
+    max-width: 1140px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+}
+
+// --- Sticky Sidebar Architecture ---
+.sticky-sidebar {
+    position: sticky;
+    top: 96px;
+    z-index: 10;
+}
+
+// --- Filter Sidebar Styling (Catalog) ---
+.filter-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-card);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-card);
+}
+
+.filter-group {
+    margin-bottom: var(--space-5);
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 0.8125rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--color-text-muted);
+        margin-bottom: var(--space-2);
+        display: block;
+    }
+}
+
+// --- Product Grid (Card Layout) ---
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--space-5);
+
+    @media (min-width: 1200px) {
+        gap: var(--space-6);
+    }
+}
+
+// --- Asymmetric Product Detail Grid (60/40) ---
+.product-gallery-block {
+    @media (min-width: 992px) {
+        position: sticky;
+        top: 96px;
+    }
+}
+
+// --- Cart Summary Layout ---
+.cart-summary-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-card);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-card);
+}
+
+// --- Hero Section Layout (Full-Bleed Fluid Header - Phase 4.2 Bolder) ---
+.hero-section {
+    background: radial-gradient(circle at 50% 25%, rgba(66, 86, 154, 0.48) 0%, rgba(24, 36, 71, 0.90) 65%, rgba(24, 36, 71, 0.96) 100%), url('/images/hero.png');
+    background-size: cover;
+    background-position: center;
+    color: #ffffff !important;
+    padding: var(--space-8) 0 calc(var(--space-9) + 24px);
+    position: relative;
+    overflow: hidden;
+
+    h1, h2, h3, h4, h5, h6,
+    .display-1, .display-2, .display-3, .display-hero,
+    .lead, p {
+        color: #ffffff !important;
+    }
+
+    @media (min-width: 992px) {
+        padding: calc(var(--space-9) + 8px) 0 calc(var(--space-9) + 36px);
+    }
+}
+
+// Hero CTAs (Bolder, Tactile Generous & Soft Ambient Shadows)
+.btn-hero-primary {
+    background: linear-gradient(135deg, var(--color-serene-indigo) 0%, #3730a3 100%) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    font-weight: 700;
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    border-radius: 12px;
+    min-height: 52px;
+    padding: 14px 36px;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.2s ease,
+                border-color 0.2s ease;
+    box-shadow: var(--shadow-hero-primary);
+
+    &:hover,
+    &:focus {
+        background: linear-gradient(135deg, #4338ca 0%, #312e81 100%) !important;
+        border-color: rgba(255, 255, 255, 0.65) !important;
+        color: #ffffff !important;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hero-lifted);
+    }
+
+    &:focus-visible {
+        outline: 3px solid #b1cdff;
+        outline-offset: 3px;
+    }
+}
+
+.btn-hero-secondary {
+    background: rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #ffffff !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.40) !important;
+    font-weight: 600;
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    border-radius: 12px;
+    min-height: 52px;
+    padding: 14px 34px;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.2s ease,
+                border-color 0.2s ease,
+                color 0.2s ease;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+
+    &:hover,
+    &:focus {
+        background: rgba(255, 255, 255, 0.22) !important;
+        border-color: rgba(255, 255, 255, 0.75) !important;
+        color: #ffffff !important;
+        transform: translateY(-2px);
+        box-shadow: 0 12px 26px rgba(0, 0, 0, 0.3);
+    }
+
+    &:focus-visible {
+        outline: 3px solid #ffffff;
+        outline-offset: 3px;
+    }
+}
+
+// Hero Trust Metrics Strip (Phase 4.2 Bolder)
+.hero-metrics-strip {
+    max-width: 860px;
+    margin: var(--space-6) auto 0;
+    padding: var(--space-3) var(--space-4);
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 20px;
+    box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.35);
+
+    @media (min-width: 768px) {
+        padding: var(--space-4) var(--space-5);
+    }
+
+    .hero-metric-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-3);
+        padding: var(--space-2) var(--space-3);
+        text-align: left;
+    }
+
+    .metric-icon-wrap {
+        width: 44px;
+        height: 44px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: rgba(79, 70, 229, 0.30);
+        border: 1px solid rgba(177, 205, 255, 0.25);
+        color: #ffffff;
+        font-size: 1.25rem;
+    }
+
+    .metric-text-wrap {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .metric-number {
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #ffffff;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+    }
+
+    .metric-label {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.88);
+        line-height: 1.2;
+    }
+}
+
+// --- Category Cards & Micro-Interactions (Refined, Subtle, Tactile) ---
+.category-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-card);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.25s ease,
+                border-color 0.25s ease;
+
+    .category-icon-wrapper {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: #f1f5f9;
+        color: #334155;
+        transition: background-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
+
+        i {
+            color: inherit;
+            line-height: 1;
+            font-size: 1.5rem;
+        }
+    }
+
+    .category-title {
+        color: var(--color-text-primary);
+        font-weight: 600;
+        transition: color 0.25s ease;
+    }
+}
+
+// Hover & Focus States: Subtle, calm elevation without visual noise
+.category-card-link {
+    display: block;
+    height: 100%;
+    text-decoration: none;
+
+    &:focus-visible {
+        outline: 2px solid var(--color-serene-indigo);
+        outline-offset: 4px;
+        border-radius: var(--radius-card);
+    }
+
+    &:hover .category-card,
+    &:focus-visible .category-card {
+        transform: translateY(-4px);
+        background-color: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 12px 24px -4px rgba(24, 36, 71, 0.08), 0 4px 8px -2px rgba(24, 36, 71, 0.04) !important;
+
+        .category-icon-wrapper {
+            background-color: var(--color-periwinkle-subtle) !important;
+            color: var(--color-serene-indigo) !important;
+            transform: scale(1.06);
+
+            i {
+                color: var(--color-serene-indigo) !important;
+            }
+        }
+
+        .category-title,
+        h3, h5 {
+            color: var(--color-text-primary) !important;
+        }
+    }
+}
+
+// Backward-compatibility for hover-lift (Elevation only, natural shadow)
+.hover-lift {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px -4px rgba(24, 36, 71, 0.08);
+    }
+}
+
+// =============================================================================
+// Phase 4.1: Sleep Finder (Floating Discovery Bar) & Photographic Categories
+// =============================================================================
+
+.sleep-finder-wrapper {
+    margin-top: -52px;
+    position: relative;
+    z-index: 20;
+
+    @media (max-width: 767.98px) {
+        margin-top: -36px;
+    }
+}
+
+.sleep-finder-card {
+    background-color: #ffffff;
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px -8px rgba(24, 36, 71, 0.12), 0 8px 16px -4px rgba(24, 36, 71, 0.06);
+    padding: var(--space-5);
+
+    @media (min-width: 992px) {
+        padding: var(--space-6) var(--space-7);
+    }
+}
+
+.finder-step-box {
+    background-color: var(--color-canvas);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 14px;
+    padding: var(--space-4);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.finder-pill-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-2);
+
+    @media (max-width: 575.98px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.finder-pill-btn {
+    border: 1.5px solid var(--color-border-subtle);
+    background-color: #ffffff;
+    color: var(--color-text-primary);
+    border-radius: 10px;
+    padding: 10px 8px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.2s ease,
+                border-color 0.2s ease,
+                color 0.2s ease,
+                box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    user-select: none;
+
+    i {
+        font-size: 1.25rem;
+        color: var(--color-serene-indigo);
+        transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .pill-label {
+        font-weight: 600;
+        line-height: 1.2;
+    }
+
+    .pill-hint {
+        font-size: 0.6875rem;
+        font-weight: 400;
+        color: var(--color-text-muted);
+        line-height: 1.2;
+    }
+
+    &:hover {
+        border-color: var(--color-serene-indigo);
+        background-color: var(--color-periwinkle-subtle);
+        color: var(--color-serene-indigo);
+        transform: translateY(-2px);
+    }
+
+    &.active {
+        background-color: var(--color-serene-indigo) !important;
+        border-color: var(--color-serene-indigo) !important;
+        color: #ffffff !important;
+        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
+
+        i {
+            color: #ffffff !important;
+            transform: scale(1.1);
+        }
+
+        .pill-hint {
+            color: rgba(255, 255, 255, 0.85) !important;
+        }
+    }
+
+    &:focus-visible {
+        outline: var(--focus-outline);
+        outline-offset: 2px;
+    }
+}
+
+.finder-cta-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.btn-finder-action {
+    background: linear-gradient(135deg, var(--color-navy) 0%, #2a3c70 100%);
+    color: #ffffff !important;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-family: var(--font-display);
+    padding: 14px 28px;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.2s ease;
+    box-shadow: 0 8px 20px -4px rgba(24, 36, 71, 0.25);
+    text-decoration: none;
+    width: 100%;
+    text-align: center;
+
+    &:hover,
+    &:focus {
+        background: linear-gradient(135deg, #20315c 0%, #354b8c 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 26px -4px rgba(24, 36, 71, 0.32);
+        color: #ffffff !important;
+    }
+
+    &:focus-visible {
+        outline: var(--focus-outline);
+        outline-offset: 3px;
+    }
+}
+
+// --- Photographic Category Cards ---
+.category-photo-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.2s ease;
+
+    .category-photo-wrapper {
+        position: relative;
+        height: 140px;
+        width: 100%;
+        background-color: #f1f5f9;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .category-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(24, 36, 71, 0.05) 0%, rgba(24, 36, 71, 0.35) 100%);
+            pointer-events: none;
+        }
+
+        .category-badge-chip {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: var(--color-serene-indigo);
+            border: 1px solid rgba(79, 70, 229, 0.2);
+            font-size: 0.6875rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.02em;
+            box-shadow: 0 2px 8px rgba(24, 36, 71, 0.1);
+        }
+    }
+
+    .category-card-body {
+        padding: var(--space-4);
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+
+        .category-name {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: 4px;
+            transition: color 0.2s ease;
+        }
+
+        .category-desc {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            line-height: 1.4;
+            margin-bottom: 0;
+        }
+    }
+}
+
+.category-photo-link {
+    text-decoration: none;
+    display: block;
+    height: 100%;
+
+    &:hover .category-photo-card,
+    &:focus-visible .category-photo-card {
+        transform: translateY(-4px);
+        border-color: #cbd5e1;
+        box-shadow: 0 14px 28px -4px rgba(24, 36, 71, 0.1), 0 6px 12px -2px rgba(24, 36, 71, 0.05);
+
+        .category-photo-wrapper img {
+            transform: scale(1.06);
+        }
+
+        .category-name {
+            color: var(--color-serene-indigo);
+        }
+    }
+
+    &:focus-visible {
+        outline: var(--focus-outline);
+        outline-offset: 4px;
+        border-radius: var(--radius-card);
+    }
+}
+
+// =============================================================================
+// Phase 4.2: Trust Pillars, Security Seals & Tactile CTA Styling
+// =============================================================================
+
+// Tactile Generous CTA Buttons
+.btn-cta-bold {
+    min-height: 52px;
+    padding: 14px 32px;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    border-radius: 12px;
+    box-shadow: var(--shadow-ambient-cta);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.2s ease,
+                border-color 0.2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-cta-lifted);
+    }
+
+    &:focus-visible {
+        outline: var(--focus-outline);
+        outline-offset: 3px;
+    }
+}
+
+// 4 Pillars of Rest & Trust (Grid)
+.trust-pillars-grid {
+    .trust-card {
+        background-color: var(--color-surface);
+        border: 1px solid var(--color-border-subtle);
+        border-radius: var(--radius-card);
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                    box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                    border-color 0.2s ease;
+        box-shadow: var(--shadow-card);
+
+        &:hover {
+            transform: translateY(-4px);
+            border-color: var(--color-border-medium);
+            box-shadow: var(--shadow-lifted);
+        }
+    }
+
+    .trust-icon-box {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--color-periwinkle-subtle);
+        color: var(--color-serene-indigo);
+    }
+
+    .trust-badge-pill {
+        background-color: var(--color-slate-subtle);
+        color: var(--color-text-primary);
+        border: 1px solid var(--color-border-subtle);
+        border-radius: 20px;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        padding: 4px 10px;
+        width: fit-content;
+    }
+
+    .stripe-badge-text {
+        font-size: 0.6875rem;
+        font-weight: 600;
+        color: var(--color-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    .stripe-wordmark-svg {
+        color: #635bff;
+    }
+}
+
+// Compact Trust Strip (Product Detail Page)
+.trust-compact-box {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-ambient);
+
+    @media (min-width: 576px) {
+        .border-end-sm {
+            border-right: 1px solid var(--color-border-subtle);
+        }
+    }
+}
+
+// Checkout / Cart Trust Seal Box
+.trust-checkout-seal {
+    background-color: var(--color-slate-subtle);
+    border: 1px dashed var(--color-border-medium);
+    border-radius: 12px;
+
+    .shadow-2xs {
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+}
+
+// Footer Trust Strip
+.footer-trust-strip {
+    font-size: 0.8125rem;
+
+    .stripe-footer-svg {
+        opacity: 0.85;
+        transition: opacity 0.2s ease;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+}
+
+// =============================================================================
+// Phase 4.4 (delight) — Pantalla de Confirmación y Detalle de Pedido
+// =============================================================================
+
+// Hero de Confirmación Serena (Midnight Sanctuary)
+.order-confirmation-hero {
+    position: relative;
+    background: linear-gradient(135deg, #182447 0%, #1e293b 50%, #0f172a 100%);
+    border-radius: var(--radius-xl);
+    color: #ffffff;
+    padding: 2.75rem 2.25rem;
+    box-shadow: 0 12px 36px -6px rgba(24, 36, 71, 0.28);
+    overflow: hidden;
+    margin-bottom: var(--space-6);
+
+    &::after {
+        content: "";
+        position: absolute;
+        top: -20%;
+        right: -10%;
+        width: 420px;
+        height: 420px;
+        background: radial-gradient(circle, rgba(117, 142, 249, 0.14) 0%, rgba(79, 70, 229, 0.04) 50%, transparent 70%);
+        pointer-events: none;
+        border-radius: 50%;
+    }
+
+    .serene-confirm-badge {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.85rem;
+        flex-shrink: 0;
+        animation: sereneAuraGlow 3s ease-in-out infinite;
+        border: 2px solid rgba(255, 255, 255, 0.25);
+    }
+
+    .order-hero-title {
+        font-family: var(--font-family-display, 'Inter', sans-serif);
+        font-size: clamp(1.65rem, 3.2vw, 2.25rem);
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        color: #ffffff;
+        margin-bottom: 0.5rem;
+        line-height: 1.25;
+    }
+
+    .order-hero-subtitle {
+        font-size: 1.05rem;
+        color: #cbd5e1;
+        max-width: 68ch;
+        line-height: 1.55;
+        margin-bottom: 1.5rem;
+    }
+
+    .badge-sanctuary-status {
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        color: #ffffff;
+        padding: 6px 16px;
+        border-radius: 50rem;
+        font-weight: 600;
+        font-size: 0.8125rem;
+        letter-spacing: 0.01em;
+
+        &.status-success {
+            color: #34d399;
+            border-color: rgba(52, 211, 153, 0.45);
+            background: rgba(5, 150, 105, 0.18);
+        }
+
+        &.status-processing {
+            color: #93c5fd;
+            border-color: rgba(147, 197, 253, 0.45);
+            background: rgba(79, 70, 229, 0.18);
+        }
+
+        &.status-danger {
+            color: #f87171;
+            border-color: rgba(248, 113, 113, 0.45);
+            background: rgba(220, 38, 38, 0.18);
+        }
+    }
+
+    .badge-sanctuary-meta {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        color: #e2e8f0;
+        padding: 6px 14px;
+        border-radius: 50rem;
+        font-size: 0.8125rem;
+        font-weight: 500;
+    }
+}
+
+// Timeline Interactivo de Fases de Descanso
+.order-timeline-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    padding: 1.85rem;
+    margin-bottom: var(--space-6);
+
+    .timeline-header-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--color-text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .timeline-header-subtitle {
+        font-size: 0.9rem;
+        color: var(--color-text-muted);
+        margin-bottom: 1.75rem;
+    }
+
+    // Rail y conector
+    .order-timeline-track {
+        position: relative;
+        padding: 1.25rem 0.5rem 0.5rem;
+
+        @media (min-width: 768px) {
+            .timeline-rail {
+                position: absolute;
+                top: 36px;
+                left: 10%;
+                right: 10%;
+                height: 4px;
+                background-color: var(--color-slate-subtle);
+                border-radius: 4px;
+                z-index: 1;
+
+                .timeline-progress-fill {
+                    height: 100%;
+                    width: 100%;
+                    background: linear-gradient(90deg, #059669 0%, #4f46e5 100%);
+                    border-radius: 4px;
+                    transform-origin: left center;
+                    transform: scaleX(var(--timeline-progress-scale, 1));
+                    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+                }
+            }
+        }
+    }
+
+    .order-timeline-steps {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        position: relative;
+        z-index: 2;
+
+        @media (min-width: 768px) {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+        }
+    }
+
+    .timeline-step {
+        text-align: left;
+        position: relative;
+
+        @media (min-width: 768px) {
+            text-align: center;
+        }
+
+        .timeline-node-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+
+            @media (min-width: 768px) {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+
+        .timeline-node-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            cursor: pointer;
+            border: 3px solid #ffffff;
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+            &:focus-visible {
+                outline: 2px solid var(--color-serene-indigo);
+                outline-offset: 3px;
+            }
+        }
+
+        .timeline-step-title {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: 2px;
+            line-height: 1.3;
+        }
+
+        .timeline-step-desc {
+            font-size: 0.8125rem;
+            color: var(--color-text-muted);
+            margin-bottom: 0;
+            line-height: 1.35;
+        }
+
+        // Estados del paso
+        &.is-completed {
+            .timeline-node-btn {
+                background: #059669;
+                color: #ffffff;
+                box-shadow: 0 0 0 2px #059669, 0 4px 10px rgba(5, 150, 105, 0.25);
+            }
+        }
+
+        &.is-active {
+            .timeline-node-btn {
+                background: var(--color-serene-indigo);
+                color: #ffffff;
+                box-shadow: 0 0 0 2px var(--color-serene-indigo), 0 4px 14px rgba(79, 70, 229, 0.35);
+                animation: sereneNodePulse 2.5s ease-in-out infinite;
+            }
+
+            .timeline-step-title {
+                color: var(--color-serene-indigo);
+            }
+        }
+
+        &.is-upcoming {
+            .timeline-node-btn {
+                background: var(--color-surface);
+                color: #94a3b8;
+                border: 2px dashed #cbd5e1;
+                box-shadow: none;
+            }
+
+            .timeline-step-title {
+                color: #64748b;
+            }
+
+            .timeline-step-desc {
+                color: #94a3b8;
+            }
+        }
+    }
+
+    // Panel interactivo de detalle de fase
+    .timeline-detail-panel {
+        background-color: var(--color-slate-subtle);
+        border: 1px solid var(--color-border-subtle);
+        border-radius: 12px;
+        padding: 1.25rem 1.5rem;
+        margin-top: 1.75rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+
+        .detail-panel-icon {
+            font-size: 1.5rem;
+            color: var(--color-serene-indigo);
+            flex-shrink: 0;
+            line-height: 1;
+            margin-top: 2px;
+        }
+
+        .detail-panel-title {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: 2px;
+        }
+
+        .detail-panel-text {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            margin-bottom: 0;
+            line-height: 1.45;
+        }
+    }
+}
+
+// Tarjetas y Tablas de Contenido de Pedido
+.order-section-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    padding: 1.85rem;
+    margin-bottom: var(--space-6);
+
+    .order-section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--color-text-primary);
+        margin-bottom: 1.25rem;
+    }
+
+    .order-item-img {
+        width: 58px;
+        height: 58px;
+        border-radius: 10px;
+        object-fit: cover;
+        border: 1px solid var(--color-border-subtle);
+        flex-shrink: 0;
+    }
+
+    .order-item-placeholder {
+        width: 58px;
+        height: 58px;
+        border-radius: 10px;
+        background-color: var(--color-slate-subtle);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+        font-size: 1.25rem;
+        border: 1px solid var(--color-border-subtle);
+        flex-shrink: 0;
+    }
+
+    .order-item-name {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--color-text-primary);
+        text-decoration: none;
+        transition: color 0.2s ease;
+
+        &:hover {
+            color: var(--color-serene-indigo);
+        }
+    }
+
+    .order-item-chip {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--color-text-muted);
+        background-color: var(--color-slate-subtle);
+        border: 1px solid var(--color-border-subtle);
+        padding: 2px 8px;
+        border-radius: 6px;
+        margin-top: 4px;
+    }
+}
+
+// Ritual de Bienvenida al Descanso (Unboxing Sereno)
+.unboxing-ritual-card {
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-card);
+    padding: 1.85rem;
+    margin-bottom: var(--space-6);
+
+    .unboxing-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--color-text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .unboxing-subtitle {
+        font-size: 0.875rem;
+        color: var(--color-text-muted);
+        margin-bottom: 1.5rem;
+    }
+
+    .ritual-box {
+        background-color: var(--color-surface);
+        border: 1px solid var(--color-border-subtle);
+        border-radius: 12px;
+        padding: 1.25rem;
+        height: 100%;
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-ambient);
+        }
+
+        .ritual-icon-badge {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--color-periwinkle-subtle);
+            color: var(--color-serene-indigo);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .ritual-box-title {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: 0.35rem;
+        }
+
+        .ritual-box-desc {
+            font-size: 0.8125rem;
+            color: var(--color-text-muted);
+            margin-bottom: 0;
+            line-height: 1.45;
+        }
+    }
+}
+
+// Tarjeta de Resumen Económico
+.order-summary-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    padding: 1.85rem;
+    margin-bottom: var(--space-6);
+
+    .summary-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--color-text-primary);
+        margin-bottom: 1.25rem;
+    }
+
+    .summary-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        font-size: 0.9375rem;
+        color: var(--color-text-muted);
+
+        .summary-val {
+            font-weight: 600;
+            color: var(--color-text-primary);
+            font-variant-numeric: tabular-nums;
+        }
+    }
+
+    .summary-total-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding-top: 1rem;
+        border-top: 1px solid var(--color-border-subtle);
+        margin-top: 1rem;
+        margin-bottom: 1.5rem;
+
+        .total-label {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+
+        .total-amount {
+            font-size: 1.85rem;
+            font-weight: 800;
+            color: var(--color-deep-sanctuary-navy);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.02em;
+        }
+    }
+
+    .btn-download-invoice {
+        min-height: 48px;
+        font-weight: 600;
+        font-size: 0.9375rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow-ambient-cta);
+        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+        &:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-cta-lifted);
+        }
+    }
+
+    .order-support-box {
+        background-color: var(--color-slate-subtle);
+        border: 1px dashed var(--color-border-medium);
+        border-radius: 10px;
+        padding: 0.875rem 1rem;
+        font-size: 0.8125rem;
+        color: var(--color-text-muted);
+        margin-top: 1.25rem;
+    }
+}
+
+// =============================================================================
+// Phase 5: Transactional Clarity, Empty States & Defensive UI Resilience
+// =============================================================================
+
+// --- Reusable Empty State Styles ---
+.empty-state-card {
+    width: 100%;
+    max-width: 680px;
+    min-width: 0;
+    margin: 0 auto;
+    box-sizing: border-box;
+
+    .empty-state-icon-aura {
+        width: 88px;
+        height: 88px;
+        border-radius: 50%;
+        background-color: rgba(79, 70, 229, 0.08);
+        border: 1px solid rgba(79, 70, 229, 0.16);
+        box-shadow: 0 8px 24px -4px rgba(79, 70, 229, 0.12);
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+        &:hover {
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 575.98px) {
+            width: 76px;
+            height: 76px;
+        }
+    }
+
+    .empty-state-icon {
+        font-size: 2.5rem;
+        line-height: 1;
+
+        @media (max-width: 575.98px) {
+            font-size: 2rem;
+        }
+    }
+
+    .badge {
+        white-space: normal !important;
+        max-width: 100%;
+        line-height: 1.45;
+        text-align: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .empty-state-desc {
+        width: 100%;
+        max-width: 520px;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: var(--color-text-muted);
+
+        @media (max-width: 575.98px) {
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+    }
+
+    .btn,
+    .btn-cta-bold {
+        max-width: 100%;
+        white-space: normal;
+        word-break: break-word;
+    }
+}
+
+// --- Multi-line Clamping and Defensive Typography ---
+.line-clamp-2,
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+// --- Transactional Cart Table & Cost Breakdown ---
+.cart-table {
+    th {
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+    }
+
+    td {
+        vertical-align: middle;
+    }
+}
+
+.shipping-threshold-banner {
+    border-radius: var(--radius-sm);
+
+    .progress {
+        background-color: #ffffff;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+
+    .progress-bar {
+        border-radius: 100px;
+        background-color: var(--color-accent-indigo, #4F46E5);
+    }
+}
+
+.cart-trust-assurances {
+    background-color: var(--color-slate-subtle);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-sm);
+}
+
+// --- Defensive Form Validation Feedback (:user-invalid / .is-invalid) ---
+.needs-validation {
+    .form-control:user-invalid,
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        background-color: #fff8f8;
+
+        &:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.15);
+        }
+    }
+
+    .form-control:user-valid,
+    .form-control.is-valid {
+        border-color: #198754;
+
+        &:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.15);
+        }
+    }
+}
+
+// Prefers-reduced-motion accessibility floor
+@media (prefers-reduced-motion: reduce) {
+    .sleep-finder-card,
+    .finder-pill-btn,
+    .btn-finder-action,
+    .category-photo-card,
+    .category-photo-wrapper img,
+    .category-photo-link,
+    .btn-hero-primary,
+    .btn-hero-secondary,
+    .btn-cta-bold,
+    .trust-card,
+    .hover-lift,
+    .order-confirmation-hero,
+    .serene-confirm-badge,
+    .timeline-node-btn,
+    .timeline-progress-fill,
+    .ritual-box,
+    .btn-download-invoice,
+    .posture-select-btn,
+    .quick-firmness-pill,
+    .spine-pulse-dot {
+        transition: none !important;
+        transform: none !important;
+        animation: none !important;
+    }
+}
+
+// =============================================================================
+// Phase 6: Operational Density (Admin Quieter) & Signature Feature (Overdrive)
+// =============================================================================
+
+// --- Subphase 6.1: Quieter High-Density Administration ---
+.admin-sidebar-card {
+    border: 1px solid var(--color-border-subtle, #e2e8f0);
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.admin-sidebar-nav {
+    .list-group-item {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #334155;
+        border: none;
+        border-radius: 6px;
+        margin: 2px 8px;
+        transition: all 0.15s ease;
+
+        &:hover {
+            background-color: #f1f5f9;
+            color: #0f172a;
+        }
+
+        &.active {
+            background-color: var(--color-deep-sanctuary-navy, #182447);
+            color: #ffffff;
+            font-weight: 600;
+        }
+    }
+}
+
+.kpi-card-quieter {
+    border: 1px solid var(--color-border-subtle, #e2e8f0);
+    border-radius: 12px;
+    background: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 12px rgba(24, 36, 71, 0.06);
+    }
+
+    .kpi-icon-pill {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+}
+
+.table-admin {
+    font-size: 0.85rem;
+
+    thead th {
+        background-color: #f8fafc;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        font-weight: 600;
+        padding: 0.65rem 0.85rem;
+        border-bottom: 1px solid #e2e8f0;
+        white-space: nowrap;
+    }
+
+    tbody td {
+        padding: 0.65rem 0.85rem;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+
+    tbody tr:hover {
+        background-color: #f8fafc;
+    }
+}
+
+.admin-badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: 50rem;
+    border: 1px solid transparent;
+    letter-spacing: 0.02em;
+
+    &.admin-badge-pending {
+        background-color: #fef3c7;
+        color: #92400e;
+        border-color: #fde68a;
+    }
+
+    &.admin-badge-processing {
+        background-color: #e0e7ff;
+        color: #3730a3;
+        border-color: #c7d2fe;
+    }
+
+    &.admin-badge-shipped {
+        background-color: #e0f2fe;
+        color: #0369a1;
+        border-color: #bae6fd;
+    }
+
+    &.admin-badge-delivered,
+    &.admin-badge-completed {
+        background-color: #d1fae5;
+        color: #065f46;
+        border-color: #a7f3d0;
+    }
+
+    &.admin-badge-cancelled {
+        background-color: #f1f5f9;
+        color: #475569;
+        border-color: #e2e8f0;
+    }
+
+    &.admin-badge-refunded {
+        background-color: #fee2e2;
+        color: #991b1b;
+        border-color: #fecaca;
+    }
+}
+
+// --- Subphase 6.3: Signature Feature (Firmness Advisor & Guide) ---
+.bg-navy-sanctuary {
+    background: linear-gradient(135deg, #182447 0%, #1e2b54 50%, #2a3e75 100%) !important;
+    color: #ffffff !important;
+}
+
+.firmness-advisor-wrapper {
+    .firmness-advisor-card {
+        border: 1px solid rgba(24, 36, 71, 0.12) !important;
+        background: #ffffff;
+        box-shadow: 0 4px 20px -2px rgba(24, 36, 71, 0.08);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .btn-advisor-toggle {
+        background: rgba(255, 255, 255, 0.14);
+        border: 1.5px solid rgba(255, 255, 255, 0.35);
+        color: #ffffff !important;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+        &:hover,
+        &:focus {
+            background: rgba(255, 255, 255, 0.24);
+            border-color: #ffffff;
+            color: #ffffff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        &:focus-visible {
+            outline: 2px solid #ffffff;
+            outline-offset: 2px;
+        }
+    }
+
+    .advisor-badge-pill {
+        background: rgba(255, 255, 255, 0.16);
+        border: 1px solid rgba(255, 255, 255, 0.30);
+        color: #c7d2fe;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .posture-select-btn {
+        background-color: #ffffff;
+        border-color: var(--color-border-subtle, #e2e8f0) !important;
+        border-radius: 12px;
+        cursor: pointer;
+        outline: none;
+
+        .posture-desc-sub {
+            font-size: 0.7rem;
+            line-height: 1.3;
+        }
+
+        &:hover {
+            border-color: var(--color-serene-indigo, #4f46e5) !important;
+            background-color: #f8fafc;
+            transform: translateY(-2px);
+        }
+
+        &.active {
+            border-color: var(--color-deep-sanctuary-navy, #182447) !important;
+            background-color: #eff6ff;
+            box-shadow: 0 0 0 2px var(--color-serene-indigo, #4f46e5);
+            transform: translateY(-2px);
+
+            .posture-icon i {
+                color: var(--color-deep-sanctuary-navy, #182447) !important;
+                transform: scale(1.1);
+            }
+        }
+    }
+
+    .range-slider-wrapper {
+        .firmness-slider {
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(to right, #93c5fd 0%, #6366f1 50%, #1e1b4b 100%);
+            outline: none;
+            cursor: pointer;
+
+            &::-webkit-slider-thumb {
+                width: 22px;
+                height: 22px;
+                border-radius: 50%;
+                background: #182447;
+                border: 3px solid #ffffff;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+                cursor: pointer;
+                transition: transform 0.15s ease;
+
+                &:hover {
+                    transform: scale(1.15);
+                }
+            }
+
+            &::-moz-range-thumb {
+                width: 22px;
+                height: 22px;
+                border-radius: 50%;
+                background: #182447;
+                border: 3px solid #ffffff;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+                cursor: pointer;
+            }
+        }
+
+        .marker-point {
+            cursor: pointer;
+            font-size: 0.72rem;
+            transition: color 0.15s ease;
+
+            &:hover {
+                color: var(--color-serene-indigo, #4f46e5);
+            }
+        }
+    }
+
+    .quick-firmness-pill {
+        font-size: 0.75rem;
+        font-weight: 500;
+        border-color: #cbd5e1;
+        color: #475569;
+        transition: all 0.15s ease;
+
+        &:hover {
+            border-color: var(--color-deep-sanctuary-navy, #182447);
+            color: var(--color-deep-sanctuary-navy, #182447);
+        }
+
+        &.active {
+            background-color: var(--color-deep-sanctuary-navy, #182447);
+            border-color: var(--color-deep-sanctuary-navy, #182447);
+            color: #ffffff;
+            font-weight: 600;
+        }
+    }
+
+    .advisor-preview-card {
+        background-color: #f8fafc;
+        border-color: var(--color-border-subtle, #e2e8f0);
+
+        .spine-pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+            display: inline-block;
+            animation: pulse-cervical 2s infinite;
+        }
+    }
+}
+
+@keyframes pulse-cervical {
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+// --- Iteration 4.2: Storefront Cognitive Simplification & Fast Category Chips ---
+.catalog-hub-card {
+    border: 1px solid rgba(24, 36, 71, 0.08) !important;
+}
+
+.catalog-search-wrapper {
+    .input-group {
+        border: 1.5px solid var(--color-border-subtle, #e2e8f0) !important;
+        background-color: #ffffff !important;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-control:focus {
+        box-shadow: none !important;
+    }
+}
+
+.catalog-category-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 18px;
+    border-radius: 50rem;
+    font-size: 0.845rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    background-color: #ffffff;
+    border: 1.5px solid var(--color-border-subtle, #e2e8f0);
+    color: var(--color-text-secondary, #334155);
+
+    &:hover {
+        background-color: #f8fafc;
+        border-color: #cbd5e1;
+        color: var(--color-deep-sanctuary-navy, #182447);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(24, 36, 71, 0.08);
+    }
+
+    &.active {
+        background-color: var(--color-deep-sanctuary-navy, #182447);
+        border-color: var(--color-deep-sanctuary-navy, #182447);
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(24, 36, 71, 0.25);
+        transform: translateY(-1px);
+
+        i {
+            color: #ffffff !important;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        padding: 6px 13px;
+        font-size: 0.8125rem;
+        min-height: 38px;
+        scroll-snap-align: start;
+        flex-shrink: 0;
+    }
+}
+
+.category-chips-wrapper {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    @media (max-width: 767.98px) {
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x proximity;
+        padding-right: 0.5rem;
+    }
+}
+
+.active-filter-badge {
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1e3a8a;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 50rem;
+    padding: 4px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    .filter-remove-btn {
+        color: #64748b;
+        text-decoration: none;
+        font-size: 1.15rem;
+        line-height: 1;
+        margin-left: 2px;
+        transition: color 0.15s ease;
+
+        &:hover {
+            color: var(--color-danger, #dc2626);
+        }
+    }
+}
+
+.secondary-filters-card {
+    background-color: #f8fafc;
+    border: 1px solid var(--color-border-subtle, #e2e8f0);
+}
+
+.hover-lift {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(24, 36, 71, 0.08);
+    }
+}
+
+.hover-danger:hover {
+    color: var(--color-danger, #dc2626) !important;
+}
+
+.focus-within-shadow:focus-within {
+    border-color: var(--color-serene-indigo, #4f46e5) !important;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
+}
+
+

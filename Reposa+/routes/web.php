@@ -1,17 +1,18 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\Auth\OnboardingController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\FavoriteController;
-use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\StripeWebhookController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index']);
-Route::get('/catalog', [ProductController::class, 'index']);
+Route::get('/catalog', [ProductController::class, 'index'])->name('catalog');
 Route::get('/catalog/{product}', [ProductController::class, 'show'])->name('products.show');
 
 Route::get('/lang/{locale}', [LanguageController::class, 'switchLang'])->name('lang.switch');
@@ -23,10 +24,31 @@ Route::post('/cart/update/{id}', [CartController::class, 'update'])->name('cart.
 Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
 Route::get('/cart/login', [CartController::class, 'requireLogin'])->name('cart.login');
 
-// Favoritos: endpoint JSON/AJAX. No lleva el middleware de auth para poder devolver
-// 401 cuando el usuario no está autenticado (el cliente redirige al login). El
-// propio controlador verifica la autenticación.
-Route::post('/favorites/{product}', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
+// Rutas de Checkout Adaptativo (Públicas: invitados y registrados)
+Route::get('/checkout', [CartController::class, 'checkoutPage'])->name('checkout.page');
+Route::post('/checkout', [CartController::class, 'checkout'])->name('checkout');
+
+// Stripe Checkout (Invitados y registrados)
+Route::get('/checkout/stripe', [CartController::class, 'stripeCheckout'])->name('stripe.checkout');
+Route::get('/checkout/stripe/success', [CartController::class, 'stripeSuccess'])->name('stripe.success');
+Route::get('/checkout/stripe/cancel', [CartController::class, 'stripeCancel'])->name('stripe.cancel');
+
+// Pedidos y Facturas (Protegidas por token para invitados o sesión para usuarios)
+Route::get('/orders/{order}', [CartController::class, 'showOrder'])->name('orders.show');
+Route::get('/orders/{order}/invoice', [CartController::class, 'downloadInvoice'])->name('orders.invoice');
+Route::post('/orders/{order}/claim-account', [CartController::class, 'claimAccount'])->name('orders.claim_account');
+
+// Google OAuth 2.0 (Social Sign-On)
+Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('auth.google');
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('auth.google.callback');
+Route::get('/api/auth/callback/google', [GoogleAuthController::class, 'callback']);
+Route::get('/auth/google/callback/google', [GoogleAuthController::class, 'callback']);
+
+// Onboarding obligatorio de Dirección de Envío para usuarios de Google
+Route::middleware(['auth'])->group(function () {
+    Route::get('/onboarding/shipping-address', [OnboardingController::class, 'showShippingForm'])->name('onboarding.shipping');
+    Route::post('/onboarding/shipping-address', [OnboardingController::class, 'storeShipping'])->name('onboarding.shipping.store');
+});
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
@@ -34,11 +56,13 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profile/address/{address}', [ProfileController::class, 'updateAddress'])->name('profile.address.update');
     Route::delete('/profile/address/{address}', [ProfileController::class, 'destroyAddress'])->name('profile.address.destroy');
 
-    // Rutas de Checkout/Pedidos (Solo usuarios autenticados)
-    Route::post('/checkout', [CartController::class, 'checkout'])->name('checkout');
     Route::get('/orders', [CartController::class, 'orders'])->name('orders.index');
-    Route::get('/orders/{order}', [CartController::class, 'showOrder'])->name('orders.show');
+    Route::post('/favorites/{product}', [ProfileController::class, 'toggleFavorite'])->name('favorites.toggle');
+    Route::delete('/favorites/{product}', [ProfileController::class, 'removeFavorite'])->name('favorites.destroy');
 });
+
+// Stripe Webhook (fuera de auth — Stripe envía sin sesión)
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])->name('cashier.webhook');
 
 // Rutas de Administración
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
@@ -63,4 +87,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     // Historial de Pedidos Global
     Route::get('/orders', [AdminController::class, 'orders'])->name('admin.orders');
     Route::patch('/orders/{order}/status', [AdminController::class, 'updateOrderStatus'])->name('admin.orders.updateStatus');
+    Route::post('/orders/{order}/refund', [AdminController::class, 'refundOrder'])->name('admin.orders.refund');
+
+    // Paquetería y Envíos
+    Route::post('/shipments/{shipment}/advance', [AdminController::class, 'advanceShipment'])->name('admin.shipments.advance');
+    Route::get('/shipments/{shipment}/label', [AdminController::class, 'viewShipmentLabel'])->name('admin.shipments.label');
 });

@@ -1,46 +1,113 @@
-// Custom Variables
-$primary: #182447;
-$secondary: #758ef9;
-$info: #42569a;
-$light: #b1cdff;
+// Reposa+ Design System Tokens
+@import "tokens";
 
 // Import Bootstrap
 @import "bootstrap/scss/bootstrap";
 
-// Custom styles for Reposa+
-body {
-    background-color: #f8fafc;
-    color: #182447;
-    font-family: 'Inter', sans-serif;
-}
+// Reposa+ Typography System
+@import "typography";
 
-.hero-section {
-    background: linear-gradient(135deg, #182447 0%, #42569a 100%);
-    color: white;
-    padding: 100px 0;
-}
+// Reposa+ Spatial Rhythm & Layout
+@import "layout";
 
-.card-product {
-    border: none;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    background: white;
-    border-radius: 15px;
-    overflow: hidden;
-}
+// Reposa+ Motion System & Microinteractions (Phase 4.3 animate)
+@import "animations";
 
-.card-product:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(24, 36, 71, 0.1);
+// Reposa+ Mobile Ergonomics & Responsive Adaptation (Phase 7 adapt & optimize)
+@import "mobile";
+
+// Reposa+ Button Architecture & Unified Tactile Lift (Phase 8 Polish)
+.btn {
+    font-weight: 600;
+    transition: var(--transition-base, all 0.25s cubic-bezier(0.4, 0, 0.2, 1));
 }
 
 .btn-primary {
-    background-color: #182447;
-    border-color: #182447;
-    padding: 10px 25px;
-    border-radius: 8px;
+    background-color: var(--color-primary, #182447);
+    border-color: var(--color-primary, #182447);
+    color: #ffffff;
+    padding: 10px 24px;
+    border-radius: var(--radius-md, 8px);
+
+    &:hover {
+        background-color: var(--color-twilight, #42569a);
+        border-color: var(--color-twilight, #42569a);
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(24, 36, 71, 0.15);
+    }
+
+    &:focus,
+    &:focus-visible {
+        background-color: var(--color-twilight, #42569a);
+        border-color: var(--color-twilight, #42569a);
+        color: #ffffff;
+        box-shadow: var(--focus-ring);
+        outline: none;
+    }
+
+    &:active {
+        transform: translateY(0);
+        box-shadow: none;
+    }
 }
 
-.btn-primary:hover {
-    background-color: #42569a;
-    border-color: #42569a;
+.btn-secondary {
+    background-color: var(--color-secondary, #4f46e5);
+    border-color: var(--color-secondary, #4f46e5);
+    color: #ffffff;
+    border-radius: var(--radius-md, 8px);
+
+    &:hover {
+        background-color: #4338ca;
+        border-color: #4338ca;
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    }
+
+    &:focus,
+    &:focus-visible {
+        background-color: #4338ca;
+        border-color: #4338ca;
+        color: #ffffff;
+        box-shadow: var(--focus-ring);
+        outline: none;
+    }
+
+    &:active {
+        transform: translateY(0);
+        box-shadow: none;
+    }
 }
+
+// Browser Surfaces Craft Floor: Custom Scrollbars & Caret Theming
+html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-medium, #cbd5e1) transparent;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--color-border-medium, #cbd5e1);
+    border-radius: var(--radius-pill, 50rem);
+    border: 2px solid transparent;
+    background-clip: content-box;
+
+    &:hover {
+        background-color: var(--color-muted-grey, #475569);
+    }
+}
+
+input, textarea, select {
+    caret-color: var(--color-secondary, #4f46e5);
+}
+

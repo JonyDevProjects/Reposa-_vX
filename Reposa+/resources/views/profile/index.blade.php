@@ -19,7 +19,7 @@
                     <a href="#overview" class="list-group-item list-group-item-action border-0 px-0 active"><i class="bi bi-person me-2"></i> {{ __('messages.profile.sidebar.profile') }}</a>
                     <a href="#orders" class="list-group-item list-group-item-action border-0 px-0"><i class="bi bi-box me-2"></i> {{ __('messages.profile.sidebar.orders') }}</a>
                     <a href="#addresses" class="list-group-item list-group-item-action border-0 px-0"><i class="bi bi-geo-alt me-2"></i> {{ __('messages.profile.sidebar.addresses') }}</a>
-                    <a href="#favorites" class="list-group-item list-group-item-action border-0 px-0"><i class="bi bi-heart me-2"></i> Favoritos</a>
+                    <a href="#favorites" class="list-group-item list-group-item-action border-0 px-0"><i class="bi bi-heart me-2"></i> {{ __('messages.profile.sidebar.favorites') }}</a>
                     <form method="POST" action="{{ route('logout') }}" class="d-inline">
                         @csrf
                         <button type="submit" class="list-group-item list-group-item-action border-0 px-0 text-danger"><i class="bi bi-box-arrow-right me-2"></i> {{ __('messages.nav.logout') }}</button>
@@ -109,14 +109,17 @@
 
             <!-- Orders Section -->
             <div id="orders" class="mb-5">
-                <div class="card border-0 shadow-sm rounded-4 p-5">
-                    <h4 class="fw-bold mb-4">{{ __('messages.profile.recent_orders') }}</h4>
+                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+                    <h4 class="fw-bold mb-4 text-navy">{{ __('messages.profile.recent_orders') }}</h4>
                     @if($user->orders->isEmpty())
-                        <div class="text-center py-4">
-                            <i class="bi bi-bag-x fs-1 text-muted"></i>
-                            <p class="mt-3">{{ __('messages.profile.no_orders') }}</p>
-                            <a href="/catalog" class="btn btn-primary">{{ __('messages.profile.go_to_store') }}</a>
-                        </div>
+                        <x-empty-state 
+                            icon="bi-bag-check"
+                            :title="__('messages.profile.no_orders')"
+                            :description="__('messages.profile.no_orders_desc')"
+                            actionUrl="/catalog"
+                            :actionText="__('messages.profile.go_to_store')"
+                            actionIcon="bi-chevron-right"
+                        />
                     @else
                         <div class="table-responsive">
                             <table class="table align-middle">
@@ -134,10 +137,10 @@
                                         <tr>
                                             <td class="fw-bold">#{{ $order->id }}</td>
                                             <td>{{ $order->created_at->format('d/m/Y') }}</td>
-                                            <td>{{ number_format($order->total_amount, 2) }}€</td>
+                                            <td class="tabular-nums">{{ number_format($order->total_amount, 2) }}€</td>
                                             <td>
-                                                <span class="badge bg-{{ $order->status == 'delivered' ? 'success' : 'warning' }} px-3 py-2">
-                                                    {{ ucfirst($order->status) }}
+                                                <span class="badge bg-{{ \App\Models\Order::getStatusColor($order->status) }} px-3 py-2">
+                                                    {{ \App\Models\Order::getStatusLabel($order->status) }}
                                                 </span>
                                             </td>
                                             <td class="text-end">
@@ -152,138 +155,114 @@
                 </div>
             </div>
 
-            <!-- Favorites Section -->
-            <div id="favorites" class="mb-5">
-                <div class="card border-0 shadow-sm rounded-4 p-5">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div>
-                            <h4 class="fw-bold mb-0">Las almohadas que más me gustan</h4>
-                            <p class="text-muted mb-0">Guarda aquí tus productos favoritos para volver a ellos cuando quieras.</p>
-                        </div>
-                    </div>
-
-                    @if($user->favorites->isEmpty())
-                        <div class="text-center py-4">
-                            <i class="bi bi-heart fs-1 text-muted"></i>
-                            <p class="mt-3">Aún no has marcado ninguna almohada como favorita.</p>
-                            <a href="/catalog" class="btn btn-primary">Ir al catálogo</a>
-                        </div>
-                    @else
-                        <div class="row g-4">
-                            @foreach($user->favorites as $favorite)
-                                <div class="col-md-6">
-                                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                                        <div class="row g-0">
-                                            <div class="col-4">
-                                                <img src="https://placehold.co/300x300/182447/ffffff?text={{ urlencode($favorite->name) }}" class="img-fluid h-100 object-fit-cover" alt="{{ $favorite->name }}">
-                                            </div>
-                                            <div class="col-8">
-                                                <div class="card-body d-flex flex-column h-100 justify-content-between">
-                                                    <div>
-                                                        <h5 class="card-title fw-bold mb-2">{{ $favorite->name }}</h5>
-                                                        <p class="text-muted small mb-3">{{ Str::limit($favorite->description, 90) }}</p>
-                                                        <div class="mb-3">
-                                                            @foreach($favorite->categories as $category)
-                                                                <span class="badge bg-light text-primary border me-1">{{ $category->name }}</span>
-                                                            @endforeach
-                                                        </div>
-                                                        <div class="fw-bold fs-5 text-primary">{{ number_format($favorite->price, 2) }}€</div>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between align-items-center mt-3 gap-2">
-                                                        <a href="{{ route('products.show', $favorite) }}" class="btn btn-outline-secondary btn-sm">Ver producto</a>
-                                                        <div class="d-flex gap-2">
-                                                            <form action="{{ route('cart.add', $favorite) }}" method="POST" class="m-0">
-                                                                @csrf
-                                                                <button type="submit" class="btn btn-outline-primary btn-sm">Añadir al carrito</button>
-                                                            </form>
-                                                            <button type="button"
-                                                                    class="btn btn-danger btn-sm btn-favorite"
-                                                                    data-product-id="{{ $favorite->id }}"
-                                                                    data-url="{{ route('favorites.toggle', $favorite) }}"
-                                                                    title="Quitar de favoritos">
-                                                                <i class="bi bi-heart-fill"></i>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
-                </div>
-            </div>
-
             <!-- Addresses Section -->
             <div id="addresses">
-                <div class="card border-0 shadow-sm rounded-4 p-5">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h4 class="fw-bold mb-0">{{ __('messages.profile.shipping_addresses') }}</h4>
-                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addAddressModal"><i class="bi bi-plus-lg me-1"></i> {{ __('messages.profile.new_address') }}</button>
+                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                        <h4 class="fw-bold mb-0 text-navy">{{ __('messages.profile.shipping_addresses') }}</h4>
+                        <button class="btn btn-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                            <i class="bi bi-plus-lg me-1"></i>{{ __('messages.profile.new_address') }}
+                        </button>
                     </div>
                     @if($user->addresses->isEmpty())
-                        <div class="text-center py-4">
-                            <i class="bi bi-geo fs-1 text-muted"></i>
-                            <p class="mt-3">{{ __('messages.profile.no_addresses') }}</p>
-                        </div>
+                        <x-empty-state 
+                            icon="bi-geo-alt"
+                            :title="__('messages.profile.no_addresses')"
+                            :description="__('messages.profile.no_addresses_desc')"
+                        >
+                            <div class="mt-2">
+                                <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                                    <i class="bi bi-plus-lg me-1"></i>{{ __('messages.profile.new_address') }}
+                                </button>
+                            </div>
+                        </x-empty-state>
                     @else
                         <div class="row g-3">
                             @foreach($user->addresses as $address)
                                 <div class="col-md-6">
-                                    <div class="border rounded-4 p-4 position-relative">
+                                    <div class="border rounded-4 p-4 position-relative bg-white shadow-2xs h-100 d-flex flex-column">
                                         @if($address->is_main)
                                             <span class="badge bg-secondary position-absolute top-0 end-0 m-3">{{ __('messages.profile.main_address') }}</span>
                                         @endif
-                                        <h6 class="fw-bold">{{ $address->street }}</h6>
+                                        <h6 class="fw-bold text-navy mb-1 text-break">{{ $address->street }}</h6>
                                         <p class="text-muted small mb-0">{{ $address->zip_code }} - {{ $address->city }}</p>
-                                        <div class="mt-3 d-flex gap-3">
-                                            <a href="#" class="small text-decoration-none" data-bs-toggle="modal" data-bs-target="#editAddressModal{{ $address->id }}">{{ __('messages.profile.edit') }}</a>
+                                        <div class="mt-auto pt-3 d-flex gap-3">
+                                            <a href="#" class="small text-decoration-none fw-semibold" data-bs-toggle="modal" data-bs-target="#editAddressModal{{ $address->id }}">
+                                                <i class="bi bi-pencil me-1"></i>{{ __('messages.profile.edit') }}
+                                            </a>
                                             <form action="{{ route('profile.address.destroy', $address) }}" method="POST" onsubmit="return confirm('{{ __('messages.profile.confirm_delete_address') }}');">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-link btn-sm text-danger p-0 text-decoration-none">{{ __('messages.profile.delete') }}</button>
+                                                <button type="submit" class="btn btn-link btn-sm text-danger p-0 text-decoration-none small">
+                                                    <i class="bi bi-trash me-1"></i>{{ __('messages.profile.delete') }}
+                                                </button>
                                             </form>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Edit Address Modal -->
-                                <div class="modal fade" id="editAddressModal{{ $address->id }}" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <form action="{{ route('profile.address.update', $address) }}" method="POST">
+                                <div class="modal fade" id="editAddressModal{{ $address->id }}" tabindex="-1" aria-labelledby="editAddressTitle{{ $address->id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content border-0 shadow-lg rounded-4">
+                                            <form action="{{ route('profile.address.update', $address) }}" method="POST" class="needs-validation">
                                                 @csrf
                                                 @method('PUT')
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">{{ __('messages.profile.edit_address') }}</h5>
+                                                <div class="modal-header border-bottom-0 pb-0">
+                                                    <h5 class="modal-title fw-bold text-navy" id="editAddressTitle{{ $address->id }}">{{ __('messages.profile.edit_address') }}</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
-                                                <div class="modal-body">
+                                                <div class="modal-body py-3">
                                                     <div class="mb-3">
-                                                        <label class="form-label">{{ __('messages.profile.street') }}</label>
-                                                        <input type="text" name="street" class="form-control" value="{{ $address->street }}" required>
+                                                        <label for="edit_street_{{ $address->id }}" class="form-label small fw-semibold text-navy">{{ __('messages.profile.street') }} *</label>
+                                                        <input type="text" 
+                                                               id="edit_street_{{ $address->id }}" 
+                                                               name="street" 
+                                                               class="form-control rounded-3" 
+                                                               value="{{ $address->street }}" 
+                                                               required 
+                                                               minlength="3" 
+                                                               maxlength="255" 
+                                                               autocomplete="street-address">
+                                                        <div class="invalid-feedback small">Por favor, introduce una dirección válida.</div>
                                                     </div>
                                                     <div class="mb-3">
-                                                        <label class="form-label">{{ __('messages.profile.city') }}</label>
-                                                        <input type="text" name="city" class="form-control" value="{{ $address->city }}" required>
+                                                        <label for="edit_city_{{ $address->id }}" class="form-label small fw-semibold text-navy">{{ __('messages.profile.city') }} *</label>
+                                                        <input type="text" 
+                                                               id="edit_city_{{ $address->id }}" 
+                                                               name="city" 
+                                                               class="form-control rounded-3" 
+                                                               value="{{ $address->city }}" 
+                                                               required 
+                                                               minlength="2" 
+                                                               maxlength="100" 
+                                                               autocomplete="address-level2">
+                                                        <div class="invalid-feedback small">Por favor, indica la localidad o ciudad.</div>
                                                     </div>
                                                     <div class="mb-3">
-                                                        <label class="form-label">{{ __('messages.profile.zip_code') }}</label>
-                                                        <input type="text" name="zip_code" class="form-control" value="{{ $address->zip_code }}" required>
+                                                        <label for="edit_zip_{{ $address->id }}" class="form-label small fw-semibold text-navy">{{ __('messages.profile.zip_code') }} *</label>
+                                                        <input type="text" 
+                                                               id="edit_zip_{{ $address->id }}" 
+                                                               name="zip_code" 
+                                                               class="form-control rounded-3" 
+                                                               value="{{ $address->zip_code }}" 
+                                                               required 
+                                                               pattern="[A-Za-z0-9\s\-]{3,10}" 
+                                                               maxlength="10" 
+                                                               autocomplete="postal-code">
+                                                        <div class="invalid-feedback small">Introduce un código postal válido (ej. 28013).</div>
                                                     </div>
-                                                    <div class="form-check">
+                                                    <div class="form-check mt-3">
                                                         <input type="hidden" name="is_main" value="0">
                                                         <input class="form-check-input" type="checkbox" name="is_main" value="1" id="isMain{{ $address->id }}" {{ $address->is_main ? 'checked' : '' }}>
-                                                        <label class="form-check-label" for="isMain{{ $address->id }}">
+                                                        <label class="form-check-label small" for="isMain{{ $address->id }}">
                                                             {{ __('messages.profile.mark_as_main') }}
                                                         </label>
                                                     </div>
                                                 </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.profile.cancel') }}</button>
-                                                    <button type="submit" class="btn btn-primary">{{ __('messages.profile.save_changes') }}</button>
+                                                <div class="modal-footer border-top-0 pt-0">
+                                                    <button type="button" class="btn btn-outline-secondary rounded-pill px-3" data-bs-dismiss="modal">{{ __('messages.profile.cancel') }}</button>
+                                                    <button type="submit" class="btn btn-primary rounded-pill px-4">{{ __('messages.profile.save_changes') }}</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -297,45 +276,40 @@
 
             <!-- Favorites Section -->
             <div id="favorites" class="mt-5 mb-5">
-                <div class="card border-0 shadow-sm rounded-4 p-5">
-                    <h4 class="fw-bold mb-4">{{ __('messages.favorites.title') }}</h4>
+                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+                    <h4 class="fw-bold mb-4 text-navy">{{ __('messages.favorites.title') }}</h4>
                     @if($user->favorites->isEmpty())
-                        <div class="text-center py-5">
-                            <i class="bi bi-heart fs-1 text-muted"></i>
-                            <p class="mt-3 text-muted">{{ __('messages.favorites.empty') }}</p>
-                            <a href="/catalog" class="btn btn-primary mt-2">{{ __('messages.favorites.btn_catalog') }}</a>
-                        </div>
+                        <x-empty-state 
+                            icon="bi-heart"
+                            :title="__('messages.favorites.empty_title')"
+                            :description="__('messages.favorites.empty_subtitle')"
+                            :highlight="__('messages.favorites.empty_social_proof')"
+                            actionUrl="/catalog"
+                            :actionText="__('messages.favorites.btn_catalog')"
+                            actionIcon="bi-chevron-right"
+                        />
+
+                        @if(isset($recommendedProducts) && $recommendedProducts->isNotEmpty())
+                            <div class="mt-5 pt-4 border-top">
+                                <div class="mb-3">
+                                    <h5 class="fw-bold text-navy mb-1">{{ __('messages.favorites.recommended_title') }}</h5>
+                                    <p class="text-muted small mb-0">{{ __('messages.favorites.recommended_subtitle') }}</p>
+                                </div>
+                                <div class="row g-3">
+                                    @foreach($recommendedProducts as $rec)
+                                        <div class="col-md-4">
+                                            <x-product-card :product="$rec" :favoriteIds="[]" />
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                     @else
                         <div class="row g-4">
+                            @php $userFavIds = $user->favorites->pluck('id')->toArray(); @endphp
                             @foreach($user->favorites as $product)
                                 <div class="col-md-6" id="fav-card-{{ $product->id }}">
-                                    <div class="card h-100 shadow-sm border-0 position-relative">
-                                        <button type="button" 
-                                                class="btn btn-danger text-white btn-sm rounded-circle position-absolute top-0 end-0 m-3 btn-favorite" 
-                                                data-product-id="{{ $product->id }}"
-                                                data-url="{{ route('favorites.toggle', $product) }}"
-                                                title="{{ __('messages.favorites.removed') }}">
-                                            <i class="bi bi-heart-fill"></i>
-                                        </button>
-                                        <a href="{{ route('products.show', $product) }}" class="text-decoration-none text-dark">
-                                            <img src="https://placehold.co/400x300/182447/ffffff?text={{ urlencode($product->name) }}" class="card-img-top" alt="{{ $product->name }}">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                                    <span class="badge bg-light text-primary border">{{ $product->material }}</span>
-                                                    <span class="text-muted small"><i class="bi bi-star-fill text-warning"></i> 4.8</span>
-                                                </div>
-                                                <h5 class="card-title fw-bold mb-1">{{ $product->name }}</h5>
-                                                <p class="card-text text-muted small mb-3">{{ Str::limit($product->description, 60) }}</p>
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <span class="fs-5 fw-bold text-primary">{{ number_format($product->price, 2) }}€</span>
-                                                    <form action="{{ route('cart.add', $product) }}" method="POST" class="m-0">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-outline-primary btn-sm rounded-circle"><i class="bi bi-cart-plus"></i></button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </div>
+                                    <x-product-card :product="$product" :favoriteIds="$userFavIds" />
                                 </div>
                             @endforeach
                         </div>
@@ -347,39 +321,66 @@
 </div>
 
 <!-- Add Address Modal -->
-<div class="modal fade" id="addAddressModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="{{ route('profile.address.store') }}" method="POST">
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <form action="{{ route('profile.address.store') }}" method="POST" class="needs-validation">
                 @csrf
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ __('messages.profile.new_address') }}</h5>
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold text-navy" id="addAddressTitle">{{ __('messages.profile.new_address') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body py-3">
                     <div class="mb-3">
-                        <label class="form-label">{{ __('messages.profile.street') }}</label>
-                        <input type="text" name="street" class="form-control" required>
+                        <label for="add_street" class="form-label small fw-semibold text-navy">{{ __('messages.profile.street') }} *</label>
+                        <input type="text" 
+                               id="add_street" 
+                               name="street" 
+                               class="form-control rounded-3" 
+                               required 
+                               minlength="3" 
+                               maxlength="255" 
+                               autocomplete="street-address" 
+                               placeholder="Ej. Calle Gran Vía 42, 3º B">
+                        <div class="invalid-feedback small">Por favor, introduce una dirección de entrega válida.</div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">{{ __('messages.profile.city') }}</label>
-                        <input type="text" name="city" class="form-control" required>
+                        <label for="add_city" class="form-label small fw-semibold text-navy">{{ __('messages.profile.city') }} *</label>
+                        <input type="text" 
+                               id="add_city" 
+                               name="city" 
+                               class="form-control rounded-3" 
+                               required 
+                               minlength="2" 
+                               maxlength="100" 
+                               autocomplete="address-level2" 
+                               placeholder="Ej. Madrid">
+                        <div class="invalid-feedback small">Por favor, indica tu ciudad o localidad.</div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">{{ __('messages.profile.zip_code') }}</label>
-                        <input type="text" name="zip_code" class="form-control" required>
+                        <label for="add_zip" class="form-label small fw-semibold text-navy">{{ __('messages.profile.zip_code') }} *</label>
+                        <input type="text" 
+                               id="add_zip" 
+                               name="zip_code" 
+                               class="form-control rounded-3" 
+                               required 
+                               pattern="[A-Za-z0-9\s\-]{3,10}" 
+                               maxlength="10" 
+                               autocomplete="postal-code" 
+                               placeholder="Ej. 28013">
+                        <div class="invalid-feedback small">Introduce un código postal válido (ej. 28013).</div>
                     </div>
-                    <div class="form-check">
+                    <div class="form-check mt-3">
                         <input type="hidden" name="is_main" value="0">
                         <input class="form-check-input" type="checkbox" name="is_main" value="1" id="isMainNew">
-                        <label class="form-check-label" for="isMainNew">
+                        <label class="form-check-label small" for="isMainNew">
                             {{ __('messages.profile.mark_as_main') }}
                         </label>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.profile.cancel') }}</button>
-                    <button type="submit" class="btn btn-primary">{{ __('messages.profile.save_address') }}</button>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-3" data-bs-dismiss="modal">{{ __('messages.profile.cancel') }}</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">{{ __('messages.profile.save_address') }}</button>
                 </div>
             </form>
         </div>

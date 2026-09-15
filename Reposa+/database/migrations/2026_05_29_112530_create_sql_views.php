@@ -10,8 +10,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("DROP VIEW IF EXISTS v_order_summary");
-        DB::statement("
+        DB::statement('DROP VIEW IF EXISTS v_order_summary');
+        DB::statement('
             CREATE VIEW v_order_summary AS
             SELECT
                 u.id AS user_id,
@@ -22,10 +22,10 @@ return new class extends Migration
             FROM users u
             LEFT JOIN orders o ON u.id = o.user_id
             GROUP BY u.id, u.name, u.email
-        ");
+        ');
 
-        DB::statement("DROP VIEW IF EXISTS v_top_favorited_products");
-        DB::statement("
+        DB::statement('DROP VIEW IF EXISTS v_top_favorited_products');
+        DB::statement('
             CREATE VIEW v_top_favorited_products AS
             SELECT
                 p.id AS id,
@@ -35,7 +35,7 @@ return new class extends Migration
             FROM products p
             INNER JOIN favorite_product fp ON p.id = fp.product_id
             GROUP BY p.id, p.name, p.price
-        ");
+        ');
     }
 
     /**
@@ -43,7 +43,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("DROP VIEW IF EXISTS v_order_summary");
-        DB::statement("DROP VIEW IF EXISTS v_top_favorited_products");
+        DB::statement('DROP VIEW IF EXISTS v_order_summary');
+        DB::statement('DROP VIEW IF EXISTS v_top_favorited_products');
     }
 };

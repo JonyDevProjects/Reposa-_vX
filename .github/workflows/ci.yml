@@ -1,0 +1,278 @@
+name: CI/CD Pipeline — Reposa+
+
+on:
+  push:
+    branches: [develop, main, 'release/*']
+  pull_request:
+    branches: [develop, main]
+
+defaults:
+  run:
+    working-directory: Reposa+
+
+jobs:
+  lint:
+    name: "1. Lint & Estático (Pint)"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+          coverage: none
+
+      - name: Cache de dependencias Composer
+        uses: actions/cache@v4
+        with:
+          path: Reposa+/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('Reposa+/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Instalar dependencias PHP
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Ejecutar verificación de estilo (Laravel Pint)
+        run: ./vendor/bin/pint --test
+
+  unit-tests:
+    name: "2. Tests Unitarios Puros (Memoria)"
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: dom, curl, mbstring, zip, pdo, bcmath, gd
+          tools: composer:v2
+          coverage: none
+
+      - name: Cache de dependencias Composer
+        uses: actions/cache@v4
+        with:
+          path: Reposa+/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('Reposa+/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Instalar dependencias PHP
+        run: composer install --no-progress --prefer-dist
+
+      - name: Preparar entorno para tests unitarios
+        run: |
+          cp .env.testing .env || cp .env.example .env
+          sed -i 's/DB_CONNECTION=mysql/DB_CONNECTION=sqlite/' .env
+          sed -i 's/DB_DATABASE=reposaplus_testing/DB_DATABASE=:memory:/' .env
+          php artisan key:generate --force
+
+      - name: Ejecutar Suite Unitaria en Memoria
+        run: php artisan test --testsuite=Unit
+
+  feature-tests:
+    name: "3. Tests de Integración (MySQL 8.0 + Redis)"
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: secret
+          MYSQL_DATABASE: reposaplus_testing
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=5
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: dom, curl, mbstring, zip, pdo, pdo_mysql, bcmath, gd, intl, redis
+          tools: composer:v2
+          coverage: none
+
+      - name: Cache de dependencias Composer
+        uses: actions/cache@v4
+        with:
+          path: Reposa+/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('Reposa+/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Instalar dependencias PHP
+        run: composer install --no-progress --prefer-dist
+
+      - name: Preparar entorno de base de datos
+        run: |
+          cp .env.testing .env
+          sed -i 's/DB_HOST=mysql-dev/DB_HOST=127.0.0.1/' .env
+          php artisan key:generate --force
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: reposaplus_testing
+          DB_USERNAME: root
+          DB_PASSWORD: secret
+
+      - name: Ejecutar migraciones
+        run: php artisan migrate --force
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: reposaplus_testing
+          DB_USERNAME: root
+          DB_PASSWORD: secret
+
+      - name: Ejecutar Suite de Integración Feature
+        run: php artisan test --testsuite=Feature
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: reposaplus_testing
+          DB_USERNAME: root
+          DB_PASSWORD: secret
+          REDIS_HOST: 127.0.0.1
+          REDIS_PORT: 6379
+
+  build:
+    name: "4. Compilación de Assets (Vite)"
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: Reposa+/package-lock.json
+
+      - name: Instalar dependencias Node
+        run: npm ci
+
+      - name: Compilar assets frontend
+        run: npm run build
+
+  e2e-tests:
+    name: "5. Tests E2E de Sistema (Playwright Chromium)"
+    runs-on: ubuntu-latest
+    needs: [feature-tests, build]
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: secret
+          MYSQL_DATABASE: reposaplus_testing
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=5
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: dom, curl, mbstring, zip, pdo, pdo_mysql, bcmath, gd, intl, redis
+          tools: composer:v2
+          coverage: none
+
+      - name: Configurar Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: Reposa+/package-lock.json
+
+      - name: Cache de dependencias Composer
+        uses: actions/cache@v4
+        with:
+          path: Reposa+/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('Reposa+/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Instalar dependencias PHP
+        run: composer install --no-progress --prefer-dist
+
+      - name: Instalar dependencias Node
+        run: npm ci
+
+      - name: Compilar assets para pruebas E2E
+        run: npm run build
+
+      - name: Instalar navegadores Playwright (Chromium)
+        run: npx playwright install --with-deps chromium
+
+      - name: Preparar entorno, base de datos y seeds
+        run: |
+          cp .env.testing .env
+          sed -i 's/DB_HOST=mysql-dev/DB_HOST=127.0.0.1/' .env
+          sed -i 's|APP_URL=.*|APP_URL=http://127.0.0.1:8000|' .env
+          echo "GOOGLE_CLIENT_ID=932690824736-4q6h6ajtauj6suulp1bgdkhgvam2dv1l.apps.googleusercontent.com" >> .env
+          echo "GOOGLE_CLIENT_SECRET=mock-google-client-secret-ci" >> .env
+          echo "GOOGLE_REDIRECT_URI=http://127.0.0.1:8000/auth/google/callback" >> .env
+          echo "STRIPE_KEY=pk_test_51U9Fu2K0VMwtlVDADl5i8DATOeLvL63oNGJVmsCvPZvs0Z4PFLDwnFwzBVjfBEvdyo6jFZBf4mzKtICyIjx99t7b00br7JMPmo" >> .env
+          echo "STRIPE_SECRET=sk_test_51U9Fu2K0VMwtlVDAQ9rpBMlSkde7NhH5HSZYLfOz32EMdqrU05DfYTksrMRtAmWHTz32rjKKHwq0MJoR7F69xKrw00jAS7Og8q" >> .env
+          php artisan key:generate --force
+          php artisan migrate:fresh --seed --force
+          php artisan storage:link || true
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: reposaplus_testing
+          DB_USERNAME: root
+          DB_PASSWORD: secret
+
+      - name: Iniciar servidor local Laravel
+        run: |
+          php artisan serve --host=127.0.0.1 --port=8000 > /tmp/laravel-serve.log 2>&1 &
+          timeout 30s bash -c 'until curl -s http://127.0.0.1:8000 > /dev/null; do sleep 1; done' || (cat /tmp/laravel-serve.log && exit 1)
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: reposaplus_testing
+          DB_USERNAME: root
+          DB_PASSWORD: secret
+          GOOGLE_CLIENT_ID: "932690824736-4q6h6ajtauj6suulp1bgdkhgvam2dv1l.apps.googleusercontent.com"
+          GOOGLE_CLIENT_SECRET: "mock-google-client-secret-ci"
+          GOOGLE_REDIRECT_URI: "http://127.0.0.1:8000/auth/google/callback"
+          STRIPE_KEY: "pk_test_51U9Fu2K0VMwtlVDADl5i8DATOeLvL63oNGJVmsCvPZvs0Z4PFLDwnFwzBVjfBEvdyo6jFZBf4mzKtICyIjx99t7b00br7JMPmo"
+          STRIPE_SECRET: "sk_test_51U9Fu2K0VMwtlVDAQ9rpBMlSkde7NhH5HSZYLfOz32EMdqrU05DfYTksrMRtAmWHTz32rjKKHwq0MJoR7F69xKrw00jAS7Og8q"
+          APP_URL: "http://127.0.0.1:8000"
+
+      - name: Ejecutar suite E2E de Playwright
+        run: npx playwright test
+        env:
+          BASE_URL: "http://127.0.0.1:8000"
+
+      - name: Subir reporte de Playwright en caso de fallo
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: Reposa+/playwright-report/
+          retention-days: 7

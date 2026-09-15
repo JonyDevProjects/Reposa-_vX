@@ -9,13 +9,19 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Cashier\Billable;
 
-#[Fillable(['name', 'email', 'password', 'role'])]
+#[Fillable(['name', 'email', 'password', 'role', 'google_id', 'avatar', 'email_verified_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use Billable, HasFactory, Notifiable;
+
+    public function isGoogleUser(): bool
+    {
+        return ! empty($this->google_id);
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -58,5 +64,10 @@ class User extends Authenticatable
     public function orderSummary()
     {
         return $this->hasOne(OrderSummary::class, 'user_id');
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
     }
 }

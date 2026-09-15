@@ -1,6 +1,6 @@
 # Decisiones de Diseño — Reposa+
 
-> **Asignatura:** Tecnologías Avanzadas de Desarrollo (EPD3)  
+> **Asignatura:** Tecnologías Avanzadas de Desarrollo (TFG)  
 > **Proyecto:** Reposa+ — Tienda online de colchones y descanso  
 > **Última actualización:** 30 de mayo de 2026
 
@@ -37,7 +37,7 @@ Breeze, en cambio, genera vistas con Tailwind CSS que habríamos tenido que rees
 **Decisión:** Implementar el carrito de compra mediante **sesiones PHP** para usuarios no autenticados.
 
 **Justificación:**  
-Uno de los requisitos de la EPD3 es permitir que los visitantes puedan navegar y añadir productos al carrito **sin obligarles a registrarse**. Las sesiones de PHP ofrecen un mecanismo sencillo y eficaz para almacenar el carrito temporalmente en el servidor, sin necesidad de crear registros en base de datos para usuarios anónimos.
+Uno de los requisitos de la TFG es permitir que los visitantes puedan navegar y añadir productos al carrito **sin obligarles a registrarse**. Las sesiones de PHP ofrecen un mecanismo sencillo y eficaz para almacenar el carrito temporalmente en el servidor, sin necesidad de crear registros en base de datos para usuarios anónimos.
 
 Cuando el usuario se autentica, el carrito de sesión se puede migrar a la tabla `cart_items` de forma transparente.
 
@@ -78,7 +78,7 @@ Las vistas SQL encapsulan consultas complejas (JOINs, agregaciones) directamente
 - **Reutilización:** Cualquier controlador puede acceder a las estadísticas con `OrderSummary::all()` sin duplicar la lógica SQL.
 - **Separación de responsabilidades:** Los modelos Eloquent actúan como capa de acceso limpia, manteniendo los controladores esbeltos.
 
-Este enfoque satisface el requisito del Problema 1 de la EPD3 sobre el uso de vistas en la base de datos.
+Este enfoque satisface el requisito del Problema 1 de la TFG sobre el uso de vistas en la base de datos.
 
 ---
 
@@ -203,4 +203,4 @@ Esta adaptación es transparente y no afecta al funcionamiento de la aplicación
 
 ---
 
-> **Nota final:** Todas estas decisiones fueron tomadas considerando los requisitos específicos de la EPD3 de la asignatura Tecnologías Avanzadas de Desarrollo, buscando el equilibrio entre simplicidad, buenas prácticas y cumplimiento académico.
+> **Nota final:** Todas estas decisiones fueron tomadas considerando los requisitos específicos de la TFG de la asignatura Tecnologías Avanzadas de Desarrollo, buscando el equilibrio entre simplicidad, buenas prácticas y cumplimiento académico.

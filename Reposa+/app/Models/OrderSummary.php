@@ -7,8 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class OrderSummary extends Model
 {
     protected $table = 'v_order_summary';
+
     protected $primaryKey = 'user_id';
+
     public $timestamps = false;
+
     public $incrementing = false;
 
     public function user()
