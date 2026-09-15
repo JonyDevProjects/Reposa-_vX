@@ -1,7 +1,7 @@
 <x-mail::message>
 # {{ __('messages.email.refunded.title') }}
 
-{{ __('messages.email.confirmed.hello', ['name' => $order->user->name]) }}
+{{ __('messages.email.confirmed.hello', ['name' => $order->customer_name]) }}
 
 {{ __('messages.email.refunded.order_refunded', ['id' => str_pad($order->id, 6, '0', STR_PAD_LEFT)]) }}
 

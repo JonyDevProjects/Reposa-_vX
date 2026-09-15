@@ -195,6 +195,13 @@ return [
     |
     */
 
-    'attributes' => [],
-
+    'attributes' => [
+        'shipping_name' => 'full name',
+        'shipping_email' => 'email address',
+        'shipping_street' => 'delivery address',
+        'shipping_city' => 'city',
+        'shipping_zip_code' => 'postal code',
+        'shipping_province' => 'province',
+        'shipping_phone' => 'mobile phone',
+    ],
 ];

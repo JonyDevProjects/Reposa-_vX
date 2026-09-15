@@ -4,18 +4,8 @@
         : collect(session()->get('cart', []))->sum('quantity');
 @endphp
 
-<!-- Mobile Bottom Navigation Bar (<768px Viewports) -->
 <nav class="mobile-nav-bar d-md-none" aria-label="{{ __('messages.mobile.nav_label') }}">
     <div class="mobile-nav-inner">
-        <!-- Home -->
-        <a href="/" 
-           class="mobile-nav-item {{ request()->is('/') ? 'active' : '' }}" 
-           aria-label="{{ __('messages.mobile.nav_home') }}"
-           @if(request()->is('/')) aria-current="page" @endif>
-            <i class="bi {{ request()->is('/') ? 'bi-house-door-fill' : 'bi-house-door' }} mobile-nav-icon"></i>
-            <span class="mobile-nav-label">{{ __('messages.mobile.nav_home') }}</span>
-        </a>
-
         <!-- Catalog -->
         <a href="/catalog" 
            class="mobile-nav-item {{ request()->is('catalog*') && !request()->has('q') ? 'active' : '' }}" 
@@ -51,23 +41,33 @@
             <span class="mobile-nav-label">{{ __('messages.mobile.nav_cart') }}</span>
         </a>
 
-        <!-- Profile / Auth -->
+        <!-- Profile / Auth / Admin -->
         @guest
             <a href="/login" 
                class="mobile-nav-item {{ request()->is('login*') || request()->is('register*') ? 'active' : '' }}" 
                aria-label="{{ __('messages.mobile.nav_login') }}"
-               @if(request()->is('login*')) aria-current="page" @endif>
+               @if(request()->is('login*') || request()->is('register*')) aria-current="page" @endif>
                 <i class="bi bi-person mobile-nav-icon"></i>
                 <span class="mobile-nav-label">{{ __('messages.mobile.nav_login') }}</span>
             </a>
         @else
-            <a href="/profile" 
-               class="mobile-nav-item {{ request()->is('profile*') ? 'active' : '' }}" 
-               aria-label="{{ __('messages.mobile.nav_profile') }}"
-               @if(request()->is('profile*')) aria-current="page" @endif>
-                <i class="bi {{ request()->is('profile*') ? 'bi-person-check-fill' : 'bi-person-check' }} mobile-nav-icon"></i>
-                <span class="mobile-nav-label">{{ __('messages.mobile.nav_profile') }}</span>
-            </a>
+            @if(Auth::user()->role === 'admin')
+                <a href="{{ route('admin.dashboard') }}" 
+                   class="mobile-nav-item {{ request()->is('admin*') ? 'active' : '' }}" 
+                   aria-label="{{ __('messages.layout.admin_panel') }}"
+                   @if(request()->is('admin*')) aria-current="page" @endif>
+                    <i class="bi {{ request()->is('admin*') ? 'bi-speedometer2 text-warning' : 'bi-speedometer2' }} mobile-nav-icon"></i>
+                    <span class="mobile-nav-label {{ request()->is('admin*') ? 'fw-bold text-primary' : '' }}">{{ __('messages.mobile.nav_admin') }}</span>
+                </a>
+            @else
+                <a href="/profile" 
+                   class="mobile-nav-item {{ request()->is('profile*') ? 'active' : '' }}" 
+                   aria-label="{{ __('messages.mobile.nav_profile') }}"
+                   @if(request()->is('profile*')) aria-current="page" @endif>
+                    <i class="bi {{ request()->is('profile*') ? 'bi-person-check-fill' : 'bi-person-check' }} mobile-nav-icon"></i>
+                    <span class="mobile-nav-label">{{ __('messages.mobile.nav_profile') }}</span>
+                </a>
+            @endif
         @endguest
     </div>
 </nav>

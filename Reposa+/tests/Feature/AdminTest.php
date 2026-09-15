@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Mail\OrderConfirmed;
+use App\Mail\OrderRefunded;
+use App\Mail\PaymentFailed;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -126,15 +129,75 @@ class AdminTest extends TestCase
         $response->assertSessionHas('error');
     }
 
-    public function test_cannot_refund_order_without_payment_intent(): void
+    public function test_admin_can_refund_direct_order_without_payment_intent(): void
     {
+        Mail::fake();
+
+        $product = Product::factory()->create(['stock' => 5]);
         $order = Order::factory()->completed()->create([
             'payment_intent_id' => null,
+            'stripe_session_id' => null,
+            'total_amount' => 50.00,
+        ]);
+        OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'product_id' => $product->id,
+            'quantity' => 2,
+            'price_at_purchase' => 25.00,
         ]);
 
-        $response = $this->actingAs($this->admin)->post("/admin/orders/{$order->id}/refund");
+        $product->decrement('stock', 2);
+        $this->assertEquals(3, $product->fresh()->stock);
 
-        $response->assertSessionHas('error');
+        $response = $this->actingAs($this->admin)->post("/admin/orders/{$order->id}/refund", [
+            'reason' => 'Devolución directa en efectivo',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+        $this->assertEquals(Order::STATUS_REFUNDED, $order->fresh()->status);
+        $this->assertEquals(5, $product->fresh()->stock);
+        $this->assertDatabaseHas('refunds', [
+            'order_id' => $order->id,
+            'amount' => 50.00,
+            'status' => 'succeeded',
+        ]);
+    }
+
+    public function test_admin_can_refund_completed_order_via_refund_endpoint(): void
+    {
+        Mail::fake();
+
+        $user = User::factory()->create(['email' => 'cliente@example.com']);
+        $product = Product::factory()->create(['stock' => 5]);
+        $order = Order::factory()->completed()->withPaymentIntent()->create([
+            'user_id' => $user->id,
+            'shipping_email' => 'cliente@example.com',
+            'total_amount' => 100.00,
+        ]);
+        OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'product_id' => $product->id,
+            'quantity' => 2,
+            'price_at_purchase' => 50.00,
+        ]);
+
+        $product->decrement('stock', 2);
+        $this->assertEquals(3, $product->fresh()->stock);
+
+        $response = $this->actingAs($this->admin)->post("/admin/orders/{$order->id}/refund", [
+            'reason' => 'Devolución aprobada por admin',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+        $this->assertEquals(Order::STATUS_REFUNDED, $order->fresh()->status);
+        $this->assertEquals(5, $product->fresh()->stock);
+        $this->assertDatabaseHas('refunds', [
+            'order_id' => $order->id,
+            'amount' => 100.00,
+            'status' => 'succeeded',
+        ]);
     }
 
     public function test_admin_can_create_product(): void
@@ -213,5 +276,58 @@ class AdminTest extends TestCase
 
         $response->assertRedirect();
         $this->assertDatabaseMissing('categories', ['id' => $category->id]);
+    }
+
+    public function test_admin_can_view_dashboard_with_guest_and_user_orders(): void
+    {
+        // 1 orden de usuario registrado completada
+        Order::factory()->completed()->create([
+            'user_id' => User::factory()->create()->id,
+        ]);
+
+        // 1 orden de invitado completada (user_id = null)
+        Order::factory()->completed()->create([
+            'user_id' => null,
+            'shipping_email' => 'invitado@test.com',
+            'shipping_name' => 'Invitado Especial',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get('/admin/dashboard');
+
+        $response->assertOk();
+        $response->assertSee('Invitado Especial');
+        $response->assertSee('Invitado');
+    }
+
+    public function test_order_emails_render_properly_for_guest_orders(): void
+    {
+        $guestOrder = Order::factory()->completed()->create([
+            'user_id' => null,
+            'shipping_email' => 'invitado@test.com',
+            'shipping_name' => 'Invitado Mails',
+        ]);
+
+        $product = Product::factory()->create();
+        OrderItem::factory()->create([
+            'order_id' => $guestOrder->id,
+            'product_id' => $product->id,
+            'quantity' => 1,
+            'price_at_purchase' => 49.99,
+        ]);
+
+        $refund = Refund::create([
+            'order_id' => $guestOrder->id,
+            'amount' => 49.99,
+            'reason' => 'Devolución de prueba',
+        ]);
+
+        $confirmedHtml = (new OrderConfirmed($guestOrder))->render();
+        $this->assertStringContainsString('Invitado Mails', $confirmedHtml);
+
+        $failedHtml = (new PaymentFailed($guestOrder, 'Fallo de pago'))->render();
+        $this->assertStringContainsString('Invitado Mails', $failedHtml);
+
+        $refundedHtml = (new OrderRefunded($guestOrder, $refund))->render();
+        $this->assertStringContainsString('Invitado Mails', $refundedHtml);
     }
 }

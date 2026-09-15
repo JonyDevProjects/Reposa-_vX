@@ -65,4 +65,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(OrderSummary::class, 'user_id');
     }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
 }

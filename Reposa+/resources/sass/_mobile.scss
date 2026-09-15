@@ -4,12 +4,6 @@
 // Targets: <768px Viewports, Touch Targets (>=48px), Safe Areas & Performance
 // =============================================================================
 
-// --- Base Body Safe Area & Mobile Nav Spacing ---
-@media (max-width: 767.98px) {
-    body {
-        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
-    }
-}
 
 // --- Mobile Bottom Navigation Bar (<768px Viewports) ---
 .mobile-nav-bar {
@@ -31,9 +25,9 @@
 
     .mobile-nav-inner {
         display: grid;
-        grid-template-columns: repeat(5, 1fr);
+        grid-template-columns: repeat(4, 1fr);
         height: 60px;
-        max-width: 520px;
+        max-width: 480px;
         margin: 0 auto;
         align-items: center;
         justify-items: center;
@@ -311,5 +305,16 @@
             color: #ffffff !important;
             border-color: var(--color-deep-sanctuary-navy, #182447) !important;
         }
+    }
+}
+
+// --- Mobile Form Touch Optimization & iOS Zoom Prevention ---
+@media (max-width: 767.98px) {
+    .form-select,
+    .form-control,
+    .form-control-sm,
+    .form-select-sm {
+        min-height: 44px;
+        font-size: 16px !important; // Eliminates iOS Safari viewport auto-zoom
     }
 }

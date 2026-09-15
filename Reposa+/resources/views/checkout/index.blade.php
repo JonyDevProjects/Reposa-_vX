@@ -18,7 +18,30 @@
         </div>
     @endif
 
-    <form action="{{ route('checkout') }}" method="POST" id="checkout-form" novalidate>
+    @if($errors->any())
+        <div class="alert alert-danger border-0 rounded-4 p-3 mb-4 shadow-sm" role="alert" id="checkout-server-errors">
+            <div class="d-flex align-items-center gap-2 mb-2 fw-bold text-danger">
+                <i class="bi bi-exclamation-triangle-fill fs-5 flex-shrink-0"></i>
+                <span>{{ __('messages.checkout.form_errors_header') }}</span>
+            </div>
+            <ul class="mb-0 ps-3 small text-danger-emphasis">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <div class="alert alert-danger border-0 rounded-4 p-3 mb-4 shadow-sm d-none" role="alert" id="checkout-client-errors">
+        <div class="d-flex align-items-center gap-2 mb-2 fw-bold text-danger">
+            <i class="bi bi-exclamation-triangle-fill fs-5 flex-shrink-0"></i>
+            <span>{{ __('messages.checkout.form_errors_header') }}</span>
+        </div>
+        <ul class="mb-0 ps-3 small text-danger-emphasis" id="checkout-client-errors-list">
+        </ul>
+    </div>
+
+    <form action="{{ route('checkout') }}" method="POST" id="checkout-form" class="needs-validation" novalidate>
         @csrf
         <div class="row g-4 align-items-start">
             {{-- Columna izquierda: Datos de Envío y Opciones --}}
@@ -73,6 +96,14 @@
                             @endauth
                         </div>
 
+                        {{-- Aviso inline cuando faltan campos obligatorios --}}
+                        <div id="shipping-required-notice" class="alert alert-warning border border-warning-subtle rounded-3 p-3 mb-3 d-none">
+                            <div class="d-flex align-items-center gap-2 small fw-semibold text-dark">
+                                <i class="bi bi-exclamation-circle-fill fs-5 text-warning flex-shrink-0"></i>
+                                <span>{{ __('messages.checkout.form_required_notice') }}</span>
+                            </div>
+                        </div>
+
                         {{-- Si está autenticado y tiene direcciones guardadas --}}
                         @auth
                             @if($userAddresses->isNotEmpty())
@@ -111,57 +142,78 @@
                                     <label for="shipping_name" class="form-label small fw-semibold text-muted">
                                         {{ __('messages.auth.full_name') }} <span class="text-danger">*</span>
                                     </label>
-                                    <input type="text" class="form-control rounded-3" id="shipping_name" name="shipping_name" 
-                                           value="{{ old('shipping_name', Auth::user()?->name) }}" required
+                                    <input type="text" class="form-control rounded-3 @error('shipping_name') is-invalid @enderror" id="shipping_name" name="shipping_name" 
+                                           value="{{ old('shipping_name', Auth::user()?->name ?? ($guestShipping['shipping_name'] ?? '')) }}" required
                                            placeholder="Ej. María García López">
+                                    <div class="invalid-feedback" id="feedback-shipping_name">
+                                        {{ $errors->first('shipping_name') ?: __('messages.checkout.validation.name_required') }}
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="shipping_email" class="form-label small fw-semibold text-muted">
                                         {{ __('messages.auth.email') }} <span class="text-danger">*</span>
                                     </label>
-                                    <input type="email" class="form-control rounded-3" id="shipping_email" name="shipping_email" 
-                                           value="{{ old('shipping_email', Auth::user()?->email) }}" required
+                                    <input type="email" class="form-control rounded-3 @error('shipping_email') is-invalid @enderror" id="shipping_email" name="shipping_email" 
+                                           value="{{ old('shipping_email', Auth::user()?->email ?? ($guestShipping['shipping_email'] ?? '')) }}" required
                                            placeholder="maria@ejemplo.com">
+                                    <div class="invalid-feedback" id="feedback-shipping_email">
+                                        {{ $errors->first('shipping_email') ?: __('messages.checkout.validation.email_required') }}
+                                    </div>
                                 </div>
                                 <div class="col-md-12">
                                     <label for="shipping_street" class="form-label small fw-semibold text-muted">
                                         {{ __('messages.auth.street') }} <span class="text-danger">*</span>
                                     </label>
-                                    <input type="text" class="form-control rounded-3" id="shipping_street" name="shipping_street" 
-                                           value="{{ old('shipping_street') }}"
+                                    <input type="text" class="form-control rounded-3 @error('shipping_street') is-invalid @enderror" id="shipping_street" name="shipping_street" 
+                                           value="{{ old('shipping_street', $guestShipping['shipping_street'] ?? '') }}" required
                                            placeholder="{{ __('messages.auth.street_placeholder') }}">
+                                    <div class="invalid-feedback" id="feedback-shipping_street">
+                                        {{ $errors->first('shipping_street') ?: __('messages.checkout.validation.street_required') }}
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="shipping_city" class="form-label small fw-semibold text-muted">
                                         {{ __('messages.auth.city') }} <span class="text-danger">*</span>
                                     </label>
-                                    <input type="text" class="form-control rounded-3" id="shipping_city" name="shipping_city" 
-                                           value="{{ old('shipping_city') }}"
+                                    <input type="text" class="form-control rounded-3 @error('shipping_city') is-invalid @enderror" id="shipping_city" name="shipping_city" 
+                                           value="{{ old('shipping_city', $guestShipping['shipping_city'] ?? '') }}" required
                                            placeholder="{{ __('messages.auth.city_placeholder') }}">
+                                    <div class="invalid-feedback" id="feedback-shipping_city">
+                                        {{ $errors->first('shipping_city') ?: __('messages.checkout.validation.city_required') }}
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="shipping_zip_code" class="form-label small fw-semibold text-muted">
                                         {{ __('messages.auth.zip_code') }} <span class="text-danger">*</span>
                                     </label>
-                                    <input type="text" class="form-control rounded-3" id="shipping_zip_code" name="shipping_zip_code" 
-                                           value="{{ old('shipping_zip_code') }}"
+                                    <input type="text" class="form-control rounded-3 @error('shipping_zip_code') is-invalid @enderror" id="shipping_zip_code" name="shipping_zip_code" 
+                                           value="{{ old('shipping_zip_code', $guestShipping['shipping_zip_code'] ?? '') }}" required
                                            placeholder="{{ __('messages.auth.zip_code_placeholder') }}">
+                                    <div class="invalid-feedback" id="feedback-shipping_zip_code">
+                                        {{ $errors->first('shipping_zip_code') ?: __('messages.checkout.validation.zip_code_required') }}
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="shipping_province" class="form-label small fw-semibold text-muted">
                                         {{ __('messages.auth.province') }}
                                     </label>
-                                    <input type="text" class="form-control rounded-3" id="shipping_province" name="shipping_province" 
-                                           value="{{ old('shipping_province') }}"
+                                    <input type="text" class="form-control rounded-3 @error('shipping_province') is-invalid @enderror" id="shipping_province" name="shipping_province" 
+                                           value="{{ old('shipping_province', $guestShipping['shipping_province'] ?? '') }}"
                                            placeholder="{{ __('messages.auth.province_placeholder') }}">
+                                    @error('shipping_province')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="col-md-6">
                                     <label for="shipping_phone" class="form-label small fw-semibold text-muted">
                                         {{ __('messages.auth.phone') }} <span class="text-danger">*</span>
                                     </label>
-                                    <input type="tel" class="form-control rounded-3" id="shipping_phone" name="shipping_phone" 
-                                           value="{{ old('shipping_phone', $userPhone) }}" required
+                                    <input type="tel" class="form-control rounded-3 @error('shipping_phone') is-invalid @enderror" id="shipping_phone" name="shipping_phone" 
+                                           value="{{ old('shipping_phone', $userPhone ?? ($guestShipping['shipping_phone'] ?? '')) }}" required
                                            placeholder="{{ __('messages.auth.phone_placeholder') }}">
+                                    <div class="invalid-feedback" id="feedback-shipping_phone">
+                                        {{ $errors->first('shipping_phone') ?: __('messages.checkout.validation.phone_required') }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -171,34 +223,73 @@
                 {{-- Bloque 2: Opciones de Envío / Paquetería --}}
                 <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4">
                     <div class="card-body p-4">
-                        <h2 class="h6 fw-bold text-navy mb-3 d-flex align-items-center gap-2">
-                            <i class="bi bi-truck text-primary"></i>
-                            <span>{{ __('messages.checkout.shipping_method') }}</span>
-                        </h2>
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                            <h2 class="h6 fw-bold text-navy mb-0 d-flex align-items-center gap-2">
+                                <i class="bi bi-truck text-primary"></i>
+                                <span>{{ __('messages.checkout.shipping_method') }}</span>
+                            </h2>
+                            @if($total >= 50.00)
+                                <span class="badge bg-success-subtle text-success border border-success-subtle fw-semibold px-2 py-1 small">
+                                    <i class="bi bi-gift-fill me-1"></i>¡Envío gratuito disponible!
+                                </span>
+                            @endif
+                        </div>
 
+                        @if($total >= 50.00)
+                            <div class="alert alert-success d-flex align-items-center gap-3 py-2 px-3 rounded-3 border-0 bg-success-subtle text-success mb-3 small">
+                                <i class="bi bi-stars fs-4 flex-shrink-0 text-success"></i>
+                                <div>
+                                    <div class="fw-bold">¡Enhorabuena! Has superado el umbral de 50,00€.</div>
+                                    <div class="text-success-emphasis" style="font-size: 0.8rem;">Disfrutas de Envío Estándar Correos Express <strong>100% gratuito</strong> en esta compra.</div>
+                                </div>
+                            </div>
+                        @else
+                            @php $remainingForFree = 50.00 - $total; @endphp
+                            <div class="p-2 px-3 rounded-3 bg-light border mb-3 d-flex align-items-center justify-content-between flex-wrap gap-2 small text-muted">
+                                <span><i class="bi bi-info-circle text-primary me-1"></i>Añade <strong>{{ number_format($remainingForFree, 2) }}€</strong> más para conseguir <strong>Envío Estándar Gratuito</strong>.</span>
+                                <a href="{{ route('catalog') }}" class="text-primary fw-semibold text-decoration-none">
+                                    Añadir productos <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        @endif
+
+                        @php
+                            $selectedServiceId = old('shipping_service_type', $guestShipping['shipping_service_type'] ?? ($shippingRates[0]['id'] ?? 'standard_48h'));
+                            $selectedRate = collect($shippingRates)->firstWhere('id', $selectedServiceId) ?? ($shippingRates[0] ?? ['cost' => 0.0, 'id' => 'standard_48h']);
+                        @endphp
                         <div class="d-flex flex-column gap-3">
                             @foreach($shippingRates as $rate)
-                                <div class="p-3 rounded-3 border bg-light d-flex align-items-center justify-content-between gap-3">
+                                @php 
+                                    $isFree = ($rate['cost'] == 0); 
+                                    $isChecked = ($rate['id'] === $selectedRate['id']);
+                                @endphp
+                                <div class="p-3 rounded-3 border {{ $isFree ? 'border-success border-2 bg-success-subtle bg-opacity-25 shadow-2xs' : 'bg-light border-light-subtle' }} d-flex align-items-center justify-content-between gap-3 shipping-rate-card transition-all"
+                                     style="{{ $isFree ? 'border-color: rgba(5, 150, 105, 0.45) !important;' : '' }}">
                                     <div class="form-check flex-grow-1">
                                         <input class="form-check-input mt-1" type="radio" 
                                                name="shipping_service_type" 
                                                id="ship_{{ $rate['id'] }}" 
                                                value="{{ $rate['id'] }}" 
                                                data-cost="{{ $rate['cost'] }}"
-                                               {{ $loop->first ? 'checked' : '' }}
+                                               {{ $isChecked ? 'checked' : '' }}
                                                onchange="updateShippingTotal({{ $rate['cost'] }})">
-                                        <label class="form-check-label w-100" for="ship_{{ $rate['id'] }}">
-                                            <div class="d-flex align-items-center justify-content-between">
-                                                <div>
+                                        <label class="form-check-label w-100 cursor-pointer" for="ship_{{ $rate['id'] }}">
+                                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                                <div class="d-flex align-items-center flex-wrap gap-2">
                                                     <strong class="text-navy">{{ $rate['name'] }}</strong>
-                                                    <span class="badge bg-light text-secondary border ms-1 small">{{ $rate['carrier'] }}</span>
+                                                    <span class="badge bg-white text-secondary border small">{{ $rate['carrier'] }}</span>
+                                                    @if($isFree)
+                                                        <span class="badge bg-success text-white fw-bold small shadow-2xs">
+                                                            <i class="bi bi-check-circle-fill me-1"></i>¡ENVÍO GRATUITO!
+                                                        </span>
+                                                    @endif
                                                 </div>
-                                                <span class="badge {{ $rate['cost'] == 0 ? 'bg-success text-white' : 'bg-primary-subtle text-primary border' }} fw-bold tabular-nums">
-                                                    {{ $rate['cost'] == 0 ? 'Gratis' : number_format($rate['cost'], 2) . '€' }}
+                                                <span class="badge {{ $isFree ? 'bg-success text-white px-3 py-1 fs-6' : 'bg-primary-subtle text-primary border' }} fw-bold tabular-nums">
+                                                    {{ $isFree ? '0,00€ (Gratis)' : number_format($rate['cost'], 2) . '€' }}
                                                 </span>
                                             </div>
                                             <div class="text-muted small mt-1">{{ $rate['description'] }}</div>
-                                            <div class="small text-primary fw-semibold mt-1">
+                                            <div class="small {{ $isFree ? 'text-success fw-semibold' : 'text-primary fw-semibold' }} mt-1">
                                                 <i class="bi bi-clock-history me-1"></i>{{ $rate['estimated_days'] }}
                                             </div>
                                         </label>
@@ -304,7 +395,7 @@
 
                         {{-- Desglose de costes --}}
                         @php
-                            $defaultShippingCost = $shippingRates[0]['cost'] ?? 0.0;
+                            $defaultShippingCost = $selectedRate['cost'] ?? ($shippingRates[0]['cost'] ?? 0.0);
                             $subtotalNet = round($total / 1.21, 2);
                             $taxVat = round($total - $subtotalNet, 2);
                         @endphp
@@ -342,6 +433,10 @@
                             <i id="btn-submit-icon" class="bi bi-credit-card me-2"></i><span id="btn-submit-text">{{ __('messages.checkout.btn_place_order') }}</span>
                         </button>
 
+                        <div id="btn-submit-feedback" class="alert alert-danger py-2 px-3 small rounded-3 mb-3 d-none text-center shadow-2xs">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ __('messages.checkout.btn_missing_data_hint') }}
+                        </div>
+
                         <p class="text-center text-muted small mb-3" style="font-size: 0.78rem;">
                             <i class="bi bi-shield-check text-success me-1"></i>{{ __('messages.checkout.guarantee_text') }}
                         </p>
@@ -353,6 +448,19 @@
         </div>
     </form>
 </div>
+
+<style>
+@keyframes checkoutShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+}
+.animate-shake {
+    animation: checkoutShake 0.45s ease-in-out;
+    border: 1px solid #dc3545 !important;
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.15) !important;
+}
+</style>
 
 <script>
     const itemsTotal = {{ (float) $total }};
@@ -379,5 +487,224 @@
             if (btnIcon) btnIcon.className = 'bi bi-shield-lock-fill me-2';
         }
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkoutForm = document.getElementById('checkout-form');
+        const submitBtn = document.getElementById('btn-submit-order');
+        const shippingNotice = document.getElementById('shipping-required-notice');
+        const clientErrorsAlert = document.getElementById('checkout-client-errors');
+        const clientErrorsList = document.getElementById('checkout-client-errors-list');
+        const btnSubmitFeedback = document.getElementById('btn-submit-feedback');
+        const shippingCard = document.querySelector('#guest-address-fields')?.closest('.card');
+
+        const addressRadios = document.querySelectorAll('input[name="address_id"]');
+        const guestFieldsContainer = document.getElementById('guest-address-fields');
+
+        function syncAddressFieldRequirements() {
+            const selectedAddr = document.querySelector('input[name="address_id"]:checked');
+            const isUsingSaved = selectedAddr && selectedAddr.value !== 'new';
+            const inputs = guestFieldsContainer?.querySelectorAll('input[name^="shipping_"]');
+            if (inputs) {
+                inputs.forEach(inp => {
+                    if (isUsingSaved) {
+                        inp.removeAttribute('required');
+                        inp.classList.remove('is-invalid');
+                    } else if (inp.id !== 'shipping_province') {
+                        inp.setAttribute('required', 'required');
+                    }
+                });
+            }
+        }
+        addressRadios.forEach(radio => radio.addEventListener('change', syncAddressFieldRequirements));
+
+        const fieldDefinitions = [
+            { id: 'shipping_name', name: "{{ __('messages.auth.full_name') }}", minLength: 2 },
+            { id: 'shipping_email', name: "{{ __('messages.auth.email') }}", isEmail: true },
+            { id: 'shipping_street', name: "{{ __('messages.auth.street') }}", minLength: 3 },
+            { id: 'shipping_city', name: "{{ __('messages.auth.city') }}", minLength: 2 },
+            { id: 'shipping_zip_code', name: "{{ __('messages.auth.zip_code') }}", minLength: 3 },
+            { id: 'shipping_phone', name: "{{ __('messages.auth.phone') }}", minLength: 6 },
+        ];
+
+        fieldDefinitions.forEach(field => {
+            const input = document.getElementById(field.id);
+            if (input) {
+                input.addEventListener('input', function () {
+                    if (this.value.trim().length > 0) {
+                        this.classList.remove('is-invalid');
+                        const anyInvalidLeft = fieldDefinitions.some(f => {
+                            const inp = document.getElementById(f.id);
+                            return inp && inp.classList.contains('is-invalid');
+                        });
+                        if (!anyInvalidLeft) {
+                            if (shippingNotice) shippingNotice.classList.add('d-none');
+                            if (clientErrorsAlert) clientErrorsAlert.classList.add('d-none');
+                            if (btnSubmitFeedback) btnSubmitFeedback.classList.add('d-none');
+                            if (shippingCard) shippingCard.classList.remove('animate-shake');
+                        }
+                    }
+                });
+            }
+        });
+
+        if (checkoutForm && submitBtn) {
+            checkoutForm.addEventListener('submit', function (e) {
+                const selectedAddr = document.querySelector('input[name="address_id"]:checked');
+                const isUsingSaved = selectedAddr && selectedAddr.value !== 'new';
+
+                if (!isUsingSaved) {
+                    let hasErrors = false;
+                    let firstInvalidEl = null;
+                    const errorMessages = [];
+
+                    fieldDefinitions.forEach(field => {
+                        const input = document.getElementById(field.id);
+                        if (!input) return;
+
+                        const val = input.value.trim();
+                        let isFieldValid = true;
+
+                        if (!val || (field.minLength && val.length < field.minLength)) {
+                            isFieldValid = false;
+                            errorMessages.push(`El campo ${field.name.toLowerCase()} es obligatorio.`);
+                        } else if (field.isEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+                            isFieldValid = false;
+                            errorMessages.push(`El campo ${field.name.toLowerCase()} debe ser un correo válido.`);
+                        }
+
+                        if (!isFieldValid) {
+                            hasErrors = true;
+                            input.classList.add('is-invalid');
+                            if (!firstInvalidEl) {
+                                firstInvalidEl = input;
+                            }
+                        } else {
+                            input.classList.remove('is-invalid');
+                        }
+                    });
+
+                    if (hasErrors) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        if (clientErrorsAlert && clientErrorsList) {
+                            clientErrorsList.innerHTML = errorMessages.map(msg => `<li>${msg}</li>`).join('');
+                            clientErrorsAlert.classList.remove('d-none');
+                        }
+
+                        if (shippingNotice) {
+                            shippingNotice.classList.remove('d-none');
+                        }
+
+                        if (btnSubmitFeedback) {
+                            btnSubmitFeedback.classList.remove('d-none');
+                        }
+
+                        if (shippingCard) {
+                            shippingCard.classList.remove('animate-shake');
+                            void shippingCard.offsetWidth;
+                            shippingCard.classList.add('animate-shake');
+                        }
+
+                        if (firstInvalidEl) {
+                            firstInvalidEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            setTimeout(() => firstInvalidEl.focus(), 350);
+                        }
+
+                        return false;
+                    }
+                }
+
+                if (clientErrorsAlert) clientErrorsAlert.classList.add('d-none');
+                if (shippingNotice) shippingNotice.classList.add('d-none');
+                if (btnSubmitFeedback) btnSubmitFeedback.classList.add('d-none');
+
+                saveGuestDataToStorage();
+
+                const isStripe = document.getElementById('payment_stripe')?.checked;
+                setTimeout(function () {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = isStripe
+                        ? '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Redirigiendo a pasarela segura...'
+                        : '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Procesando pedido seguro...';
+                }, 10);
+            });
+        }
+
+        // Persistencia en sessionStorage para usuarios invitados (evita pérdida al regresar de Stripe)
+        const GUEST_STORAGE_KEY = 'reposa_checkout_guest_shipping';
+        const isAuthUser = {{ Auth::check() ? 'true' : 'false' }};
+
+        function saveGuestDataToStorage() {
+            if (isAuthUser) return;
+            const data = {
+                shipping_name: document.getElementById('shipping_name')?.value || '',
+                shipping_email: document.getElementById('shipping_email')?.value || '',
+                shipping_street: document.getElementById('shipping_street')?.value || '',
+                shipping_city: document.getElementById('shipping_city')?.value || '',
+                shipping_zip_code: document.getElementById('shipping_zip_code')?.value || '',
+                shipping_province: document.getElementById('shipping_province')?.value || '',
+                shipping_phone: document.getElementById('shipping_phone')?.value || '',
+                shipping_service_type: document.querySelector('input[name="shipping_service_type"]:checked')?.value || '',
+            };
+            try {
+                sessionStorage.setItem(GUEST_STORAGE_KEY, JSON.stringify(data));
+            } catch (e) {}
+        }
+
+        function restoreGuestDataFromStorage() {
+            if (isAuthUser) return;
+            try {
+                const raw = sessionStorage.getItem(GUEST_STORAGE_KEY);
+                if (!raw) return;
+                const data = JSON.parse(raw);
+                ['shipping_name', 'shipping_email', 'shipping_street', 'shipping_city', 'shipping_zip_code', 'shipping_province', 'shipping_phone'].forEach(fieldId => {
+                    const el = document.getElementById(fieldId);
+                    if (el && !el.value && data[fieldId]) {
+                        el.value = data[fieldId];
+                    }
+                });
+                if (data.shipping_service_type) {
+                    const rateRadio = document.querySelector(`input[name="shipping_service_type"][value="${data.shipping_service_type}"]`);
+                    if (rateRadio && !rateRadio.checked) {
+                        rateRadio.checked = true;
+                        const cost = parseFloat(rateRadio.getAttribute('data-cost') || 0);
+                        updateShippingTotal(cost);
+                    }
+                }
+            } catch (e) {}
+        }
+
+        restoreGuestDataFromStorage();
+        saveGuestDataToStorage();
+
+        ['shipping_name', 'shipping_email', 'shipping_street', 'shipping_city', 'shipping_zip_code', 'shipping_province', 'shipping_phone'].forEach(fieldId => {
+            const el = document.getElementById(fieldId);
+            if (el) {
+                el.addEventListener('input', saveGuestDataToStorage);
+                el.addEventListener('change', saveGuestDataToStorage);
+            }
+        });
+
+        function resetSubmitButton() {
+            if (!submitBtn) return;
+            submitBtn.disabled = false;
+            const isStripe = document.getElementById('payment_stripe')?.checked !== false;
+            const iconClass = isStripe ? 'bi bi-credit-card me-2' : 'bi bi-shield-lock-fill me-2';
+            const labelText = isStripe ? "{{ __('messages.checkout.btn_place_order') }}" : "{{ __('messages.checkout.direct_order') }}";
+            submitBtn.innerHTML = `<i id="btn-submit-icon" class="${iconClass}"></i><span id="btn-submit-text">${labelText}</span>`;
+        }
+
+        resetSubmitButton();
+
+        window.addEventListener('pageshow', function (event) {
+            resetSubmitButton();
+            restoreGuestDataFromStorage();
+        });
+
+        document.querySelectorAll('input[name="shipping_service_type"]').forEach(radio => {
+            radio.addEventListener('change', saveGuestDataToStorage);
+        });
+    });
 </script>
 @endsection

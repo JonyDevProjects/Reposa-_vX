@@ -3,15 +3,15 @@
 @section('title', __('messages.admin.dashboard.title'))
 
 @section('content')
-<div class="container py-4">
+<div class="container-fluid px-3 px-xl-4 py-4">
     <div class="row g-4">
         {{-- Navigation Sidebar --}}
-        <div class="col-lg-3">
+        <div class="col-lg-3 col-xl-2">
             @include('admin.partials.sidebar')
         </div>
 
         {{-- Main Dashboard Content --}}
-        <div class="col-lg-9">
+        <div class="col-lg-9 col-xl-10">
             {{-- Dashboard Header --}}
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
                 <div>
@@ -22,6 +22,9 @@
                     <span class="badge bg-light text-muted border px-2 py-1 small">
                         <i class="bi bi-clock me-1"></i> {{ now()->format('d/m/Y H:i') }}
                     </span>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#adminPasswordModal" title="{{ __('messages.profile.change_password') }}">
+                        <i class="bi bi-key me-1"></i> {{ __('messages.profile.change_password') }}
+                    </button>
                     <a href="{{ route('admin.orders') }}" class="btn btn-sm btn-outline-primary">
                         <i class="bi bi-receipt me-1"></i> {{ __('messages.admin.sidebar.orders') }}
                     </a>
@@ -279,7 +282,10 @@
                                 <tr>
                                     <td class="fw-bold tabular-nums text-primary">#{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</td>
                                     <td>
-                                        <span class="fw-semibold text-dark">{{ $order->user->name }}</span>
+                                        <span class="fw-semibold text-dark">{{ $order->customer_name }}</span>
+                                        @if($order->isGuest())
+                                            <span class="badge bg-secondary-subtle text-secondary border ms-1" style="font-size: 0.65rem;">Invitado</span>
+                                        @endif
                                     </td>
                                     <td class="text-muted small tabular-nums">{{ $order->created_at->format('d/m/Y H:i') }}</td>
                                     <td class="text-end fw-bold tabular-nums text-navy">{{ number_format($order->total_amount, 2) }}€</td>
@@ -299,6 +305,42 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Cambiar Contraseña Admin --}}
+<div class="modal fade" id="adminPasswordModal" tabindex="-1" aria-labelledby="adminPasswordModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-3 border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-navy h6 mb-0" id="adminPasswordModalTitle">
+                    <i class="bi bi-shield-lock text-primary me-2"></i>{{ __('messages.profile.change_password') }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <form method="POST" action="{{ route('user-password.update') }}">
+                @csrf
+                @method('PUT')
+                <div class="modal-body pt-3">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">{{ __('messages.profile.current_password') }}</label>
+                        <input type="password" name="current_password" class="form-control" required autocomplete="current-password">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">{{ __('messages.profile.new_password') }}</label>
+                        <input type="password" name="password" class="form-control" required autocomplete="new-password">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">{{ __('messages.profile.confirm_password') }}</label>
+                        <input type="password" name="password_confirmation" class="form-control" required autocomplete="new-password">
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-sm btn-light" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-sm btn-primary fw-semibold">{{ __('messages.profile.update_password') }}</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

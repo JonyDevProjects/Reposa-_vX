@@ -57,6 +57,8 @@ class Shipment extends Model
 
     const STATUS_INCIDENT = 'incident';
 
+    const STATUS_CANCELLED = 'cancelled';
+
     const STATUS_LABELS = [
         self::STATUS_PRE_REGISTERED => 'Etiqueta creada / Pre-admitido',
         self::STATUS_IN_TRANSIT => 'En tránsito',
@@ -64,6 +66,7 @@ class Shipment extends Model
         self::STATUS_OUT_FOR_DELIVERY => 'En reparto',
         self::STATUS_DELIVERED => 'Entregado',
         self::STATUS_INCIDENT => 'Incidencia en reparto',
+        self::STATUS_CANCELLED => 'Envío cancelado',
     ];
 
     const STATUS_COLORS = [
@@ -73,6 +76,7 @@ class Shipment extends Model
         self::STATUS_OUT_FOR_DELIVERY => 'indigo',
         self::STATUS_DELIVERED => 'success',
         self::STATUS_INCIDENT => 'danger',
+        self::STATUS_CANCELLED => 'secondary',
     ];
 
     public function order(): BelongsTo

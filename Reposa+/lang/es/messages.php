@@ -12,6 +12,7 @@ return [
         'register' => 'Registrarse',
         'profile' => 'Mi Perfil',
         'logout' => 'Cerrar Sesión',
+        'cart' => 'Carrito',
     ],
     'footer' => [
         'title' => 'Reposa+',
@@ -202,6 +203,8 @@ return [
     'cart.free' => 'GRATIS',
     'cart.total' => 'Total',
     'cart.checkout' => 'FINALIZAR COMPRA',
+    'cart.finalize_order' => 'Finalizar Pedido',
+    'cart.continue_shopping' => 'Continuar Comprando',
     'cart.secure_payment' => 'Pago 100% Seguro',
     'cart.shipping_info' => 'Envío en 24-48h por Reposa+ Logística',
     'cart.free_shipping_threshold_remaining' => '¡Solo te faltan :amount€ para conseguir envío gratuito 24/48h!',
@@ -430,6 +433,12 @@ return [
     'catalog.login_favorite' => 'Inicia sesión para añadir a favoritos',
     'catalog.low_stock' => '¡Quedan :count!',
     'catalog.filters' => 'Filtros',
+    'catalog.search_smart_placeholder' => 'Buscar por postura, firmeza o material (ej. de lado, cervical, suave)...',
+    'catalog.category_chips_all' => 'Todas las almohadas',
+    'catalog.category_all' => 'Todas las categorías',
+    'catalog.secondary_filters_toggle' => 'Filtros',
+    'catalog.filter_active_tag' => 'Filtros activos',
+    'catalog.clear_search' => 'Borrar búsqueda',
 
     // Catalog Show — remaining
     'catalog.show.last_units' => '¡Quedan solo :count unidades!',
@@ -538,8 +547,19 @@ return [
     'cart.payment_success' => '¡Pago realizado con éxito! Tu pedido ha sido confirmado.',
     'cart.session_not_found' => 'No se encontró la sesión de pago.',
     'cart.payment_not_completed' => 'El pago no fue completado.',
-    'cart.payment_cancelled' => 'El pago fue cancelado. Tu carrito se mantiene intacto.',
+    'cart.payment_cancelled' => 'Has cancelado el proceso de pago. Tu carrito sigue guardado.',
+    'trust.100_nights' => '100 noches de prueba garantizadas',
+    'trust.free_shipping' => 'Envío express peninsular gratuito',
+    'cart.enter_shipping_details' => 'Por favor, introduce los datos de envío y destinatario.',
+    'cart.error' => 'Por favor, revisa los errores indicados:',
+    'common.close' => 'Cerrar',
+    'product.out_of_stock' => 'Agotado',
+    'orders.download_invoice' => 'Descargar factura',
     'cart.stock_insufficient' => 'Stock insuficiente para ":name". Disponible: :available, solicitado: :requested.',
+    'cart.quantity_min_one' => 'La cantidad mínima debe ser al menos 1.',
+    'cart.stock_max_reached' => 'Has alcanzado el stock máximo disponible (:count uds.).',
+    'cart.quantity_min_reached' => 'La cantidad mínima permitida es 1 ud.',
+    'cart.updating' => 'Actualizando cesta...',
 
     // Controllers — Admin messages
     'admin.product_created' => 'Producto creado correctamente.',
@@ -674,8 +694,10 @@ return [
     'firmness_guide.recommendation_title' => 'Firmeza Recomendada para ti',
     'firmness_guide.filter_cta' => 'Ver almohadas con firmeza',
     'firmness_guide.pillows_found' => 'modelos compatibles en catálogo',
-    'firmness_guide.toggle_btn' => '✨ Guía Anatómica de Firmeza',
+    'firmness_guide.toggle_btn' => 'Guía Anatómica de Firmeza',
     'firmness_guide.toggle_close' => 'Cerrar Asesor',
+    'firmness_guide.banner_prompt' => '¿Dudas sobre qué almohada necesitas? Descubre tu almohada ideal según tu postura',
+    'firmness_guide.banner_subtitle' => 'Asesor anatómico interactivo: alinea tu columna y cuello en 2 pasos',
 
     // Phase 7 — Mobile Ergonomics & Extreme Web Performance
     'mobile' => [
@@ -685,6 +707,7 @@ return [
         'nav_search' => 'Buscar',
         'nav_cart' => 'Cesta',
         'nav_profile' => 'Perfil',
+        'nav_admin' => 'Admin',
         'nav_login' => 'Entrar',
         'search_modal_title' => 'Buscar en Reposa+',
         'search_modal_input_placeholder' => 'Busca por modelo, material, firmeza...',
@@ -724,6 +747,15 @@ return [
     'checkout.items' => 'Productos',
     'checkout.shipping_free_threshold' => '¡Envío express gratuito aplicado!',
     'checkout.guarantee_text' => 'Garantía oficial de 100 noches de prueba y devoluciones gratuitas.',
+    'checkout.form_required_notice' => 'Por favor, completa todos los campos obligatorios (*) de datos de envío y destinatario antes de proceder al pago.',
+    'checkout.form_errors_header' => 'Es necesario completar los datos de envío y destinatario antes de proceder al pago:',
+    'checkout.btn_missing_data_hint' => 'Completa los datos obligatorios de envío arriba antes de pagar.',
+    'checkout.validation.name_required' => 'Por favor, introduce el nombre completo del destinatario.',
+    'checkout.validation.email_required' => 'Por favor, introduce un correo electrónico válido.',
+    'checkout.validation.street_required' => 'Por favor, introduce la dirección de entrega (calle, número, piso).',
+    'checkout.validation.city_required' => 'Por favor, introduce la localidad o ciudad de entrega.',
+    'checkout.validation.zip_code_required' => 'Por favor, introduce el código postal.',
+    'checkout.validation.phone_required' => 'Por favor, introduce un teléfono de contacto para el transportista.',
 
     // Reclamación de cuenta para invitados (1-clic)
     'orders.claim_account_title' => 'Guarda tu cuenta en 1 clic',

@@ -12,6 +12,7 @@ return [
         'register' => 'Register',
         'profile' => 'My Profile',
         'logout' => 'Log Out',
+        'cart' => 'Cart',
     ],
     'footer' => [
         'title' => 'Reposa+',
@@ -202,6 +203,8 @@ return [
     'cart.free' => 'FREE',
     'cart.total' => 'Total',
     'cart.checkout' => 'PROCEED TO CHECKOUT',
+    'cart.finalize_order' => 'Complete Order',
+    'cart.continue_shopping' => 'Continue Shopping',
     'cart.secure_payment' => '100% Secure Payment',
     'cart.shipping_info' => 'Shipping in 24-48h by Reposa+ Logistics',
     'cart.free_shipping_threshold_remaining' => 'Only :amount€ left for free express 24/48h shipping!',
@@ -430,6 +433,12 @@ return [
     'catalog.login_favorite' => 'Log in to add to favorites',
     'catalog.low_stock' => ':count left!',
     'catalog.filters' => 'Filters',
+    'catalog.search_smart_placeholder' => 'Search by posture, firmness or material (e.g. side sleeper, cervical, soft)...',
+    'catalog.category_chips_all' => 'All pillows',
+    'catalog.category_all' => 'All categories',
+    'catalog.secondary_filters_toggle' => 'Filters',
+    'catalog.filter_active_tag' => 'Active filters',
+    'catalog.clear_search' => 'Clear search',
 
     // Catalog Show — remaining
     'catalog.show.last_units' => 'Only :count units left!',
@@ -538,8 +547,19 @@ return [
     'cart.payment_success' => 'Payment completed successfully! Your order has been confirmed.',
     'cart.session_not_found' => 'Payment session not found.',
     'cart.payment_not_completed' => 'Payment was not completed.',
-    'cart.payment_cancelled' => 'Payment was cancelled. Your cart remains intact.',
+    'cart.payment_cancelled' => 'Payment process was cancelled. Your cart is preserved.',
+    'trust.100_nights' => '100-night trial guaranteed',
+    'trust.free_shipping' => 'Free mainland express shipping',
+    'cart.enter_shipping_details' => 'Please enter shipping and recipient details.',
+    'cart.error' => 'Please review the errors indicated below:',
+    'common.close' => 'Close',
+    'product.out_of_stock' => 'Out of Stock',
+    'orders.download_invoice' => 'Download invoice',
     'cart.stock_insufficient' => 'Insufficient stock for ":name". Available: :available, requested: :requested.',
+    'cart.quantity_min_one' => 'The minimum quantity must be at least 1.',
+    'cart.stock_max_reached' => 'You have reached the maximum available stock (:count pcs.).',
+    'cart.quantity_min_reached' => 'The minimum allowed quantity is 1 pc.',
+    'cart.updating' => 'Updating cart...',
 
     // Controllers — Admin messages
     'admin.product_created' => 'Product created successfully.',
@@ -674,8 +694,10 @@ return [
     'firmness_guide.recommendation_title' => 'Recommended Firmness for you',
     'firmness_guide.filter_cta' => 'View pillows with firmness',
     'firmness_guide.pillows_found' => 'compatible models in catalog',
-    'firmness_guide.toggle_btn' => '✨ Anatomical Firmness Guide',
+    'firmness_guide.toggle_btn' => 'Anatomical Firmness Guide',
     'firmness_guide.toggle_close' => 'Close Advisor',
+    'firmness_guide.banner_prompt' => 'Not sure which pillow you need? Discover your ideal pillow based on your posture',
+    'firmness_guide.banner_subtitle' => 'Interactive anatomical advisor: align your spine and neck in 2 steps',
 
     // Phase 7 — Mobile Ergonomics & Extreme Web Performance
     'mobile' => [
@@ -685,6 +707,7 @@ return [
         'nav_search' => 'Search',
         'nav_cart' => 'Cart',
         'nav_profile' => 'Profile',
+        'nav_admin' => 'Admin',
         'nav_login' => 'Log In',
         'search_modal_title' => 'Search Reposa+',
         'search_modal_input_placeholder' => 'Search by model, material, firmness...',
@@ -724,6 +747,15 @@ return [
     'checkout.items' => 'Products',
     'checkout.shipping_free_threshold' => 'Free express shipping applied!',
     'checkout.guarantee_text' => 'Official 100-night trial guarantee and free returns.',
+    'checkout.form_required_notice' => 'Please complete all required (*) shipping and recipient details before proceeding to payment.',
+    'checkout.form_errors_header' => 'You must complete the shipping and recipient details before proceeding to payment:',
+    'checkout.btn_missing_data_hint' => 'Please complete the required shipping details above before paying.',
+    'checkout.validation.name_required' => 'Please enter the recipient full name.',
+    'checkout.validation.email_required' => 'Please enter a valid email address.',
+    'checkout.validation.street_required' => 'Please enter the delivery address (street, number, floor).',
+    'checkout.validation.city_required' => 'Please enter the delivery city.',
+    'checkout.validation.zip_code_required' => 'Please enter the postal code.',
+    'checkout.validation.phone_required' => 'Please enter a contact phone number for the courier.',
 
     // Guest Account Claim (1-Click)
     'orders.claim_account_title' => 'Save your account in 1 click',

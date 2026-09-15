@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
+use App\Services\Cart\CartCalculator;
 use App\Services\Shipping\ShippingServiceInterface;
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -23,27 +24,19 @@ use PHPUnit\Framework\TestCase;
 
 class CartController extends Controller
 {
+    public function __construct(
+        protected ?CartCalculator $calculator = null
+    ) {
+        $this->calculator = $calculator ?? new CartCalculator;
+    }
+
     public function index()
     {
-        if (Auth::check()) {
-            $cartItems = CartItem::where('user_id', Auth::id())->with('product')->get();
-        } else {
-            $sessionCart = session()->get('cart', []);
-            $cartItems = collect($sessionCart)->map(function ($item, $productId) {
-                return (object) [
-                    'id' => $productId,
-                    'product_id' => $productId,
-                    'quantity' => $item['quantity'],
-                    'product' => Product::find($productId),
-                ];
-            });
-        }
+        $cartItems = $this->getCurrentCartItems();
+        $totals = $this->calculator->calculateTotals($cartItems);
+        $total = $totals['total'];
 
-        $total = $cartItems->sum(function ($item) {
-            return $item->product->price * $item->quantity;
-        });
-
-        return view('cart.index', compact('cartItems', 'total'));
+        return view('cart.index', compact('cartItems', 'total', 'totals'));
     }
 
     public function add(Product $product)
@@ -119,25 +112,87 @@ class CartController extends Controller
     {
         $request->validate(['quantity' => 'required|integer|min:1']);
 
+        $requestedQty = (int) $request->quantity;
+
         if (Auth::check()) {
             $cartItem = CartItem::findOrFail($id);
             $product = Product::find($cartItem->product_id);
 
-            if ($product && $request->quantity > $product->stock) {
-                return back()->with('error', __('messages.cart.only_left', ['count' => $product->stock, 'name' => $product->name]));
+            if ($product && $requestedQty > $product->stock) {
+                $errorMsg = __('messages.cart.only_left', ['count' => $product->stock, 'name' => $product->name]);
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $errorMsg,
+                        'error_code' => 'exceeds_stock',
+                        'max_stock' => $product->stock,
+                        'current_quantity' => $cartItem->quantity,
+                    ], 422);
+                }
+
+                return back()->with('error', $errorMsg);
             }
 
-            $cartItem->update(['quantity' => $request->quantity]);
+            $cartItem->update(['quantity' => $requestedQty]);
+            $updatedItemQty = $cartItem->quantity;
+            $unitPrice = $product ? (float) $product->price : 0.0;
+            $productStock = $product ? (int) $product->stock : 0;
+            $productName = $product ? $product->name : '';
         } else {
             $cart = session()->get('cart', []);
-            if (isset($cart[$id])) {
-                $product = Product::find($id);
-                if ($product && $request->quantity > $product->stock) {
-                    return back()->with('error', __('messages.cart.only_left', ['count' => $product->stock, 'name' => $product->name]));
+            if (! isset($cart[$id])) {
+                if ($request->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => __('messages.cart.empty')], 404);
                 }
-                $cart[$id]['quantity'] = $request->quantity;
-                session()->put('cart', $cart);
+
+                return back()->with('error', __('messages.cart.empty'));
             }
+
+            $product = Product::find($id);
+            if ($product && $requestedQty > $product->stock) {
+                $errorMsg = __('messages.cart.only_left', ['count' => $product->stock, 'name' => $product->name]);
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $errorMsg,
+                        'error_code' => 'exceeds_stock',
+                        'max_stock' => $product->stock,
+                        'current_quantity' => $cart[$id]['quantity'],
+                    ], 422);
+                }
+
+                return back()->with('error', $errorMsg);
+            }
+
+            $cart[$id]['quantity'] = $requestedQty;
+            session()->put('cart', $cart);
+            $updatedItemQty = $requestedQty;
+            $unitPrice = $product ? (float) $product->price : 0.0;
+            $productStock = $product ? (int) $product->stock : 0;
+            $productName = $product ? $product->name : '';
+        }
+
+        if ($request->wantsJson()) {
+            $cartItems = $this->getCurrentCartItems();
+            $totals = $this->calculator->calculateTotals($cartItems);
+            $lineSubtotal = $this->calculator->calculateLineSubtotal($unitPrice, $updatedItemQty);
+
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.cart.updated'),
+                'item' => [
+                    'id' => $id,
+                    'quantity' => $updatedItemQty,
+                    'unit_price' => $unitPrice,
+                    'unit_price_formatted' => number_format($unitPrice, 2, ',', '.').' €',
+                    'subtotal' => $lineSubtotal,
+                    'subtotal_formatted' => number_format($lineSubtotal, 2, ',', '.').' €',
+                    'stock' => $productStock,
+                    'name' => $productName,
+                ],
+                'totals' => $totals,
+                'cart_count' => $totals['items_count'],
+            ]);
         }
 
         return back()->with('success', __('messages.cart.updated'));
@@ -154,6 +209,19 @@ class CartController extends Controller
                 unset($cart[$id]);
                 session()->put('cart', $cart);
             }
+        }
+
+        if (request()->wantsJson()) {
+            $cartItems = $this->getCurrentCartItems();
+            $totals = $this->calculator->calculateTotals($cartItems);
+
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.cart.removed'),
+                'totals' => $totals,
+                'cart_count' => $totals['items_count'],
+                'is_empty' => $cartItems->isEmpty(),
+            ]);
         }
 
         return back()->with('success', __('messages.cart.removed'));
@@ -179,7 +247,24 @@ class CartController extends Controller
         $userAddresses = $user ? $user->addresses()->get() : collect();
         $userPhone = $user?->profile?->phone;
 
-        return view('checkout.index', compact('cartItems', 'total', 'shippingRates', 'user', 'userAddresses', 'userPhone'));
+        $guestShipping = session('guest_shipping', []);
+        if (empty($guestShipping) && ! $user && session('guest_order_token')) {
+            $prevOrder = Order::where('guest_token', session('guest_order_token'))->latest()->first();
+            if ($prevOrder) {
+                $guestShipping = [
+                    'shipping_name' => $prevOrder->shipping_name,
+                    'shipping_email' => $prevOrder->shipping_email,
+                    'shipping_phone' => $prevOrder->shipping_phone,
+                    'shipping_street' => $prevOrder->shipping_street,
+                    'shipping_city' => $prevOrder->shipping_city,
+                    'shipping_zip_code' => $prevOrder->shipping_zip_code,
+                    'shipping_province' => $prevOrder->shipping_province,
+                    'shipping_service_type' => $prevOrder->shipping_service_type,
+                ];
+            }
+        }
+
+        return view('checkout.index', compact('cartItems', 'total', 'shippingRates', 'user', 'userAddresses', 'userPhone', 'guestShipping'));
     }
 
     protected function getCurrentCartItems()
@@ -259,6 +344,25 @@ class CartController extends Controller
             $shippingZip = $request->shipping_zip_code;
             $shippingProvince = $request->shipping_province ?? '';
             $serviceType = $request->input('shipping_service_type', 'standard_48h');
+
+            session([
+                'guest_shipping' => [
+                    'shipping_name' => $shippingName,
+                    'shipping_email' => $shippingEmail,
+                    'shipping_phone' => $shippingPhone,
+                    'shipping_street' => $shippingStreet,
+                    'shipping_city' => $shippingCity,
+                    'shipping_zip_code' => $shippingZip,
+                    'shipping_province' => $shippingProvince,
+                    'shipping_service_type' => $serviceType,
+                ],
+            ]);
+
+            if (session('guest_order_token')) {
+                Order::where('guest_token', session('guest_order_token'))
+                    ->where('status', 'pending')
+                    ->update(['status' => 'cancelled']);
+            }
         } else {
             if ($request->filled('address_id') && $request->address_id !== 'new') {
                 $address = $user->addresses()->find($request->address_id);
@@ -512,6 +616,7 @@ class CartController extends Controller
 
         if ($guestToken) {
             session(['guest_order_token' => $guestToken]);
+            session()->forget('guest_shipping');
         }
 
         try {
@@ -617,6 +722,19 @@ class CartController extends Controller
             $shippingZip = $validated['shipping_zip_code'];
             $shippingProvince = $validated['shipping_province'] ?? '';
             $serviceType = $validated['shipping_service_type'] ?? 'standard_48h';
+
+            session([
+                'guest_shipping' => [
+                    'shipping_name' => $shippingName,
+                    'shipping_email' => $shippingEmail,
+                    'shipping_phone' => $shippingPhone,
+                    'shipping_street' => $shippingStreet,
+                    'shipping_city' => $shippingCity,
+                    'shipping_zip_code' => $shippingZip,
+                    'shipping_province' => $shippingProvince,
+                    'shipping_service_type' => $serviceType,
+                ],
+            ]);
         } else {
             $mainAddress = $user->addresses()->where('is_main', true)->first() ?? $user->addresses()->first();
             $shippingName = $user->name;
@@ -813,6 +931,7 @@ class CartController extends Controller
             CartItem::where('user_id', $order->user_id)->delete();
         } else {
             session()->forget('cart');
+            session()->forget('guest_shipping');
         }
 
         if ($order->guest_token) {
@@ -840,6 +959,20 @@ class CartController extends Controller
 
         if ($order) {
             $order->update(['status' => 'cancelled']);
+            if (! Auth::check()) {
+                session([
+                    'guest_shipping' => [
+                        'shipping_name' => $order->shipping_name,
+                        'shipping_email' => $order->shipping_email,
+                        'shipping_phone' => $order->shipping_phone,
+                        'shipping_street' => $order->shipping_street,
+                        'shipping_city' => $order->shipping_city,
+                        'shipping_zip_code' => $order->shipping_zip_code,
+                        'shipping_province' => $order->shipping_province,
+                        'shipping_service_type' => $order->shipping_service_type,
+                    ],
+                ]);
+            }
         }
 
         return redirect('/cart')->with('error', __('messages.cart.payment_cancelled'));
@@ -847,14 +980,18 @@ class CartController extends Controller
 
     public function downloadInvoice(Order $order)
     {
-        if ($order->user_id) {
-            if (! auth()->check() || $order->user_id !== auth()->id()) {
-                abort(403);
-            }
-        } else {
-            $token = request('token') ?? session('guest_order_token');
-            if (! $token || $order->guest_token !== $token) {
-                abort(403);
+        $isAdmin = auth()->check() && auth()->user()->isAdmin();
+
+        if (! $isAdmin) {
+            if ($order->user_id) {
+                if (! auth()->check() || $order->user_id !== auth()->id()) {
+                    abort(403);
+                }
+            } else {
+                $token = request('token') ?? session('guest_order_token');
+                if (! $token || $order->guest_token !== $token) {
+                    abort(403);
+                }
             }
         }
 

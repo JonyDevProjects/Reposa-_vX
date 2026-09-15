@@ -37,3 +37,5 @@ auth.json
 
 # Testing environment
 .env.testing
+test-results/
+playwright-report/
