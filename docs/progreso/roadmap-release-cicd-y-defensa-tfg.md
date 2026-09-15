@@ -51,8 +51,8 @@ main ───────────────────────┴─
 | **4.1** | **Estabilización Operativa Back-Office (Propuesta 1)** | Desviaciones D1 a D5 resueltas: logística bidireccional, comando `orders:reset-test-matrix`, PDF admin, fix error 500 Stripe y reembolsos directos (125 tests). | ✅ Completada |
 | **4.2** | **Rediseño del Catálogo Storefront (Propuesta 1)** | Divulgación progresiva: Asesor Anatómico colapsado bajo demanda, píldoras de categoría, búsqueda tolerante/semántica y filtros despejados. | ✅ Completada |
 | **4.3** | **Refinamiento Reactivo y Resiliencia en Carrito y Checkout** | Cálculo en tiempo real con debounce y límites de stock, layout móvil, validación shake y scroll, persistencia en doble capa + BFCache, desglose fiscal transparente y 570/570 i18n (141 tests). | ✅ Completada |
-| **5** | **Promoción de Release Final v1.1.0 a `main` (GitFlow)** | Fusión `--no-ff` a `main`, etiquetado oficial `v1.1.0-tfg-final` y back-merge hacia `develop`. | ⏳ Planificada |
-| **6** | **Preparación del Material de Soporte para la Defensa del TFG** | Confección de `docs/defensa-tfg/` con guion temporalizado (15 min), catálogo de diapositivas y argumentario defensivo. | ⏳ Planificada |
+| **5** | **Promoción de Release Final v1.1.0 a `main` (GitFlow)** | Fusión `--no-ff` a `main`, etiquetado oficial `v1.1.0-tfg-final` (y `v1.1.0`), back-merge hacia `develop` y limpieza de rama de release. | ✅ Completada |
+| **6** | **Preparación del Material de Soporte para la Defensa del TFG** | Confección de `docs/defensa-tfg/` con guion temporalizado (15 min), catálogo de 12 diapositivas, guía de live demo (4 min) y FAQ para el tribunal. | ✅ Completada |
 
 ---
 
@@ -214,27 +214,29 @@ Tras la simplificación del catálogo en la Iteración 4.2, la auditoría heurí
 
 ## Fase 5: Promoción de Release Final v1.1.0 a `main` (GitFlow Release)
 
-### 5.1 Protocolo de Fusión y Etiquetado Oficial
-Una vez homologados y testeados los ajustes de UI/UX, se procede al cierre formal de la release hacia producción:
+### 5.1 Protocolo de Fusión, Etiquetado Oficial y Back-Merge
+Concluido el ciclo de refinamiento UI/UX y generado el material de defensa, se procedió al cierre formal de la rama de release bajo el modelo GitFlow canónico:
 
 ```bash
-# 1. Cambiar a la rama de producción
+# 1. Posicionarse en la rama de producción y sincronizar cambios
 git checkout main
-git pull origin main
 
-# 2. Fusionar la rama de release con preservación de grafo
-git merge --no-ff release/v1.1.0 -m "Merge branch 'release/v1.1.0' into main — Entrega Oficial TFG"
+# 2. Fusionar la rama de release preservando el grafo explícito (--no-ff)
+# (En caso de colisiones históricas con snapshots previos, se aplica la estrategia '-X theirs'
+# manteniendo la versión certificada de 'release/v1.1.0' y resolviendo Reposa+/Dockerfile)
+git merge --no-ff -X theirs release/v1.1.0 -m "Merge branch 'release/v1.1.0' into main — Entrega Oficial TFG"
+git add Reposa+/Dockerfile
+git commit -m "Merge branch 'release/v1.1.0' into main — Entrega Oficial TFG"
 
-# 3. Etiquetar la versión semántica definitiva
+# 3. Etiquetar la versión semántica definitiva y el tag académico
+git tag -a v1.1.0-tfg-final -m "Release v1.1.0-tfg-final: Entrega Definitiva del TFG Reposa+ con Pipeline CI/CD y Material de Defensa"
 git tag -a v1.1.0 -m "Release v1.1.0: Refinamiento Heurístico UI/UX, Alta Densidad Admin y Entrega Oficial del TFG"
-git push origin main --tags
 
-# 4. Sincronizar de vuelta (back-merge) hacia develop
+# 4. Sincronizar de retorno (back-merge) hacia la rama de desarrollo
 git checkout develop
 git merge --no-ff release/v1.1.0 -m "Merge branch 'release/v1.1.0' into develop"
-git push origin develop
 
-# 5. Eliminar la rama de release temporal
+# 5. Limpieza ordenada de la rama de release temporal
 git branch -d release/v1.1.0
 ```
 
@@ -243,36 +245,20 @@ git branch -d release/v1.1.0
 ## Fase 6: Preparación del Material de Soporte para la Defensa del TFG
 
 ### 6.1 Estructura del Directorio de Defensa (`docs/defensa-tfg/`)
-Se creará un directorio dedicado con toda la documentación estratégica para afrontar la exposición oral ante el tribunal evaluador:
+Se ha consolidado el directorio especializado [`docs/defensa-tfg/`](../defensa-tfg/) con 4 documentos estratégicos para la exposición ante el tribunal universitario:
 
-```text
-docs/defensa-tfg/
-├── guion-exposicion-15-minutos.md    (Cronograma y minutaje de la presentación oral)
-├── estructura-diapositivas.md        (Guía de diseño de 12 slides de alto impacto)
-├── guion-demostracion-en-vivo.md     (Paso a paso para la demo funcional de 4 minutos)
-└── faq-tribunal-preguntas-clave.md   (Respuestas a preguntas inquisitivas del tribunal)
-```
-
-### 6.2 Minutaje de la Exposición Oral (15 Minutos Totales)
-* **Minutos 00:00 - 02:30 | Introducción y Nicho de Negocio:**
-  - Justificación de Reposa+ (*Sleep Tech & Ergonomics*).
-  - El lema central: *"No vendemos almohadas, vendemos noches de descanso profundo"*.
-  - Justificación de Laravel frente a CMS empaquetados.
-* **Minutos 02:30 - 06:00 | Arquitectura del Sistema e Integridad Transaccional:**
-  - Modelo Entidad-Relación, vistas SQL nativas y mitigación de problemas N+1.
-  - Concurrencia de stock: demostración técnica de `lockForUpdate()` y transacciones ACID.
-  - Ecosistema de pagos: Stripe Checkout asíncrono y webhooks con idempotencia.
-* **Minutos 06:00 - 10:00 | Demostración en Vivo (*Live Demo*):**
-  - Compra completa como invitado con selección de paquetería estándar y envío gratis $\ge 50€$.
-  - Generación de `guest_token`, factura en PDF y conversión de cuenta en un clic (*Claim Account*).
-  - Panel de administración: cambio de estado logístico e impresión de etiqueta térmica A6.
-* **Minutos 10:00 - 13:00 | Estrategia de Calidad: El Trofeo de Pruebas frente a Cohn:**
-  - Argumentación del Testing Trophy (Dodds/Fowler).
-  - Desmitificación de la lentitud de la integración: 119 pruebas en <12s.
-  - Demostración de la suite unitaria pura en microsegundos (22 tests en 0.06s).
-* **Minutos 13:00 - 15:00 | Conclusiones y Ecosistema de Agentes de IA:**
-  - Reflexión sobre el rol del ingeniero de software como orquestador de agentes de IA (Antigravity).
-  - Cierre y apertura del turno de preguntas del tribunal.
+1. **[`guion-exposicion-15-minutos.md`](../defensa-tfg/guion-exposicion-15-minutos.md):**
+   - Cronograma y minutaje estricto distribuido en 5 bloques narrativos (Nicho, Arquitectura ACID, Live Demo, Testing Trophy y Agentes de IA).
+   - Guion oral con transcripción recomendada para el orador y pautas de lenguaje corporal y control del tiempo.
+2. **[`estructura-diapositivas.md`](../defensa-tfg/estructura-diapositivas.md):**
+   - Arquitectura detallada de 12 diapositivas de alto impacto visual y conceptual.
+   - Especificación de layouts, mockups en pantalla dividida, diagramas de secuencia transaccionales y notas del presentador.
+3. **[`guion-demostracion-en-vivo.md`](../defensa-tfg/guion-demostracion-en-vivo.md):**
+   - Protocolo pre-vuelo (*pre-flight checklist*) para dejar el stack Docker y los datos listos mediante `php artisan orders:reset-test-matrix`.
+   - Paso a paso cronometrado de 4 minutos (catálogo con asesor anatómico, carrito reactivo con `CartCalculator`, checkout de invitado resiliente con neutralización de BFCache, factura PDF oficial y back-office con etiquetas térmicas A6).
+   - Plan de contingencia (*Plan B*) con atajos y comandos de rescate de 5 segundos.
+4. **[`faq-tribunal-preguntas-clave.md`](../defensa-tfg/faq-tribunal-preguntas-clave.md):**
+   - Batería de 8 preguntas inquisitivas y respuestas técnicas exhaustivas sobre concurrencia con `lockForUpdate()`, Testing Trophy vs. Cohn, webhooks e idempotencia de Stripe, seguridad de `guest_token`, optimización N+1 con vistas SQL, rol del alumno frente a agentes IA, e internacionalización con accesibilidad WCAG 2.1 AA.
 
 ---
 
@@ -282,4 +268,5 @@ docs/defensa-tfg/
 |---|---|:---:|---|
 | **10/09/2026** | Jonathan Quispe | `v1.0.0` | Definición formal del roadmap de CI/CD, ciclo de releases bajo GitFlow (Propuesta 1: v1.0.0 core transaccional + v1.1.0 refinamiento UI/UX) y material de soporte para la defensa del TFG. |
 | **15/09/2026** | Jonathan Quispe | `v1.1.0` | Registro y cierre de la Iteración 4.3: Refinamiento reactivo en carrito (`CartCalculator`), resiliencia móvil, persistencia de invitados con neutralización de BFCache (`pageshow`), validación multinivel con shake/scroll, homologación fiscal en `/orders/{id}` y certificación de 141 tests Pest y 8/8 Playwright E2E. |
+| **15/09/2026** | Jonathan Quispe | `v1.1.0` | Ejecución integral de las Fases 5 y 6: Creación del material de soporte para la defensa del TFG en `docs/defensa-tfg/` (4 documentos estratégicos), promoción GitFlow a `main` con `--no-ff`, doble etiquetado oficial `v1.1.0-tfg-final` y `v1.1.0`, back-merge hacia `develop` y cierre de la rama de release. |
 
