@@ -513,14 +513,14 @@ STRIPE_TEST_KEY=pk_test_...
 
 ### Stripe Test Keys
 
-Las claves de test estan en `.env.testing`:
+Las claves de test deben configurarse en el archivo `.env` local desde el Dashboard de Stripe (Modo Test):
 
-```
-STRIPE_SECRET=sk_test_51U9Fu2K0VMwtlVDAQ9rpBMlSkde7NhH5HSZYLfOz32EMdqrU05DfYTksrMRtAmWHTz32rjKKHwq0MJoR7F69xKrw00jAS7Og8q
-STRIPE_KEY=pk_test_51U9Fu2K0VMwtlVDADl5i8DATOeLvL63oNGJVmsCvPZvs0Z4PFLDwnFwzBVjfBEvdyo6jFZBf4mzKtICyIjx99t7b00br7JMPmo
+```bash
+STRIPE_SECRET=sk_test_51U9... [Clave Secreta Test de Stripe]
+STRIPE_KEY=pk_test_51U9... [Clave Publicable Test de Stripe]
 ```
 
-**Nota:** Estas son claves de TEST. Nunca usarlas en produccion.
+**Nota:** Utilizar siempre claves de TEST (prefijo `sk_test_` y `pk_test_`). Nunca utilizar credenciales de producción (`sk_live_`).
 
 ---
 
