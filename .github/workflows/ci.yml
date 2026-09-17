@@ -18,10 +18,10 @@ jobs:
       - name: Checkout del repositorio
         uses: actions/checkout@v4
 
-      - name: Configurar PHP 8.3
+      - name: Configurar PHP 8.4
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.4'
           tools: composer:v2
           coverage: none
 
@@ -47,10 +47,10 @@ jobs:
       - name: Checkout del repositorio
         uses: actions/checkout@v4
 
-      - name: Configurar PHP 8.3
+      - name: Configurar PHP 8.4
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.4'
           extensions: dom, curl, mbstring, zip, pdo, bcmath, gd
           tools: composer:v2
           coverage: none
@@ -98,10 +98,10 @@ jobs:
       - name: Checkout del repositorio
         uses: actions/checkout@v4
 
-      - name: Configurar PHP 8.3
+      - name: Configurar PHP 8.4
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.4'
           extensions: dom, curl, mbstring, zip, pdo, pdo_mysql, bcmath, gd, intl, redis
           tools: composer:v2
           coverage: none
@@ -192,10 +192,10 @@ jobs:
       - name: Checkout del repositorio
         uses: actions/checkout@v4
 
-      - name: Configurar PHP 8.3
+      - name: Configurar PHP 8.4
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.4'
           extensions: dom, curl, mbstring, zip, pdo, pdo_mysql, bcmath, gd, intl, redis
           tools: composer:v2
           coverage: none
