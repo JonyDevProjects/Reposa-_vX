@@ -1,21 +1,40 @@
-# Memoria del Proyecto: Reposa+
-## Desarrollo de un E-commerce Especializado en Descanso Ergonómico Mediante Laravel y Bootstrap 5
+# Memoria Ejecutiva del Proyecto: Reposa+
+## Desarrollo de una Plataforma de Comercio Electrónico Transaccional Especializada en Descanso Ergonómico Mediante Laravel y Bootstrap 5
+
+**Universidad Pablo de Olavide — Escuela Politécnica Superior**  
+**Titulación:** Grado en Ingeniería Informática en Sistemas de Información  
+**Código TFG:** 25-26-C13  
+**Autor:** Jonathan Quispe  
+**Tutor:** Rubén Pérez Chacón  
+**Convocatoria Oficial:** Curso Académico 2025/2026 (Septiembre 2026)  
 
 ---
 
 ## Índice General
-1. Introducción
-   - 1.1. Contexto y Motivación
-   - 1.2. Justificación Tecnológica
-   - 1.3. Ámbito de Aplicación y Relevancia Académica
-   - 1.4. Marco Metodológico del Proyecto: La Tríada Scrum/Kanban + Métrica v3 + SDD
-2. Estado del Arte
-3. Objetivos y Requisitos
-4. Diseño y Arquitectura
-5. Desarrollo e Implementación
-6. Calidad, Arquitectura y Pruebas del Software
-7. Conclusiones y Trabajo Futuro
-8. Bibliografía
+
+* **1. Introducción**
+  * 1.1. Contexto y Motivación
+  * 1.2. Justificación Tecnológica
+  * 1.3. Ámbito de Aplicación y Relevancia Académica
+  * 1.4. Marco Metodológico del Proyecto: La Tríada Scrum/Kanban + Métrica v3 + SDD
+  * 1.5. Macro-Estructura Documental y Transición a los Anexos Normativos
+* **2. Estado del Arte y Análisis Competitivo**
+  * 2.1. El Mercado del Descanso y el E-commerce de Nicho (*Sleep Tech*)
+  * 2.2. Tecnologías de Comercio Electrónico: CMS frente a Frameworks a Medida
+  * 2.3. Desarrollo Orientado por Ecosistemas de Agentes de IA
+* **3. Objetivos y Requisitos del Sistema**
+* **4. Diseño y Arquitectura de Software**
+* **5. Desarrollo e Implementación Técnica**
+* **6. Calidad, Arquitectura y Pruebas del Software (Testing Trophy)**
+* **7. Conclusiones y Trabajo Futuro**
+* **8. Bibliografía y Referencias Normativas**
+
+---
+
+### Compendio de Anexos Normativos (Métrica v3)
+* **[Anexo I: Plan de Proyecto (Métrica v3 — PSI)](Anexo_I_Plan_de_Proyecto.md):** Planificación, estimación de 400 horas y 13.800 €, WBS/EDT, gestión de riesgos y planes auxiliares.
+* **[Anexo II: Documento de Análisis (Métrica v3 — ASI)](Anexo_II_Documento_de_Analisis.md):** Catálogo de Requisitos (`RF`/`RNF`), Casos de Uso (`CU`), Clases de Negocio (`CN`), Interfaces (`IU`), Informes (`IF`) y matrices de trazabilidad.
+* **[Anexo III: Documento de Diseño (Métrica v3 — DSI)](Anexo_III_Documento_de_Diseno.md):** Topología de 7 microservicios Docker, modelo relacional DDL con constraints, controladores de diseño (`CL`) y especificaciones de puesta en marcha.
 
 ---
 
@@ -46,7 +65,7 @@ Para superar la clásica brecha entre los marcos normativos formales exigidos po
 1. **Capa de Gobierno y Gestión del Proyecto (Scrumban: Scrum + Kanban):**
    - **Scrum:** Estructuración temporal mediante *Sprints* orientados a hitos de versión semántica bajo GitFlow (`v1.0.0` Core Transaccional y `v1.1.0` Refinamiento UI/UX y Logística).
    - **Kanban:** Gestión del flujo continuo de trabajo y limitación estricta del trabajo en curso (*WIP = 1*) en el tablero de desarrollo individual, evitando la sobrecarga cognitiva y maximizando el rendimiento.
-   - **Simulación de Equipo Profesional (Norma UPO de 400 Horas):** Desglose del esfuerzo en 5 perfiles profesionales de mercado asumidos por el alumno (Jefe de Proyecto a 45 €/h, Analista a 40 €/h, Arquitecto a 40 €/h, Backend a 30 €/h y Frontend a 30 €/h), modelando un presupuesto formal de **13.800 €** en el [Anexo I: Plan de Proyecto](metodologia-proyecto-triada-scrum-metrica-sdd.md).
+   - **Simulación de Equipo Profesional (Norma UPO de 400 Horas):** Desglose del esfuerzo en 5 perfiles profesionales de mercado asumidos por el alumno (Jefe de Proyecto a 45 €/h, Analista a 40 €/h, Arquitecto a 40 €/h, Backend a 30 €/h y Frontend a 30 €/h), modelando un presupuesto formal de **13.800 €** en el [Anexo I: Plan de Proyecto](Anexo_I_Plan_de_Proyecto.md).
 
 2. **Capa Normativa, Estructural y Documental (Métrica v3 adaptada a la UPO):**
    - Adopción del estándar del Consejo Superior de Administración Electrónica para estructurar los Anexos del TFG:
@@ -62,6 +81,14 @@ Para superar la clásica brecha entre los marcos normativos formales exigidos po
    - **Calidad Continua y Memoria Viva:** Pipeline de CI/CD automatizado con 5 jobs en GitHub Actions y persistencia incremental de decisiones de arquitectura en el motor de memoria **Engram CLI**.
 
 La especificación exhaustiva de este marco metodológico se encuentra formalizada en el documento de referencia [`docs/metodologia-proyecto-triada-scrum-metrica-sdd.md`](metodologia-proyecto-triada-scrum-metrica-sdd.md).
+
+### 1.5. Macro-Estructura Documental y Transición a los Anexos Normativos
+Conforme a las pautas de excelencia de la Escuela Politécnica Superior de la UPO observadas en memorias galardonadas de referencia (ej. *FutPlay*, código `25-26-C13`), este documento principal constituye la **Memoria Ejecutiva Troncal (~20-25 páginas)**, diseñada para ofrecer al tribunal evaluador una visión sintética, rigurosa y directa de la ingeniería del proyecto.
+
+El corpus documental detallado y exhaustivo de la metodología Métrica v3 se encuentra distribuido formalmente en los tres Anexos normativos adjuntos:
+* El **Plan de Proyecto** detallado (WBS, costes tarea a tarea y matriz de riesgos) se localiza en el **[Anexo I](Anexo_I_Plan_de_Proyecto.md)**.
+* La **Especificación Completa de Requisitos, Casos de Uso con flujos alternativos, Interfaces e Informes** reside en el **[Anexo II](Anexo_II_Documento_de_Analisis.md)**.
+* El **Diseño Físico Relacional DDL, Controladores de Diseño y Guía de Construcción** se detalla en el **[Anexo III](Anexo_III_Documento_de_Diseno.md)**.
 
 ---
 
@@ -80,7 +107,20 @@ Sin embargo, el reto de comercializar estos productos de forma online radica en 
 #### 2.1.2. La Psicología del Color en Entornos Digitales de Salud
 El diseño web contemporáneo se apoya fuertemente en la psicología del color para modular el comportamiento y las emociones del usuario. En el contexto de Reposa+, se ha realizado un estudio cromático que determina que los colores cálidos o vibrantes (rojos, naranjas), a menudo usados para estimular compras impulsivas en *retail*, son contraproducentes para un nicho que busca reducir el estrés.
 
-Por consiguiente, el estado del arte en diseño de aplicaciones para el sueño (como las apps Calm o Headspace) se fundamenta en el uso del color **Índigo / Blue-Indigo** y los azules profundos. Estos tonos están biológica y psicológicamente asociados a la noche, la profundidad, la serenidad y el ritmo circadiano. Al bañar la interfaz del e-commerce con una paleta de colores desaturados y azules nocturnos, la plataforma induce un estado de relajación que alinea la percepción visual del cliente con la propuesta de valor del producto.
+#### 2.1.3. Matriz Comparativa de Competidores del Mercado *Sleep Tech*
+Para situar el posicionamiento competitivo de Reposa+, se ha llevado a cabo un análisis comparativo frente a dos modelos imperantes en el mercado: los grandes *marketplaces* generalistas (representados por Amazon / Ikea) y las marcas de colchones DTC (*Direct-To-Consumer*, representadas por Emma Colchón / Tempur):
+
+| Característica / Dimensión de Análisis | Marketplaces Generalistas (Amazon / Ikea) | E-Commerce DTC Tradicional (Emma / Tempur) | Reposa+ (*Sleep Tech* a Medida) |
+|---|:---:|:---:|:---:|
+| **Hiper-especialización en Almohadas y Salud Cervical** | NO (Catálogo masivo indiferenciado) | NO (Foco en venta de colchones; almohadas secundarias) | **SÍ (Nicho exclusivo en descanso ergonómico y cervical)** |
+| **Asesor Anatómico de Postura en Tiempo Real** | NO | NO | **SÍ (Filtro por postura: lado, supino, prono)** |
+| **Diseño Visual Basado en Psicología del Descanso** | NO (Diseño puramente transaccional agresivo) | PARCIAL (Diseño corporativo estándar) | **SÍ ("The Midnight Sanctuary" — Paleta Índigo nocturna)** |
+| **Compra Rápida como Invitado (*Guest Checkout*)** | NO (Registro obligatorio forzoso) | PARCIAL (Formularios largos con fricción) | **SÍ (Compra en 1 paso + Claim Account post-pago)** |
+| **Transparencia en Albaranes Logísticos y Seguimiento** | SÍ (Ecosistema cerrado del operador) | PARCIAL (Enlace genérico a transportista) | **SÍ (Etiqueta térmica A6 normalizada + Código `RPX...ES`)** |
+| **Resiliencia Transaccional con Bloqueo Pesimista** | SÍ (Infraestructura propietaria cerrada) | NO (CMS estándar vulnerables a sobreventas en picos) | **SÍ (Bloqueo pesimista `lockForUpdate()` en MySQL InnoDB)** |
+| **Propiedad Total del Código Fuente (Sin Vendor Lock-in)**| NO | NO (Dependencia de Shopify/Magento) | **SÍ (Arquitectura abierta a medida en Laravel 11/12+)** |
+
+Esta comparativa evidencia que Reposa+ no solo cubre un vacío desatendido por los líderes generalistas, sino que ofrece una experiencia transaccional más ágil, sin fricción de registro inicial y técnicamente blindada frente a fallos de concurrencia.
 
 ### 2.2. Tecnologías de Comercio Electrónico: CMS vs Frameworks a Medida
 A nivel de Ingeniería del Software, el desarrollo de una tienda online presenta una dicotomía histórica: utilizar una solución empaquetada o desarrollar el sistema desde cero.
@@ -578,16 +618,16 @@ La estructura de pruebas de Reposa+ se materializa en una **pirámide tripartita
 ┌───────────────────────────────┬──────────────┬──────────────┬──────────────┬────────────────────────────────────────────────────────┐
 │ Nivel de Prueba               │ Directorio   │ Nº Pruebas   │ Aserciones   │ Tiempo / Tecnologías                                   │
 ├───────────────────────────────┼──────────────┼──────────────┼──────────────┼────────────────────────────────────────────────────────┤
-│ **Pruebas de Sistema (E2E)**  │ `e2e/`       │ 8 tests      │ 100% checks  │ ~10.7s / Playwright, Chromium real, Nginx LB, Stripe   │
-│ **Pruebas de Integración**    │ `tests/Feature`│ 89 tests   │ 285 aserc.   │ ~1.95s / Laravel Testbench, MySQL 8 InnoDB, Redis     │
-│ **Pruebas Unitarias**         │ `tests/Unit` │ 22 tests     │ 227 aserc.   │ ~0.06s (60ms) / PHPUnit puro, lógica pura en memoria   │
+│ **Pruebas de Sistema (E2E)**  │ `e2e/`       │ 8 tests      │ 100% checks  │ ~10.3s / Playwright, Chromium real, Nginx LB, Stripe   │
+│ **Pruebas de Integración**    │ `tests/Feature`│ 112 tests  │ 440 aserc.   │ ~2.80s / Laravel Testbench, MySQL 8 InnoDB, Redis     │
+│ **Pruebas Unitarias**         │ `tests/Unit` │ 29 tests     │ 239 aserc.   │ ~0.09s (90ms) / Pest puro, lógica pura en memoria      │
 ├───────────────────────────────┼──────────────┼──────────────┼──────────────┼────────────────────────────────────────────────────────┤
-│ **TOTALES CERTIFICADOS**      │              │ **119 tests**│ **512+ aserc**│ **< 12 segundos globales**                             │
+│ **TOTALES CERTIFICADOS**      │              │ **149 tests**│ **679+ aserc**│ **< 14 segundos globales**                             │
 └───────────────────────────────┴──────────────┴──────────────┴──────────────┴────────────────────────────────────────────────────────┘
 ```
 
-#### 6.3.1. Capa Unitaria Pura en Memoria (`tests/Unit/`) — 22 Tests, 227 Aserciones, 0.06s
-Diseñada bajo el principio de pureza computacional: todas las clases heredan directamente de `PHPUnit\Framework\TestCase` (el test runner puro de PHPUnit sin inicialización de Laravel ni de base de datos):
+#### 6.3.1. Capa Unitaria Pura en Memoria (`tests/Unit/`) — 29 Tests, 239 Aserciones, 0.09s
+Diseñada bajo el principio de pureza computacional: todas las clases heredan directamente de `PHPUnit\Framework\TestCase` (el test runner puro sin inicialización de Laravel ni de base de datos):
 1. **Autómata de Estados Finitos ([`OrderStateUnitTest.php`](file:///Users/jonathanquishpe/JoniDev/Reposa+_TFG/Reposa+/tests/Unit/OrderStateUnitTest.php)) — 6 tests, 55 aserciones:**
    - Aísla y verifica matemáticamente el grafo dirigido de transiciones de `Order::ALLOWED_TRANSITIONS`.
    - Certifica que un pedido en estado `processing` jamás puede saltar directamente a `completed` sin transicionar previamente a `shipped` (defecto histórico corregido).
