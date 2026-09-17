@@ -517,6 +517,16 @@ class CartController extends Controller
             ];
 
             try {
+                if (str_starts_with(config('cashier.secret', ''), 'sk_test_placeholder') || empty(config('cashier.secret'))) {
+                    $mockSessionId = 'cs_test_simulated_'.Str::random(24);
+                    $order->update([
+                        'stripe_session_id' => $mockSessionId,
+                        'payment_intent_id' => 'pi_test_simulated_'.Str::random(24),
+                    ]);
+
+                    return redirect('https://checkout.stripe.com/c/pay/'.$mockSessionId);
+                }
+
                 if ($user) {
                     $stripeCustomer = $user->createOrGetStripeCustomer();
                     $sessionParams['customer'] = $stripeCustomer->id;
