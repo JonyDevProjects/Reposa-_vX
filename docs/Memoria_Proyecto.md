@@ -5,6 +5,10 @@
 
 ## Índice General
 1. Introducción
+   - 1.1. Contexto y Motivación
+   - 1.2. Justificación Tecnológica
+   - 1.3. Ámbito de Aplicación y Relevancia Académica
+   - 1.4. Marco Metodológico del Proyecto: La Tríada Scrum/Kanban + Métrica v3 + SDD
 2. Estado del Arte
 3. Objetivos y Requisitos
 4. Diseño y Arquitectura
@@ -32,9 +36,32 @@ Este Trabajo se enmarca en la necesidad de demostrar competencias avanzadas de I
 Asimismo, el proyecto incorpora un enfoque vanguardista al integrar un **Ecosistema de Agentes de Inteligencia Artificial** en su ciclo de desarrollo. Esta metodología representa un salto evolutivo en la Ingeniería de Software, donde la IA no actúa meramente como un asistente de codificación, sino como una red de agentes autónomos con reglas, habilidades (skills) y flujos de trabajo (workflows) definidos que aseguran la integridad del código, la cohesión del diseño y la cobertura de pruebas.
 
 ### 1.3. Ámbito de Aplicación y Relevancia Académica
-El proyecto se desarrolla como respuesta a los requisitos académicos establecidos en la Asignatura "EPD 3: Frameworks – Laravel". Constituye una prueba integradora de conocimientos que abarca desde la conceptualización de la base de datos y la administración de sistemas, hasta la implementación de interfaces de usuario asíncronas y el despliegue en entornos virtualizados.
+El proyecto se desarrolla como **Trabajo de Fin de Grado (TFG)** para la obtención del título de **Graduado en Ingeniería Informática en Sistemas de Información** por la **Escuela Politécnica Superior de la Universidad Pablo de Olavide (UPO)**. Constituye una obra integradora de competencias profesionales que abarca desde la formulación estratégica de requisitos y el modelado conceptual de bases de datos, hasta la implementación de interfaces de usuario asíncronas, la seguridad transaccional en pasarelas de pago y la automatización de la integración continua (CI/CD) en entornos virtualizados.
 
-La relevancia de este trabajo radica en la combinación de un caso de negocio realista (con requerimientos estrictos de usabilidad y conversión) con una ejecución técnica rigurosa. A lo largo del documento se detallará cómo se han superado los distintos retos de ingeniería: la gestión concurrente del carrito de la compra, el manejo de roles y permisos mediante *middlewares*, la internacionalización de la plataforma (multi-idioma) y la persistencia segura de las transacciones (checkout).
+La relevancia de este trabajo radica en la combinación de un caso de negocio realista (con requerimientos estrictos de usabilidad y conversión en el nicho *Sleep Tech*) con una ejecución técnica y metodológica de máximo rigor. A lo largo del documento se detallará cómo se han superado los distintos retos de ingeniería: la gestión concurrente del inventario con bloqueos pesimistas (`lockForUpdate()`), el manejo de roles y permisos mediante *middlewares*, la compra híbrida como invitado (*Guest Checkout*), la internacionalización nativa de la plataforma y el blindaje frente a fallos de red y pasarelas de pago externas.
+
+### 1.4. Marco Metodológico del Proyecto: La Tríada Scrum/Kanban + Métrica v3 + SDD
+Para superar la clásica brecha entre los marcos normativos formales exigidos por la universidad y las dinámicas ágiles del desarrollo de software contemporáneo, Reposa+ adopta una **metodología híbrida formal-ágil articulada en tres capas desacopladas**:
+
+1. **Capa de Gobierno y Gestión del Proyecto (Scrumban: Scrum + Kanban):**
+   - **Scrum:** Estructuración temporal mediante *Sprints* orientados a hitos de versión semántica bajo GitFlow (`v1.0.0` Core Transaccional y `v1.1.0` Refinamiento UI/UX y Logística).
+   - **Kanban:** Gestión del flujo continuo de trabajo y limitación estricta del trabajo en curso (*WIP = 1*) en el tablero de desarrollo individual, evitando la sobrecarga cognitiva y maximizando el rendimiento.
+   - **Simulación de Equipo Profesional (Norma UPO de 400 Horas):** Desglose del esfuerzo en 5 perfiles profesionales de mercado asumidos por el alumno (Jefe de Proyecto a 45 €/h, Analista a 40 €/h, Arquitecto a 40 €/h, Backend a 30 €/h y Frontend a 30 €/h), modelando un presupuesto formal de **13.800 €** en el [Anexo I: Plan de Proyecto](metodologia-proyecto-triada-scrum-metrica-sdd.md).
+
+2. **Capa Normativa, Estructural y Documental (Métrica v3 adaptada a la UPO):**
+   - Adopción del estándar del Consejo Superior de Administración Electrónica para estructurar los Anexos del TFG:
+     * **PSI (Planificación) $\rightarrow$ Anexo I:** Plan de Proyecto, WBS/EDT, análisis de riesgos y costes.
+     * **ASI (Análisis) $\rightarrow$ Anexo II:** Catálogo de Requisitos Funcionales (`RF-xxx`) y No Funcionales (`RNF-xxx`), Casos de Uso (`CU-xxx`), Clases de Negocio (`CN-xxx`), Interfaces (`IU-xxx`) e Informes (`IF-xxx`).
+     * **DSI (Diseño) $\rightarrow$ Anexo III:** Modelo Físico Relacional SQL, diagramas de despliegue y clases de controladores (`CL-xxx`).
+   - **Matrices de Trazabilidad Cruzada:** Garantía matemática de coherencia bidireccional desde los Objetivos (`OBJ`) hasta los Casos de Uso y las Pruebas Automatizadas.
+
+3. **Capa de Producción Técnica e Ingeniería (Spec-Driven Development — SDD):**
+   - **La Especificación como Fuente Única de Verdad:** Ninguna funcionalidad se codifica sin un documento de especificación formal previo (Roadmap técnico).
+   - **Especificaciones Ejecutables (Testing Trophy):** Los criterios de aceptación se materializan en una pirámide de **141 pruebas automatizadas en Pest** (29 Unitarias puras + 112 de Integración contra MySQL 8 y Redis en 2.89s) y **8 pruebas de sistema E2E con Microsoft Playwright** sobre navegadores reales.
+   - **Orquestación de Agentes de IA (Google Antigravity SDK):** El alumno ejerce como Arquitecto de Software y Tech Lead, delegando tareas mecánicas a agentes autónomos gobernados por especificaciones formales y reglas estrictas de diseño.
+   - **Calidad Continua y Memoria Viva:** Pipeline de CI/CD automatizado con 5 jobs en GitHub Actions y persistencia incremental de decisiones de arquitectura en el motor de memoria **Engram CLI**.
+
+La especificación exhaustiva de este marco metodológico se encuentra formalizada en el documento de referencia [`docs/metodologia-proyecto-triada-scrum-metrica-sdd.md`](metodologia-proyecto-triada-scrum-metrica-sdd.md).
 
 ---
 
@@ -89,7 +116,7 @@ La integración de este ecosistema de agentes no reemplaza al ingeniero humano, 
 
 ## 3. Objetivos y Requisitos
 
-La definición clara de los objetivos y requisitos es un paso fundamental en la metodología de Ingeniería del Software, ya que establece la línea base contra la cual se validará el éxito del proyecto. Para Reposa+, los requisitos funcionales y no funcionales emanan directamente de las directrices académicas de la EPD 3 de Frameworks.
+La definición clara de los objetivos y requisitos es un paso fundamental en la metodología de Ingeniería del Software, ya que establece la línea base contra la cual se validará el éxito del proyecto. Para Reposa+, los requisitos funcionales y no funcionales emanan directamente de las directrices técnicas del Trabajo de Fin de Grado y las mejores prácticas de la ingeniería de software moderna.
 
 ### 3.1. Objetivos Principales del Proyecto
 El objetivo general es diseñar, desarrollar y desplegar una plataforma de comercio electrónico realista, escalable y segura orientada a un nicho de mercado específico (descanso ergonómico), demostrando dominio absoluto sobre el framework Laravel y las tecnologías de frontend asociadas.
@@ -634,7 +661,7 @@ El desarrollo del proyecto se articuló sobre el modelo de ramificación **GitFl
 * **Consolidación sin avance rápido (`--no-ff`):** Todas las características se integraron en `develop` mediante fusiones explícitas con `--no-ff` (`git merge --no-ff feature/...`), preservando el grafo de historial de commits y la trazabilidad de los hitos técnicos.
 * **Integración de Fase 5:** La rama `feature/guest-checkout-and-shipping` (19 commits, +6700 líneas) consolidó el checkout de invitados, paquetería estándar, Google OAuth 2.0 y la suite unitaria pura en `develop` tras certificar la ejecución del 100% de las pruebas automatizadas.
 
-### 6.6. Auditoría EPD3 y Refinamientos de Resiliencia
+### 6.6. Auditoría Técnica de Requisitos y Refinamientos de Resiliencia
 Como paso previo a la homologación, se sometió el código a auditorías técnicas continuas para corregir desviaciones y maximizar la resiliencia operativa:
 1. **Vistas SQL Nativas:** Incorporación de `v_order_summary` y `v_top_favorited_products` para optimizar consultas de reporting en el panel administrativo, reduciendo tiempos de respuesta en un 30%.
 2. **Atomicidad Transaccional y Bloqueo Pesimista:** Blindaje del checkout con `DB::transaction()` y `lockForUpdate()`, previniendo sobreventas e inconsistencias de pedidos huérfanos ante excepciones imprevistas.
