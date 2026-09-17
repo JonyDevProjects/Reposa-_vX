@@ -268,6 +268,7 @@ jobs:
           STRIPE_KEY: "pk_test_placeholder_mock_for_testing"
           STRIPE_SECRET: "sk_test_placeholder_mock_for_testing"
           APP_URL: "http://127.0.0.1:8000"
+          PHP_CLI_SERVER_WORKERS: 4
 
       - name: Ejecutar suite E2E de Playwright
         run: npx playwright test
