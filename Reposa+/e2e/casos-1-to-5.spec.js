@@ -278,7 +278,7 @@ test.describe('Certificación Fase 5: Casos de Prueba 1 al 5 — Reposa+ E2E', (
 
     const googleUrl = new URL(request.url());
     expect(googleUrl.searchParams.get('client_id')).toMatch(/(932690824736.*|mock-client-id-ci)\.apps\.googleusercontent\.com$/);
-    expect(googleUrl.searchParams.get('redirect_uri')).toMatch(/^http:\/\/localhost(:8000)?\/(api\/)?auth\//);
+    expect(googleUrl.searchParams.get('redirect_uri')).toMatch(/^http:\/\/(localhost|127\.0\.0\.1)(:8000)?\/(api\/)?auth\//);
     expect(googleUrl.searchParams.get('scope')).toBe('openid profile email');
     expect(googleUrl.searchParams.get('response_type')).toBe('code');
     expect(googleUrl.searchParams.get('state')).toBeTruthy();
@@ -314,7 +314,7 @@ test.describe('Certificación Fase 5: Casos de Prueba 1 al 5 — Reposa+ E2E', (
 
     const googleUrl = new URL(request.url());
     expect(googleUrl.searchParams.get('client_id')).toMatch(/(932690824736.*|mock-client-id-ci)\.apps\.googleusercontent\.com$/);
-    expect(googleUrl.searchParams.get('redirect_uri')).toMatch(/^http:\/\/localhost(:8000)?\/(api\/)?auth\//);
+    expect(googleUrl.searchParams.get('redirect_uri')).toMatch(/^http:\/\/(localhost|127\.0\.0\.1)(:8000)?\/(api\/)?auth\//);
 
     await context.close();
   });
