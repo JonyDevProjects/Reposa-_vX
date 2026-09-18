@@ -8,21 +8,28 @@ La aplicación principal (desarrollada en Laravel) se encuentra en la carpeta [`
 
 Toda la documentación relacionada con el diseño, los requisitos, la base de datos y la estrategia del proyecto se encuentra consolidada en el directorio [`/docs`](./docs).
 
-### Índice de Documentos
+### Documentación Académica Oficial (Estándar EPS-UPO / Métrica v3)
 
-A continuación, puedes acceder a todos los documentos clave del proyecto:
+- 📖 [**Memoria del Proyecto (Memoria Troncal)**](./docs/Memoria_Proyecto.md): Documento principal de 20-25 páginas con justificación, arquitectura, calidad, resultados y conclusiones.
+- 📋 [**Anexo I: Plan de Proyecto (PSI)**](./docs/Anexo_I_Plan_de_Proyecto.md): Planificación temporal, EDT/WBS, catálogo de objetivos (OBJ-001..008), presupuesto canónico (400h / 13.800€) y gestión de riesgos.
+- 🔍 [**Anexo II: Documento de Análisis (ASI)**](./docs/Anexo_II_Documento_de_Analisis.md): Catálogo exhaustivo de requisitos (RF-001..017, RNF-001..006), casos de uso tabulares (CU-001..015), interfaces de usuario e interfaz externa.
+- 🏗️ [**Anexo III: Documento de Diseño (DSI)**](./docs/Anexo_III_Documento_de_Diseno.md): Arquitectura de 7 contenedores Docker, DDL relacional 3FN, diseño OO (CL-001..006), seguridad OWASP y patrones de integración.
 
-- 📄 [**Requisitos Técnicos del TFG**](./docs/EPD3%20-%202526.md): Requisitos técnicos y funcionales implementados en el Trabajo de Fin de Grado.
-- 📖 [**Memoria Oficial del TFG**](./docs/Memoria_Proyecto.md): Memoria académica completa con diseño, arquitectura, desarrollo y capítulo de Calidad, Arquitectura y Pruebas del Software.
-- 🧪 [**Roadmap de Estrategia de Testing y Pruebas Unitarias**](./docs/progreso/roadmap-estrategia-testing-y-pruebas-unitarias.md): Trofeo de pruebas (*Testing Trophy*), fundamentación frente a la pirámide de Cohn y suite tripartita (119 tests).
-- 📦 [**Roadmap de Checkout, Paquetería y Google OAuth 2.0**](./docs/progreso/roadmap-flujos-checkout-paqueteria-oauth.md): Especificación y certificación de flujos de invitado, paquetería estándar y autenticación federada.
-- 🚀 [**Roadmap de CI/CD, Releases y Defensa del TFG**](./docs/progreso/roadmap-release-cicd-y-defensa-tfg.md): Pipeline en GitHub Actions, ciclo de versiones v1.0.0 & v1.1.0 (UI/UX) y guion de defensa académica.
-- 🛒 [**Informe de E-Commerce**](./docs/Inf-E-Comerce.md): Estrategia de producto (almohadas de descanso), marca, colores y planificación del negocio.
-- 🗄️ [**Esquema de la Base de Datos**](./docs/EsquemaBBDD.md): Arquitectura, tablas y relaciones de la base de datos del sistema.
-- 🎯 [**Informe de Objetivos y Fases**](./docs/Informe_Objetivos_Fases.md): Detalle de las fases de desarrollo del proyecto, hitos alcanzados y evolución del sistema.
-- 🤖 [**Ecosistema de Agentes de IA**](./docs/Documentacion_Ecosistema_Agentes.md): Guía sobre la infraestructura de agentes (`.agents/`), reglas y herramientas automatizadas (Antigravity).
-- 🚀 [**Manual del Desarrollador — CI/CD**](./docs/Manual_Desarrollador_CICD.md): Guía completa de entornos de desarrollo, Docker, Dev Containers, testing y pipeline de CI/CD.
-- 🐳 [**Referencia de Entornos: Dev Containers vs. Docker CLI Directo**](./docs/referencia-entorno-dev-containers-vs-docker-cli.md): Decisión técnica y guía operativa sobre el entorno de desarrollo ligero para desarrolladores y agentes de IA.
+### Material de Soporte para la Defensa Académica
+
+- 📊 [**Presentación de Diapositivas (PDF Oficial)**](./docs/defensa-tfg/presentacion-defensa.pdf) | [**Versión Web Interactiva**](./docs/defensa-tfg/presentacion-defensa.html) | [**Fuente Marp**](./docs/defensa-tfg/presentacion-defensa.marp.md): Deck de 12 diapositivas de alto impacto visual.
+- ⏱️ [**Guion de Exposición de 15 Minutos**](./docs/defensa-tfg/guion-exposicion-15-minutos.md): Minutaje exacto, narrativa por bloques y pautas de oratoria para el tribunal.
+- 🎬 [**Guion de Demostración en Vivo**](./docs/defensa-tfg/guion-demostracion-en-vivo.md): Protocolo pre-vuelo (`orders:reset-test-matrix`), flujo guiado de 4 minutos y plan de contingencia.
+- ❓ [**FAQ Tribunal — Preguntas Clave**](./docs/defensa-tfg/faq-tribunal-preguntas-clave.md): 15 respuestas técnicas blindadas a preguntas de arquitectura, concurrencia, IA y testing.
+
+### Documentación Técnica y Roadmaps de Ingeniería
+
+- 🚀 [**Manual del Desarrollador — CI/CD**](./docs/Manual_Desarrollador_CICD.md): Entornos Docker, Dev Containers, configuración hermética y pipeline de GitHub Actions.
+- 🧪 [**Roadmap de Estrategia de Testing**](./docs/progreso/roadmap-estrategia-testing-y-pruebas-unitarias.md): Trofeo de pruebas (*Testing Trophy*), pirámide tripartita (149 tests: Pest + Playwright) y justificación metodológica.
+- 📦 [**Roadmap de Checkout, Paquetería y Google OAuth**](./docs/progreso/roadmap-flujos-checkout-paqueteria-oauth.md): Pasarelas de pago, autenticación federada y neutralización de BFCache.
+- 🚀 [**Roadmap de CI/CD, Releases y GitFlow**](./docs/progreso/roadmap-release-cicd-y-defensa-tfg.md): Automatización del pipeline, ciclo de promociones semánticas y trazabilidad.
+- 🤖 [**Ecosistema de Agentes de IA**](./docs/Documentacion_Ecosistema_Agentes.md): Arquitectura multi-agente, subagentes especializados y gobernanza mediante *Spec-Driven Development*.
+- 🐳 [**Referencia de Entornos: Dev Containers vs. Docker CLI Directo**](./docs/referencia-entorno-dev-containers-vs-docker-cli.md): Decisión técnica y operatividad de desarrollo.
 
 ---
 *Para información específica del framework Laravel, puedes consultar el [README interno de Reposa+](./Reposa+/README.md).*

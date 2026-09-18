@@ -53,6 +53,8 @@ main ───────────────────────┴─
 | **4.3** | **Refinamiento Reactivo y Resiliencia en Carrito y Checkout** | Cálculo en tiempo real con debounce y límites de stock, layout móvil, validación shake y scroll, persistencia en doble capa + BFCache, desglose fiscal transparente y 570/570 i18n (141 tests). | ✅ Completada |
 | **5** | **Promoción de Release Final v1.1.0 a `main` (GitFlow)** | Fusión `--no-ff` a `main`, etiquetado oficial `v1.1.0-tfg-final` (y `v1.1.0`), back-merge hacia `develop` y limpieza de rama de release. | ✅ Completada |
 | **6** | **Preparación del Material de Soporte para la Defensa del TFG** | Confección de `docs/defensa-tfg/` con guion temporalizado (15 min), catálogo de 12 diapositivas, guía de live demo (4 min) y FAQ para el tribunal. | ✅ Completada |
+| **7** | **Formalización Documental EPS-UPO (Métrica v3) y Diapositivas Marp/PDF** | Memoria Troncal (20-25 págs), Anexos I (PSI), II (ASI), III (DSI), presentación Marp/PDF/HTML y documentación de la Tríada Metodológica. | ✅ Completada |
+| **8** | **Certificación CI/CD PHP 8.4 y Promoción GitFlow de Release v1.1.1** | Blindaje hermético de Stripe/Google OAuth, session driver de BBDD, 5/5 jobs verdes en GitHub Actions y promoción `--no-ff` a `main` como `v1.1.1`. | ✅ Completada |
 
 ---
 
@@ -258,7 +260,53 @@ Se ha consolidado el directorio especializado [`docs/defensa-tfg/`](../defensa-t
    - Paso a paso cronometrado de 4 minutos (catálogo con asesor anatómico, carrito reactivo con `CartCalculator`, checkout de invitado resiliente con neutralización de BFCache, factura PDF oficial y back-office con etiquetas térmicas A6).
    - Plan de contingencia (*Plan B*) con atajos y comandos de rescate de 5 segundos.
 4. **[`faq-tribunal-preguntas-clave.md`](../defensa-tfg/faq-tribunal-preguntas-clave.md):**
-   - Batería de 8 preguntas inquisitivas y respuestas técnicas exhaustivas sobre concurrencia con `lockForUpdate()`, Testing Trophy vs. Cohn, webhooks e idempotencia de Stripe, seguridad de `guest_token`, optimización N+1 con vistas SQL, rol del alumno frente a agentes IA, e internacionalización con accesibilidad WCAG 2.1 AA.
+   - Batería de 15 preguntas inquisitivas y respuestas técnicas exhaustivas sobre concurrencia con `lockForUpdate()`, Testing Trophy vs. Cohn, webhooks e idempotencia de Stripe, seguridad de `guest_token`, optimización N+1 con vistas SQL, rol del alumno frente a agentes IA, e internacionalización con accesibilidad WCAG 2.1 AA.
+
+---
+
+## Fase 7: Formalización Documental EPS-UPO (Métrica v3) y Diapositivas de Defensa
+
+### 7.1 Reestructuración Documental según Normativa EPS-UPO
+Tras el análisis minucioso del TFG de referencia de la Universidad Pablo de Olavide (`EscobarVazquezNMemoria.pdf`, 307 páginas), se adaptó toda la documentación de Reposa+ al estándar formal:
+1. **Memoria Troncal (`docs/Memoria_Proyecto.md`):** Limitada estrictamente a 20-25 páginas (~10.100 palabras, 747 líneas) conteniendo Justificación, Objetivos, Metodología (Tríada Scrum/Kanban + Métrica v3 + SDD), Arquitectura de alto nivel, Calidad del Software y Conclusiones.
+2. **Anexo I: Plan de Proyecto — PSI (`docs/Anexo_I_Plan_de_Proyecto.md`):** Cumplimiento estricto del canon de la asignatura (400 horas de dedicación, coste estándar de 13.800 €), EDT/WBS, catálogo de objetivos formales (OBJ-001..OBJ-008), matriz de riesgos (R-001..R-008) y calendario de 14 Sprints.
+3. **Anexo II: Documento de Análisis — ASI (`docs/Anexo_II_Documento_de_Analisis.md`):** Catálogo formal de 17 requisitos funcionales (RF-001..RF-017), 6 no funcionales (RNF-001..RNF-006), 15 fichas de casos de uso (CU-001..CU-015), especificación de interfaces de usuario (IU-001..IU-008) y matriz de trazabilidad biunívoca.
+4. **Anexo III: Documento de Diseño — DSI (`docs/Anexo_III_Documento_de_Diseno.md`):** Arquitectura técnica de 7 contenedores Docker (`nginx`, `app`, `mysql`, `redis`, `worker`, `mailhog`, `browser`), DDL relacional en Tercera Forma Normal (3FN), catálogo de clases orientadas a objetos (CL-001..CL-006), diseño de la interfaz y directivas de seguridad OWASP.
+
+### 7.2 Generación y Compilación de Activos de Defensa
+Se generaron las diapositivas oficiales en 3 formatos complementarios:
+- [`presentacion-defensa.marp.md`](../defensa-tfg/presentacion-defensa.marp.md): Fuente editable con 12 diapositivas bajo sintaxis Marp y paleta corporativa Reposa+.
+- [`presentacion-defensa.html`](../defensa-tfg/presentacion-defensa.html): Deck interactivo autocontenido ejecutable en cualquier navegador web.
+- [`presentacion-defensa.pdf`](../defensa-tfg/presentacion-defensa.pdf): Documento PDF oficial de 12 diapositivas compilado mediante Marp CLI (482 KB).
+
+---
+
+## Fase 8: Certificación CI/CD PHP 8.4 y Promoción GitFlow de Release v1.1.1
+
+### 8.1 Blindaje del Pipeline CI/CD en GitHub Actions
+Para garantizar ejecuciones 100% deterministas, herméticas y sin dependencias externas:
+1. **Actualización del entorno a PHP 8.4:** Alineado con Symfony 8 y Laravel 13, instalando extensiones requeridas (`pdo_mysql`, `redis`, `bcmath`, `intl`, `mbstring`, `zip`, `pcov`).
+2. **Hermetismo frente a APIs Externas:** Simulación transparente de pasarelas de pago (Stripe Checkout y reembolsos en `AdminController` y `CartController`) al detectar claves mock de testing (`sk_test_placeholder_...`), evitando fallos por falta de conectividad o exposición de secretos.
+3. **Persistencia de Sesión E2E en Servidor Real:** Configuración de `SESSION_DRIVER=database` en `.env.testing.example` y arranque de `php artisan serve` con `PHP_CLI_SERVER_WORKERS: 4`, garantizando la sincronización de tokens CSRF y cookies entre peticiones concurrentes de Playwright Chromium.
+4. **Resultado Verificado (Run `#35288587623`):** 5/5 jobs verdes en GitHub Actions (Pint 18s, Unit Pest 17s, Integration MySQL+Redis 1m1s, Vite Build 15s, Playwright E2E 1m34s).
+
+### 8.2 Protocolo de Promoción GitFlow de Release v1.1.1
+```bash
+# 1. Creación de la rama de release desde develop
+git checkout -b release/v1.1.1 develop
+
+# 2. Promoción hacia main con preservación de grafo
+git checkout main
+git merge --no-ff release/v1.1.1 -m "Merge branch 'release/v1.1.1' into main — Certificación CI/CD y Documentación Métrica v3"
+
+# 3. Etiquetado oficial de la release de certificación
+git tag -a v1.1.1 -m "Release v1.1.1: Formalización Documental EPS-UPO (Métrica v3), Diapositivas de Defensa y Pipeline CI/CD PHP 8.4 100% Verde"
+
+# 4. Back-merge hacia develop y cierre de rama
+git checkout develop
+git merge --no-ff release/v1.1.1 -m "Merge branch 'release/v1.1.1' into develop"
+git branch -d release/v1.1.1
+```
 
 ---
 
@@ -269,4 +317,5 @@ Se ha consolidado el directorio especializado [`docs/defensa-tfg/`](../defensa-t
 | **10/09/2026** | Jonathan Quispe | `v1.0.0` | Definición formal del roadmap de CI/CD, ciclo de releases bajo GitFlow (Propuesta 1: v1.0.0 core transaccional + v1.1.0 refinamiento UI/UX) y material de soporte para la defensa del TFG. |
 | **15/09/2026** | Jonathan Quispe | `v1.1.0` | Registro y cierre de la Iteración 4.3: Refinamiento reactivo en carrito (`CartCalculator`), resiliencia móvil, persistencia de invitados con neutralización de BFCache (`pageshow`), validación multinivel con shake/scroll, homologación fiscal en `/orders/{id}` y certificación de 141 tests Pest y 8/8 Playwright E2E. |
 | **15/09/2026** | Jonathan Quispe | `v1.1.0` | Ejecución integral de las Fases 5 y 6: Creación del material de soporte para la defensa del TFG en `docs/defensa-tfg/` (4 documentos estratégicos), promoción GitFlow a `main` con `--no-ff`, doble etiquetado oficial `v1.1.0-tfg-final` y `v1.1.0`, back-merge hacia `develop` y cierre de la rama de release. |
+| **18/09/2026** | Jonathan Quispe | `v1.1.1` | Ejecución de Fases 7 y 8: Formalización integral bajo estándar Métrica v3 EPS-UPO (Memoria Troncal + Anexos I, II y III), compilación de diapositivas de defensa (PDF/HTML/Marp), actualización a PHP 8.4 en GitHub Actions con hermetismo en tests, 5/5 jobs verdes en CI y promoción GitFlow de Release v1.1.1 a `main`. |
 

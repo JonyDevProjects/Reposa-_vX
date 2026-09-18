@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reposa+ — Defensa de Trabajo de Fin de Grado (UPO)</title>
+    <style>
+        :root {
+            --bg-canvas: #090d16;
+            --bg-slide: #0f172a;
+            --bg-card: #1e293b;
+            --border-card: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #818cf8;
+            --accent: #38bdf8;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Contenedor del Slide */
+        .presentation-container {
+            position: relative;
+            width: 90vw;
+            max-width: 1200px;
+            aspect-ratio: 16 / 9;
+            background-color: var(--bg-slide);
+            border-radius: 12px;
+            border: 1px solid var(--border-card);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(99, 102, 241, 0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Cabecera del Slide */
+        .slide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 30px;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .slide-header strong {
+            color: var(--accent);
+        }
+
+        /* Cuerpo del Slide */
+        .slide-content {
+            flex: 1;
+            padding: 30px 45px;
+            overflow-y: auto;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .slide-content.active {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Pie del Slide */
+        .slide-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 30px;
+            border-top: 1px solid rgba(51, 65, 85, 0.5);
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        /* Barra de Progreso */
+        .progress-bar-container {
+            width: 100%;
+            height: 4px;
+            background: rgba(51, 65, 85, 0.4);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #38bdf8);
+            width: 8.33%;
+            transition: width 0.3s ease;
+        }
+
+        /* Tipografía y Elementos de Presentación */
+        h1 {
+            font-size: 2.3rem;
+            color: var(--primary);
+            margin-bottom: 0.3rem;
+            letter-spacing: -0.02em;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            color: var(--accent);
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            color: #c7d2fe;
+            margin-bottom: 0.6rem;
+        }
+
+        p, li {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #cbd5e1;
+        }
+
+        ul {
+            padding-left: 1.2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        li {
+            margin-bottom: 0.4rem;
+        }
+
+        .columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 0.5rem;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 8px;
+            padding: 18px 20px;
+        }
+
+        .card-highlight {
+            border-color: rgba(99, 102, 241, 0.5);
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: #3730a3;
+            color: #e0e7ff;
+            margin-right: 6px;
+        }
+
+        .badge-success {
+            background: #065f46;
+            color: #6ee7b7;
+        }
+
+        .badge-cyan {
+            background: #0e7490;
+            color: #a5f3fc;
+        }
+
+        pre {
+            background-color: #020617;
+            border: 1px solid var(--border-card);
+            border-radius: 6px;
+            padding: 12px 16px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            overflow-x: auto;
+            color: #38bdf8;
+            margin: 10px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            margin: 12px 0;
+        }
+
+        th {
+            background-color: var(--bg-card);
+            color: var(--accent);
+            text-align: left;
+            padding: 8px 12px;
+            border: 1px solid var(--border-card);
+        }
+
+        td {
+            padding: 8px 12px;
+            border: 1px solid var(--border-card);
+            background-color: rgba(15, 23, 42, 0.6);
+        }
+
+        /* Controles y Panel de Notas */
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn-ctrl {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-card);
+            color: var(--text-main);
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .btn-ctrl:hover {
+            background-color: #334155;
+            border-color: var(--accent);
+        }
+
+        .notes-drawer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--primary);
+            padding: 15px 30px;
+            font-size: 0.88rem;
+            color: #e2e8f0;
+            display: none;
+            z-index: 100;
+        }
+
+        .notes-drawer.open {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="presentation-container">
+        <!-- Cabecera -->
+        <div class="slide-header">
+            <span><strong>Reposa+</strong> — E-Commerce Transaccional <em>Sleep Tech</em></span>
+            <span>Universidad Pablo de Olavide (EPS)</span>
+        </div>
+
+        <!-- Slide 1: Portada -->
+        <div class="slide-content active" id="slide-1" data-notes="Saludo formal al tribunal. Presentar mi nombre (Jonathan Quispe), código TFG 25-26-C13 y tutor Rubén Pérez Chacón. Resaltar que el proyecto combina rigor biomédico con ingeniería de software contemporánea.">
+            <h1>Reposa+</h1>
+            <h3 style="color: #94a3b8; font-weight: normal; margin-bottom: 20px;">Plataforma de Comercio Electrónico Transaccional Especializada en Descanso Ergonómico</h3>
+            
+            <div class="card card-highlight">
+                <p><strong>Defensa de Trabajo de Fin de Grado</strong></p>
+                <p style="margin-top: 6px;">• <strong>Alumno:</strong> Jonathan Quispe &nbsp;|&nbsp; <strong>Tutor:</strong> Rubén Pérez Chacón (Código TFG: <code>25-26-C13</code>)</p>
+                <p>• <strong>Titulación:</strong> Grado en Ingeniería Informática en Sistemas de Información</p>
+                <p>• <strong>Institución:</strong> Escuela Politécnica Superior — Universidad Pablo de Olavide (UPO), Sevilla</p>
+                <p>• <strong>Convocatoria:</strong> Curso Académico 2025/2026</p>
+            </div>
+
+            <div style="margin-top: 25px;">
+                <span class="badge">Laravel 11/12+</span>
+                <span class="badge">PHP 8.4</span>
+                <span class="badge">MySQL 8 InnoDB</span>
+                <span class="badge">7 Microservicios Docker</span>
+                <span class="badge badge-success">141 Tests Pest + 8 Playwright E2E</span>
+                <span class="badge badge-cyan">GitFlow v1.1.0-tfg-final</span>
+            </div>
+        </div>
+
+        <!-- Slide 2: Nicho & Problema -->
+        <div class="slide-content" id="slide-2" data-notes="Explicar la paradoja del descanso: el 33% sufre cervicalgia pero en Internet las almohadas se compran a ciegas en marketplaces generalistas con un 78% de abandono. Reposa+ soluciona esto con su filosofía de salud y su asesor anatómico.">
+            <h2>2. Contexto y Problema de Partida: La Paradoja del Descanso Online</h2>
+            
+            <div class="columns">
+                <div class="card">
+                    <h3 style="color: var(--warning);">⚠️ La Fricción del Mercado Tradicional</h3>
+                    <ul>
+                        <li><strong>Crisis Silenciosa de Salud:</strong> El 33% de los adultos sufre patologías cervicales provocadas por un mal apoyo nocturno.</li>
+                        <li><strong>El E-Commerce Generalista Falla:</strong> Portales masivos tratan la almohada como un comodín secundario sin asesoramiento.</li>
+                        <li><strong>Intangibilidad y Desconfianza:</strong> Al no poder probar el producto físicamente, el abandono de carrito alcanza el <strong>78%</strong>.</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: var(--success);">🌙 La Solución Reposa+ (Sleep Tech)</h3>
+                    <ul>
+                        <li><strong>Propuesta de Valor Médica:</strong> <em>"No vendemos almohadas; vendemos noches de descanso profundo"</em>.</li>
+                        <li><strong>Asesor Anatómico en Tiempo Real:</strong> Segmentación inmediata según postura al dormir (lateral, supino o prono).</li>
+                        <li><strong>Psicología "Midnight Sanctuary":</strong> Paleta Índigo nocturna orientada a modular el estrés y generar confianza.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Objetivos y Justificación Técnica -->
+        <div class="slide-content" id="slide-3" data-notes="Defender con rotundidad la elección de Laravel frente a CMS como Shopify o WooCommerce. Citar la necesidad de bloqueos pesimistas, ausencia de plugins vulnerables de terceros y control estricto del TTFB en menos de 100 milisegundos.">
+            <h2>3. Objetivos Estratégicos: ¿Por Qué Ingeniería a Medida frente a un CMS?</h2>
+            
+            <div class="columns">
+                <div class="card">
+                    <h3>🎯 Objetivos Clave de Ingeniería</h3>
+                    <ul>
+                        <li><strong>Modelado Relacional 3FN:</strong> Cardinalidades 1:1 (<code>Profile</code>), 1:N (<code>Orders</code>) y N:M explícitas (<code>Categories</code>, <code>Favorites</code>).</li>
+                        <li><strong>Checkout Híbrido:</strong> Compra libre como invitado (<code>guest_token</code>) y conversión post-pago (<em>Claim Account</em>).</li>
+                        <li><strong>Logística Integrada:</strong> Tarifas deterministas (0€ en &ge;50€) y albaranes térmicos A6 (<code>RPX...ES</code>).</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>⚖️ Descarte Técnico de CMS (WooCommerce/Shopify)</h3>
+                    <ul>
+                        <li><strong>Vulnerabilidades y Seguridad:</strong> Eliminación absoluta de plugins de terceros no auditados.</li>
+                        <li><strong>Rendimiento Puro:</strong> Ausencia de <em>bloatware</em>; control del <strong>TTFB &lt; 100 ms</strong>.</li>
+                        <li><strong>Integridad Transaccional Real:</strong> Capacidad de ejecutar bloqueos pesimistas <code>lockForUpdate()</code> en base de datos.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Arquitectura Software y Datos -->
+        <div class="slide-content" id="slide-4" data-notes="Presentar el stack de 7 contenedores Docker. Destacar el desacoplamiento real de infraestructura y las vistas SQL nativas creadas para el panel de administración, evitando consultas N+1 y sobrecarga de CPU.">
+            <h2>4. Arquitectura del Sistema: 7 Microservicios Docker y Modelo E-R</h2>
+            
+            <div class="columns">
+                <div>
+                    <h3>🐳 Ecosistema de 7 Contenedores Docker</h3>
+                    <ul>
+                        <li><code>reposaplus_lb</code>: Nginx Proxy Inverso y Balanceador (80/8000).</li>
+                        <li><code>reposaplus_app</code>: PHP 8.4-FPM + Supervisor + Nginx.</li>
+                        <li><code>reposaplus_queue</code>: Worker de colas asíncronas para correos.</li>
+                        <li><code>reposaplus_mysql</code>: MySQL 8.0 motor InnoDB transaccional.</li>
+                        <li><code>reposaplus_redis</code>: Caché de sesiones y colas en Redis 7.</li>
+                        <li><code>reposaplus_mailhog</code>: Servidor SMTP Sandbox (8025).</li>
+                        <li><code>reposaplus_minio</code>: Almacenamiento S3 para facturas/fotos.</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>🗄️ Modelo Relacional y Vistas SQL</h3>
+                    <p>• <strong>Tablas:</strong> <code>users</code>, <code>profiles</code>, <code>addresses</code>, <code>products</code>, <code>orders</code>, <code>order_items</code>, <code>shipments</code>, <code>refunds</code>.</p>
+                    <p style="margin-top: 8px;">• <strong>Vistas SQL Nativas de Alto Rendimiento:</strong></p>
+                    <pre>CREATE VIEW v_order_summary AS ...
+CREATE VIEW v_top_favorited_products AS ...</pre>
+                    <p style="font-size: 0.82rem; color: var(--text-muted);">Elimina costes computacionales de agrupaciones pesadas en runtime.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Integridad Transaccional & ACID -->
+        <div class="slide-content" id="slide-5" data-notes="Este es uno de los puntos fuertes: explicar cómo se resuelven las race conditions en compras concurrentes mediante lockForUpdate(). Explicar también la idempotencia de webhooks en Stripe con HMAC-SHA256.">
+            <h2>5. Blindaje contra Condiciones de Carrera y Pasarela Stripe</h2>
+            
+            <div class="card">
+                <h3>🔒 Bloqueo Pesimista en Inventario (Concurrencia ACID)</h3>
+                <p>Ante compras simultáneas sobre la última unidad disponible, MySQL InnoDB pone en cola la transacción a nivel de fila:</p>
+                <pre>DB::transaction(function () use ($productId, $quantity) {
+    $product = Product::where('id', $productId)->lockForUpdate()->first();
+    if ($product->stock < $quantity) {
+        throw new InsufficientStockException("Stock agotado.");
+    }
+    $product->decrement('stock', $quantity);
+});</pre>
+            </div>
+
+            <div class="columns" style="margin-top: 15px;">
+                <div class="card">
+                    <h3>💳 Cumplimiento PCI-DSS en Stripe</h3>
+                    <p>Sesiones alojadas seguras (Checkout Hosted); los datos de tarjeta jamás tocan nuestro servidor.</p>
+                </div>
+                <div class="card">
+                    <h3>🛡️ Idempotencia con Webhooks HMAC</h3>
+                    <p>Firma criptográfica HMAC-SHA256 y control por <code>payment_intent_id</code> frente a reintentos.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Innovación UX/UI -->
+        <div class="slide-content" id="slide-6" data-notes="Destacar el trabajo de frontend: paleta The Midnight Sanctuary, el motor reactivo CartCalculator que recalcula subtotal e IVA vía Fetch sin recarga y la neutralización del BFCache al volver atrás.">
+            <h2>6. Innovación UX/UI: "The Midnight Sanctuary" y Reactividad</h2>
+            
+            <div class="columns">
+                <div class="card">
+                    <h3>🎨 Dirección de Diseño Sensorial</h3>
+                    <ul>
+                        <li><strong>Identidad "The Midnight Sanctuary":</strong> Paleta índigo/pizarra de bajo contraste pensada para la noche.</li>
+                        <li><strong>Divulgación Progresiva:</strong> El Asesor Anatómico es colapsable; los productos son visibles <em>above-the-fold</em> de inmediato.</li>
+                        <li><strong>Componentes Modulares:</strong> Blade limpios, reutilizables y estructurados con Bootstrap 5 y SCSS.</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>⚡ Reactividad y Resiliencia Frontend</h3>
+                    <ul>
+                        <li><strong>Motor <code>CartCalculator</code>:</strong> Peticiones AJAX debounced (300 ms) recalculando IVA (21%) y umbral de envío gratis.</li>
+                        <li><strong>Neutralización del BFCache:</strong> Captura del evento <code>pageshow</code> restaurando formularios y desbloqueando botones.</li>
+                        <li><strong>Localización Bilingüe (i18n):</strong> Alternancia ES/EN dinámica persistida en sesión mediante middleware.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Live Demo Transition -->
+        <div class="slide-content" id="slide-7" data-notes="Transición a la demo práctica de 4 minutos. Informar al tribunal de que se pasa a proyectar el entorno local de Docker para ejecutar el recorrido de compra de invitado, post-venta y panel de administración.">
+            <h1 style="text-align: center; margin-bottom: 20px;">🚀 7. Demostración Práctica en Vivo (4 Minutos)</h1>
+            
+            <div class="card card-highlight" style="padding: 25px;">
+                <h3 style="text-align: center; color: var(--accent); margin-bottom: 15px;">Recorrido Funcional Certificado en Entorno Local Docker</h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; text-align: center;">
+                    <div class="card">
+                        <strong style="color: var(--primary);">1. Storefront</strong>
+                        <p style="font-size: 0.8rem; margin-top: 6px;">Búsqueda multiatributo &rarr; Asesor postural &rarr; Cesta reactiva AJAX.</p>
+                    </div>
+                    <div class="card">
+                        <strong style="color: var(--accent);">2. Checkout</strong>
+                        <p style="font-size: 0.8rem; margin-top: 6px;">Compra como invitado &rarr; Envío postal &rarr; Simulación de cobro.</p>
+                    </div>
+                    <div class="card">
+                        <strong style="color: var(--success);">3. Post-Venta</strong>
+                        <p style="font-size: 0.8rem; margin-top: 6px;"><code>guest_token</code> &rarr; Factura en PDF &rarr; Claim Account en 1 clic.</p>
+                    </div>
+                    <div class="card">
+                        <strong style="color: var(--warning);">4. Back-Office</strong>
+                        <p style="font-size: 0.8rem; margin-top: 6px;">Albarán A6 Code 128 &rarr; Avance de tracking &rarr; Reembolso con restock.</p>
+                    </div>
+                </div>
+            </div>
+
+            <p style="text-align: center; color: var(--text-muted); margin-top: 25px; font-size: 0.9rem;">
+                <em>[Paso a proyectar el navegador web en <code>http://localhost:8000</code>]</em>
+            </p>
+        </div>
+
+        <!-- Slide 8: Logística & Back-Office -->
+        <div class="slide-content" id="slide-8" data-notes="Comentar brevemente tras la demo: la logística está integrada con códigos RPX...ES y albaranes de almacén A6; y el panel administrativo opera con alta densidad para los gestores.">
+            <h2>8. Arquitectura Logística y Panel de Alta Densidad Operativa</h2>
+            
+            <div class="columns">
+                <div class="card">
+                    <h3>📦 Operativa de Paquetería Estándar</h3>
+                    <ul>
+                        <li><strong>Tarifas Deterministas:</strong> Tarifa estándar de 4,95€ y <strong>gratuita (0,00€) en pedidos &ge; 50,00€</strong>.</li>
+                        <li><strong>Identificador Postal:</strong> Código normalizado <code>/^RPX\d{4}\d{6}ES$/</code> (15 caracteres alfanuméricos).</li>
+                        <li><strong>Sincronización Bidireccional:</strong> Avanzar a <code>in_transit</code> transiciona el pedido a <code>shipped</code>.</li>
+                        <li><strong>Albarán Térmico A6 (10x15 cm):</strong> Generación con código de barras <strong>Code 128</strong> para transportistas.</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>📊 Back-Office Administrativo</h3>
+                    <ul>
+                        <li><strong>Seguridad RBAC:</strong> Restricción estricta por middleware <code>admin</code> (HTTP 403 ante intrusiones).</li>
+                        <li><strong>Reembolsos Universales:</strong> Integración tanto para Stripe como para pagos directos, con reposición atómica de stock.</li>
+                        <li><strong>Cuadro de Mando en Tiempo Real:</strong> Agregaciones sobre la vista nativa <code>v_order_summary</code>.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Testing Trophy -->
+        <div class="slide-content" id="slide-9" data-notes="Argumento epistemológico clave: justificar por qué tenemos más tests de integración que unitarios. En transaccional, los mocks ocultan fallos de claves foráneas y sobreventas. Con Docker, 112 tests Feature corren en 2.8s.">
+            <h2>9. Estrategia de Calidad: El Trofeo de Pruebas frente a Cohn</h2>
+            
+            <div class="columns">
+                <div class="card">
+                    <h3>🏛️ Dodds & Fowler frente a Cohn (2009)</h3>
+                    <p>• <strong>El Mito de la Pirámide Clásica:</strong> Concebida en 2009 cuando levantar bases de datos tomaba minutos. Los mocks masivos en e-commerce provocan <strong>falsa confianza</strong>.</p>
+                    <p style="margin-top: 8px;">• <strong>Testing Trophy en Reposa+:</strong> El mayor ROI radica en la <strong>integración contra MySQL 8 InnoDB y Redis reales</strong> en Docker, garantizando fidelidad ACID total.</p>
+                </div>
+
+                <div class="card card-highlight">
+                    <h3>🏆 Métricas Empíricas de la Suite</h3>
+                    <ul>
+                        <li><strong>29 Tests Unitarios Puros (0.09s):</strong> Autómata de estados finitos y tarifas en memoria.</li>
+                        <li><strong>112 Tests de Integración (2.80s):</strong> Bloqueo pesimista, sesiones, OAuth y webhooks.</li>
+                        <li><strong>8 Tests Playwright E2E (10.3s):</strong> Pruebas de sistema sobre Chromium real.</li>
+                    </ul>
+                    <p style="margin-top: 10px; font-weight: bold; color: var(--success);">
+                        &check; TOTAL: 149 pruebas (679 aserciones) en &lt;14 segundos.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: CI/CD Pipeline -->
+        <div class="slide-content" id="slide-10" data-notes="Mostrar la madurez DevOps: pipeline en GitHub Actions con 5 jobs en paralelo. Ninguna feature entra a develop sin superar el análisis estático de Pint, los tests de Pest, el build de Vite y los tests E2E de Playwright.">
+            <h2>10. Automatización CI/CD: 5 Jobs en GitHub Actions</h2>
+            
+            <div class="card" style="margin-bottom: 15px;">
+                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; text-align: center;">
+                    <div class="card">
+                        <strong style="color: var(--accent);">Job 1: Lint</strong>
+                        <p style="font-size: 0.78rem; margin-top: 4px;">Laravel Pint (PSR-12, 135 ficheros)</p>
+                    </div>
+                    <div class="card">
+                        <strong style="color: var(--primary);">Job 2: Unit</strong>
+                        <p style="font-size: 0.78rem; margin-top: 4px;">Pest puro en memoria (0 deps)</p>
+                    </div>
+                    <div class="card">
+                        <strong style="color: var(--success);">Job 3: Feature</strong>
+                        <p style="font-size: 0.78rem; margin-top: 4px;">MySQL 8 + Redis en Docker runner</p>
+                    </div>
+                    <div class="card">
+                        <strong style="color: var(--warning);">Job 4: Build</strong>
+                        <p style="font-size: 0.78rem; margin-top: 4px;">Vite minificado para producción</p>
+                    </div>
+                    <div class="card">
+                        <strong style="color: #f43f5e;">Job 5: E2E</strong>
+                        <p style="font-size: 0.78rem; margin-top: 4px;">Playwright sobre Chromium real</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="columns">
+                <div class="card">
+                    <p>• <strong>Quality Gates Estrictas:</strong> Bloqueo de merges sin 100% de jobs aprobados.</p>
+                </div>
+                <div class="card">
+                    <p>• <strong>Aislamiento de Entorno:</strong> Recreación transaccional con <code>RefreshDatabase</code>.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Ecosistema de Agentes de IA -->
+        <div class="slide-content" id="slide-11" data-notes="Explicar la innovación metodológica: el alumno no actuó como un picador de código ni usó la IA como un simple chatbot, sino como director técnico y arquitecto orquestando agentes bajo Spec-Driven Development.">
+            <h2>11. Metodología: El Ingeniero como Orquestador de Agentes de IA</h2>
+            
+            <div class="columns">
+                <div class="card">
+                    <h3>🤖 Google Antigravity SDK & Spec-Driven Development</h3>
+                    <ul>
+                        <li><strong>Superación del Chatbot Reactivo:</strong> Red de agentes autónomos contextualizados con reglas de diseño (<code>agent_ui_ux</code>) y skills técnicos (<code>laravel-specialist</code>).</li>
+                        <li><strong>El Ingeniero como Arquitecto:</strong> Redacción previa de especificaciones estructuradas (Roadmaps) y validación empírica obligatoria con tests.</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>📈 Resultados Cuantificables</h3>
+                    <ul>
+                        <li><strong>Aceleración de Entrega:</strong> Incremento notable de velocidad en tareas mecánicas (scaffolding, seeders, i18n).</li>
+                        <li><strong>Cero Deuda Técnica:</strong> Refactorización inmediata bajo directrices estrictas de PHP 8.4 y PSR-12.</li>
+                        <li><strong>Memoria Viva:</strong> Persistencia incremental de decisiones con Engram CLI.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Conclusiones y Cierre -->
+        <div class="slide-content" id="slide-12" data-notes="Agradecer al tribunal, resumir los 3 pilares logrados (ingeniería a medida, trofeo de pruebas y metodología vanguardista) y dar paso formal al turno de preguntas.">
+            <h2>12. Conclusiones y Trabajo Futuro</h2>
+            
+            <div class="columns">
+                <div class="card">
+                    <h3>🎓 Balance del Proyecto</h3>
+                    <ul>
+                        <li><strong>E-Commerce Transaccional Completo:</strong> Dominio absoluto de Laravel, MVC, ACID y resiliencia transaccional.</li>
+                        <li><strong>Calidad Industrial:</strong> 149 pruebas automatizadas certificadas y pipeline CI/CD en la nube.</li>
+                        <li><strong>Release Oficial:</strong> Tag GitFlow <code>v1.1.0-tfg-final</code> en rama <code>main</code>.</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>🔮 Líneas Futuras de Expansión</h3>
+                    <ul>
+                        <li><strong>Suscripciones de Descanso:</strong> Sustitución programada de almohadas cada 18 meses con Stripe Billing.</li>
+                        <li><strong>Machine Learning en Demanda:</strong> Algoritmos predictivos de rotura de inventario según estacionalidad.</li>
+                        <li><strong>Accesibilidad Universal:</strong> Certificación formal WCAG 2.1 AAA.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 25px;">
+                <h2 style="color: var(--accent); justify-content: center; border: none; margin-bottom: 6px;">¡Muchas gracias por su atención!</h2>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Quedo a la entera disposición del tribunal para el turno de preguntas y defensa técnica.</p>
+            </div>
+        </div>
+
+        <!-- Barra de Progreso -->
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <!-- Pie de Slide -->
+        <div class="slide-footer">
+            <span>Jonathan Quispe &bull; Grado en Ingeniería Informática en Sistemas de Información (UPO)</span>
+            <span id="slide-counter">Diapositiva 1 de 12</span>
+        </div>
+    </div>
+
+    <!-- Barra de Controles Inferior -->
+    <div class="controls">
+        <button class="btn-ctrl" onclick="prevSlide()">&#9664; Anterior</button>
+        <button class="btn-ctrl" onclick="nextSlide()">Siguiente &#9654;</button>
+        <button class="btn-ctrl" onclick="toggleNotes()">📝 Notas de Orador (N)</button>
+        <button class="btn-ctrl" onclick="toggleFullscreen()">⛶ Pantalla Completa (F)</button>
+    </div>
+
+    <!-- Cajón de Notas de Orador -->
+    <div class="notes-drawer" id="notes-drawer">
+        <strong>Notas de Orador (Guion de Apoyo):</strong>
+        <p id="notes-text" style="margin-top: 6px; color: #cbd5e1;"></p>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 12;
+
+        function updateSlide() {
+            // Ocultar todos los slides
+            document.querySelectorAll('.slide-content').forEach(slide => {
+                slide.classList.remove('active');
+            });
+
+            // Activar el slide actual
+            const activeSlide = document.getElementById(`slide-${currentSlide}`);
+            if (activeSlide) {
+                activeSlide.classList.add('active');
+                
+                // Actualizar notas
+                const notes = activeSlide.getAttribute('data-notes') || 'Sin notas para esta diapositiva.';
+                document.getElementById('notes-text').textContent = notes;
+            }
+
+            // Actualizar contador y progreso
+            document.getElementById('slide-counter').textContent = `Diapositiva ${currentSlide} de ${totalSlides}`;
+            const progressPercent = (currentSlide / totalSlides) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        function toggleNotes() {
+            const drawer = document.getElementById('notes-drawer');
+            drawer.classList.toggle('open');
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => alert(err.message));
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Navegación por Teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                prevSlide();
+            } else if (e.key === 'Home') {
+                currentSlide = 1;
+                updateSlide();
+            } else if (e.key === 'End') {
+                currentSlide = totalSlides;
+                updateSlide();
+            } else if (e.key === 'n' || e.key === 'N') {
+                toggleNotes();
+            } else if (e.key === 'f' || e.key === 'F') {
+                toggleFullscreen();
+            }
+        });
+
+        // Inicialización
+        updateSlide();
+    </script>
+</body>
+</html>
