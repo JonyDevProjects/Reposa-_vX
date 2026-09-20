@@ -11,26 +11,30 @@
 
 Para garantizar una ejecución sin tropiezos, el entorno debe prepararse **10 minutos antes** del inicio de la sesión de defensa:
 
-### 1.1 Estado del Stack Docker
-Asegurarse de que los servicios principales están activos y saludables en la máquina local:
+### 1.1 Arranque y Verificación del Stack Docker
+Si los contenedores no están levantados, iniciarlos en segundo plano desde la carpeta de la aplicación:
+```bash
+cd Reposa+ && docker compose up -d
+```
+Verificar que los servicios principales están activos y saludables:
 ```bash
 docker compose ps
 ```
-*Verificar que `reposaplus_app`, `reposaplus_nginx`, `reposaplus_mysql`, `reposaplus_redis` y `reposaplus_mailhog` se encuentran en estado `Up`.*
+*Comprobar que `reposaplus_app`, `reposaplus_lb`, `reposaplus_mysql`, `reposaplus_redis` y `reposaplus_mailhog` se encuentran en estado `Up`.*
 
-### 1.2 Inicialización de Datos de Prueba Deterministas
+### 1.2 Inicialización de Datos de Prueba Deterministas (Rearme Limpio)
 Ejecutar el comando de reinicio de la matriz de pruebas para garantizar stock fresco y pedidos limpios:
 ```bash
 docker exec reposaplus_app php artisan orders:reset-test-matrix
 ```
-*(Este comando siembra los 9 pedidos modelo del ciclo de vida y asegura stock suficiente en todos los productos del catálogo).*
+*(Este comando vacía pedidos volátiles de prueba, siembra los 9 pedidos modelo del ciclo de vida y asegura stock suficiente en todos los productos del catálogo).*
 
 ### 1.3 Configuración de Pestañas en el Navegador Web (Google Chrome / Brave)
 Abrir una ventana de navegador dedicada a pantalla completa con las siguientes **3 pestañas preparadas en orden de izquierda a derecha**:
 
-1. **Pestaña 1 (Tienda / Catálogo):** `http://localhost:8080/catalog` (Modo Incógnito o sesión limpia sin autenticar).
+1. **Pestaña 1 (Tienda / Catálogo):** `http://localhost:8000/catalog` (Modo Incógnito o sesión limpia sin autenticar; también accesible en `http://localhost/catalog`).
 2. **Pestaña 2 (Bandeja de Correo MailHog):** `http://localhost:8025` (Bandeja limpia para visualizar emails transaccionales instantáneos).
-3. **Pestaña 3 (Panel de Administración):** `http://localhost:8080/admin/orders` (Sesión previamente iniciada con `admin@reposaplus.com` / `admin123`).
+3. **Pestaña 3 (Panel de Administración):** `http://localhost:8000/admin/orders` (Sesión previamente iniciada con `admin@reposaplus.com` / `admin123`).
 
 ### 1.4 Datos de Prueba a Mano (Copiar / Pegar Rápido)
 * **Nombre del Cliente Invitado:** Carlos García
@@ -45,21 +49,21 @@ Abrir una ventana de navegador dedicada a pantalla completa con las siguientes *
 
 ---
 
-### Minuto 00:00 - 00:45 | Catálogo y Asesor Anatómico de Firmeza
-* **Ubicación:** Pestaña 1 (`http://localhost:8080/catalog`).
+### Minuto 00:00 - 00:45 | Catálogo Ergonómico, Píldoras de Categoría y Filtros Dinámicos
+* **Ubicación:** Pestaña 1 (`http://localhost:8000/catalog`).
 * **Acción del Ponente:**
-  1. Mostrar el catálogo visual. Señalar que el **Asesor Anatómico** no bloquea la vista de los productos (*divulgación progresiva*).
-  2. Hacer clic en el banner colapsable: *"¿Dudas sobre qué almohada necesitas? Descubre tu almohada ideal"*.
-  3. Demostrar el filtrado por postura: hacer clic en la píldora **"De Lado"** $\rightarrow$ el catálogo filtra inmediatamente mostrando almohadas de firmeza media-alta con soporte cervical.
-  4. Probar la búsqueda tolerante: escribir `"cuello"` o `"cervical"` en el buscador rápido.
-  5. Localizar la **Almohada Cervical Ergonómica** (Precio: 45,00€) y pulsar **"Añadir a la Cesta"**.
+  1. Mostrar el catálogo visual: diseño *Sleep Tech* con paleta "The Midnight Sanctuary", tarjetas de producto con insignias de descanso y precio directo sin fricciones.
+  2. Demostrar la navegación ágil: hacer clic en las **píldoras de categoría** para alternar de inmediato entre colecciones (ej. *"Cervicales"*).
+  3. Desplegar el botón de **"Filtros"**: mostrar el panel colapsable con segmentación por firmeza, material ergonómico (viscoelástica, látex) y rango de precio.
+  4. Probar la búsqueda rápida: escribir `"cervical"` en el buscador integrado.
+  5. Localizar la **Almohada Cervical Ergonómica** (Precio: 45,00€) y pulsar **"Añadir a la Cesta"** (o ver ficha).
 * **Voz en Off del Ponente:**
-  > *"Nos encontramos en la tienda. Observen cómo la interfaz prioriza el descubrimiento del producto reduciendo la carga cognitiva. El asesor anatómico se despliega bajo demanda y la búsqueda semántica comprende la dolencia del cliente. Añadimos una unidad de nuestra almohada cervical estrella por 45,00€ y vamos al carrito."*
+  > *"Nos encontramos en la tienda. Observen cómo la interfaz prioriza el descubrimiento limpio del producto eliminando sobrecarga cognitiva. El catálogo sitúa los productos en primer plano de inmediato. Disponemos de píldoras de acceso rápido a categorías y un panel secundario de filtros para afinar por firmeza, material o precio. Añadimos una unidad de nuestra almohada cervical estrella por 45,00€ y nos dirigimos al carrito."*
 
 ---
 
 ### Minuto 00:45 - 01:30 | Carrito Reactivo y Motor `CartCalculator`
-* **Ubicación:** Pestaña 1 (`http://localhost:8080/cart`).
+* **Ubicación:** Pestaña 1 (`http://localhost:8000/cart`).
 * **Acción del Ponente:**
   1. Mostrar la barra de información logística: el subtotal es 45,00€ y el sistema alerta: *"¡Te faltan 5,00€ para disfrutar de Envío Gratuito!"* (Tarifa estándar calculada: 4,95€).
   2. Pulsar el botón **`+`** en la columna de cantidad para subir de 1 a 2 unidades.
@@ -75,7 +79,7 @@ Abrir una ventana de navegador dedicada a pantalla completa con las siguientes *
 ---
 
 ### Minuto 01:30 - 02:45 | Guest Checkout, Resiliencia BFCache y Stripe
-* **Ubicación:** Pestaña 1 (`http://localhost:8080/checkout`).
+* **Ubicación:** Pestaña 1 (`http://localhost:8000/checkout`).
 * **Acción del Ponente:**
   1. Destacar que **no se exige registro ni login previo**.
   2. Rellenar los campos con los datos del cliente invitado (Carlos García).

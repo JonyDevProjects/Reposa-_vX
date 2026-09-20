@@ -110,7 +110,7 @@
 * **Título:** Diseño de Experiencia: Psicología del Descanso y Resiliencia Frontend
 * **Pilares de Interfaz:**
   1. **Identidad Visual "The Midnight Sanctuary":** Paleta índigo/pizarra de bajo contraste nocturno, tipografía armónica y componentes Blade reutilizables.
-  2. **Divulgación Progresiva (*Progressive Disclosure*):** Asesor Anatómico colapsable por defecto; el producto es visible *above the fold* inmediatamente.
+  2. **Descubrimiento Limpio y Sin Fricción:** Catálogo directo con productos visibles de inmediato (*above the fold*), píldoras de acceso rápido a categorías y panel colapsable de filtros secundarios (firmeza, material y precio).
   3. **Motor Reactivo `CartCalculator`:** Peticiones AJAX debounced (300ms) que recalculan subtotal, IVA (21%) y el umbral de envío gratis (50€) sin refresco de página.
   4. **Resiliencia ante BFCache y Cancelaciones:** Suscripción al evento `pageshow` restaurando botones bloqueados y preservación de datos en `sessionStorage`.
 * **Elemento Visual:** Mockups de pantalla dividida: Desktop (diseño limpio con chips de categoría) y Mobile (conversión de tabla a tarjetas táctiles).
@@ -121,7 +121,7 @@
 * **Tiempo Sugerido:** 06:00 - 10:00 (4 min)
 * **Título:** Demostración Funcional en Vivo del Sistema Reposa+
 * **Contenido de la Diapositiva (Pantalla de Espera / Ruta de Navegación):**
-  * **Fase A (Storefront):** Búsqueda semántica $\rightarrow$ Asesor de postura $\rightarrow$ Carrito reactivo.
+  * **Fase A (Storefront):** Búsqueda ágil $\rightarrow$ Píldoras de categoría & filtros $\rightarrow$ Carrito reactivo.
   * **Fase B (Checkout):** Compra como invitado $\rightarrow$ Pasarela Stripe en staging $\rightarrow$ BFCache test.
   * **Fase C (Post-Venta):** Token criptográfico $\rightarrow$ Factura en PDF $\rightarrow$ Claim Account.
   * **Fase D (Back-Office):** Gestión de pedidos $\rightarrow$ Etiqueta térmica A6 $\rightarrow$ Reembolso.
