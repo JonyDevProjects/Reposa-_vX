@@ -55,7 +55,7 @@ Contenidos formalizados con máximo rigor académico:
 5. **Guion de Defensa Académica para el Tribunal:**
    - Tres preguntas críticas anticipadas con respuestas modelo estructuradas sobre arquitectura de pruebas, minimización de mocks y criterios de demarcación.
 6. **Actualización de Secciones de Cierre:**
-   - Sección 6.5 (GitFlow), 6.6 (Auditoría EPD3), 6.7 (Credenciales y Guest Checkout).
+   - Sección 6.5 (GitFlow), 6.6 (Auditoría de Requisitos Iniciales), 6.7 (Credenciales y Guest Checkout).
    - Sección 7.2 (Evolución de Pasarela de Pagos hacia suscripciones/multidivisa y CI/CD con 119 tests).
    - Sección 8 (Bibliografía) con citas académicas formales (Cohn 2009, Dodds 2018, Fowler 2012, Fowler 2014, Otwell 2024).
 

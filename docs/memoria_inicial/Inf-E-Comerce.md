@@ -1,10 +1,10 @@
-# Informe y Plan de Acción: E-Commerce (Reposa+)
+# Informe y Plan de Acción Inicial: E-Commerce Reposa+
 
-Este documento estructura los primeros pasos y el desarrollo de un e-commerce orientado a un nicho específico, basado en los requisitos de la EPD3 (Laravel). Aplicaremos un esquema conceptual y de branding coherente con la temática, y detallaremos la solución a cada uno de los problemas planteados.
+Este documento estructura los primeros pasos y el desarrollo de un e-commerce orientado a un nicho específico, basado en los requisitos técnicos y objetivos iniciales del Trabajo de Fin de Grado (Laravel). Aplicaremos un esquema conceptual y de branding coherente con la temática, y detallaremos la solución a cada uno de los hitos y requerimientos planteados.
 
 ---
 
-## 1. Visión General y Branding (Base para el Problema 0)
+## 1. Visión General y Branding (Hito 0)
 
 ### 1.1. Idea del E-Commerce y Objetivos
 Se desarrollará una tienda online especializada en **almohadas ergonómicas e inteligentes pensadas para mejorar la calidad del sueño**. Es un producto de nicho enfocado en la salud y el descanso, dirigido a personas con problemas cervicales, insomnio o simplemente buscando optimizar su descanso nocturno.
@@ -16,7 +16,7 @@ Se desarrollará una tienda online especializada en **almohadas ergonómicas e i
 ### 1.2. Diseño y Colores (Psicología del color)
 El color principal asignado es el **Índigo / Blue-Indigo**, el cual encaja a la perfección con la psicología del sueño. El índigo y los tonos azules oscuros transmiten calma, serenidad, profundidad y están intrínsecamente asociados con la noche, preparando psicológicamente al usuario para el descanso e inspirando confianza.
 
-Usaremos la siguiente paleta de colores aplicando **Bootstrap 5**, y personalizaremos exhaustivamente una plantilla base mediante variables CSS/SASS para garantizar que las modificaciones sean significativas y acorde a nuestra imagen de marca (tal como estipula el Problema 0):
+Usaremos la siguiente paleta de colores aplicando **Bootstrap 5**, y personalizaremos exhaustivamente una plantilla base mediante variables CSS/SASS para garantizar que las modificaciones sean significativas y acorde a nuestra imagen de marca (tal como estipula el Hito 0 de diseño):
 
 - **Neutral Fuerte y Acentos:** `#000000` y Blancos puros para contraste óptimo.
 - **Primario Oscuro:** `#182447` (Navbar, Headers, Botones Primarios - Recordando el cielo nocturno profundo).
@@ -26,12 +26,12 @@ Usaremos la siguiente paleta de colores aplicando **Bootstrap 5**, y personaliza
 
 ---
 
-## 2. Fase de Setup y Configuración Inicial (Problema 0)
+## 2. Fase de Setup y Configuración Inicial (Hito 0)
 
 Para asegurar un desarrollo progresivo y ordenado cumpliendo las bases metodológicas, se establecen las siguientes acciones preliminares de setup:
 
-1. **Gestión de Equipo y Roles:**
-   - Confirmar el grupo de 3 integrantes y distribuir tareas a lo largo del proceso.
+1. **Gestión de la Planificación y Roles:**
+   - Estructurar la planificación de tareas, hitos de desarrollo y estándares de calidad del proyecto.
 2. **Control de Versiones y Metodología Ágil (Tablero Kanban):**
    - Creación de un repositorio público en GitHub. Será indispensable ya que se deberá entregar la URL de una "Release" funcional.
    - Configuración de un Tablero Kanban (GitHub Projects o Trello) documentando historias de usuario, requerimientos y dividiendo el trabajo en fases como *To-do*, *In Progress* y *Done*.
@@ -44,7 +44,7 @@ Para asegurar un desarrollo progresivo y ordenado cumpliendo las bases metodoló
 
 ---
 
-## 3. Arquitectura y Esquema de Base de Datos (Problema 1)
+## 3. Arquitectura y Esquema de Base de Datos (Hito 1)
 
 El esquema UML de base de datos se estructurará abarcando todas las necesidades fundamentales del e-commerce requeridas, asegurando las cardinalidades exigidas (mínimo una de 1:1, 1:N y N:M):
 
@@ -54,10 +54,10 @@ El esquema UML de base de datos se estructurará abarcando todas las necesidades
 - **Productos (Almohadas) y Pedidos (1:N):**
   - La tabla `PRODUCT` centralizará las propiedades de las almohadas (material de relleno, grado de firmeza, precio, stock).
   - Un usuario ejecuta 0 o varios pedidos (`ORDER`) (1:N). Múltiples pedidos pueden tener múltiples productos conectados gracias a la tabla de detalle `ORDER_ITEM`.
-- **Categorías (N:M) [Resolviendo el Problema 3]:**
+- **Categorías (N:M) [Hito 3]:**
   - Existirán varias clasificaciones (ej. Cervical, Anti-Ronquidos, Látex, Espuma Viscoelástica). Un producto tiene muchas categorías y una categoría muchos productos.
   - Generación de la tabla pivote `CATEGORY_PRODUCT`.
-- **Favoritos (N:M) [Resolviendo el Problema 5]:**
+- **Favoritos (N:M) [Hito 5]:**
   - Relación de pertenencia afectiva entre `USER` y `PRODUCT`.
   - Definición de la tabla pivote de deseos como `FAVORITE_PRODUCT`.
 
@@ -65,7 +65,7 @@ El esquema UML de base de datos se estructurará abarcando todas las necesidades
 
 ---
 
-## 4. Implementación del Core: Caso de Uso Principal v1.0 (Problema 2)
+## 4. Implementación del Core: Caso de Uso Principal v1.0 (Hito 2)
 
 El desarrollo crítico inicial habilitará el flujo básico: navegar por la tienda, registrarse simulando una compra (cesta) y gestionar los pedidos.
 
@@ -83,7 +83,7 @@ El desarrollo crítico inicial habilitará el flujo básico: navegar por la tien
 
 ---
 
-## 5. Gestión de Categorías v2.0 (Problema 3)
+## 5. Gestión de Categorías v2.0 (Hito 3)
 
 Se evoluciona la plataforma con un sistema de clasificación complejo acorde al nicho:
 
@@ -96,7 +96,7 @@ Se evoluciona la plataforma con un sistema de clasificación complejo acorde al 
 
 ---
 
-## 6. Internacionalización y Perfil de Usuario v2.1 (Problema 4)
+## 6. Internacionalización y Perfil de Usuario v2.1 (Hito 4)
 
 1. **Internacionalización (i18n):**
    - Construcción de ficheros nativos de idioma (`lang/en`, `lang/es`) dentro del árbol de Laravel.
@@ -104,12 +104,12 @@ Se evoluciona la plataforma con un sistema de clasificación complejo acorde al 
 2. **Administración Extensa de Perfil de Cliente:**
    - Centralización bajo un enlace "Ajustes de Perfil/Mi Perfil" propio de toda cuenta válida de cliente.
    - Habilitación para visualización de su historial individual de tickets y envíos de sus almohadas.
-   - Habilitación para Gestión y alteración (CRUD) de domicilios / Puntos de Entrega.
+  - Habilitación para Gestión y alteración (CRUD) de domicilios / Puntos de Entrega.
    - Inclusión de capacidades internas para reconfiguración del acceso propio (Cambiar Password) validado por Hash y la consecuente función genérica de abandono de Log (Cierre de sesión).
 
 ---
 
-## 7. Sistema de Retención de Clientes v2.2 (Problema 5)
+## 7. Sistema de Retención de Clientes v2.2 (Hito 5)
 
 Estrategia funcional para mejorar la permanencia y conversión apelando de nuevo a las decisiones dinámicas (Lista de deseados):
 
@@ -123,14 +123,14 @@ Estrategia funcional para mejorar la permanencia y conversión apelando de nuevo
 
 ---
 
-## 8. Documentación Continua (Problema 6)
+## 8. Documentación Continua (Hito 6)
 
-El ciclo vital de entrega obligatoria requerirá un proceso documental perenne apoyando todo cambio:
+El ciclo vital de entrega requerirá un proceso documental perenne apoyando todo cambio:
 
 1. **Esquema Técnico Transversal:** Conservar, publicar y actualizar los Diagramas UML finalistas a medida que se inserten o crucen esquemas en la fase Back-End o muten campos cardinales. Documentar si fuera el caso uso de Vistas o Eventos puramente SQL.
 2. **Justificación Decisoria Global:** Justificar mediante breves minutas de forma oficial la apropiación selecta de determinados complementos, cómo se alteró sustancialmente la plantilla Bootstrap con CSS hasta adquirir el tono "Índigo/sueño".
 3. **Contrastación con la Realidad (Mockups vs Realidad):** Proveer las pruebas documentales que atestiguan cómo las pantallas planeadas preliminarmente contrastan respecto al aplicativo HTML final emitido por el compilador Blade de Laravel.
-4. **Validaciones Release:** Cargar copias empaquetadas correctas localizadas mediante URL y links dentro del registro original o memoria de final del periodo en la Asignatura.
+4. **Validaciones Release:** Cargar copias empaquetadas correctas localizadas mediante URL y links dentro del registro original o memoria de finalización del proyecto de Grado.
 
 **Estado de Ejecución:** La fase de cimentación (v1.0), la gestión compleja de categorías (v2.0) y la internacionalización de la plataforma (i18n) para la Home y el Catálogo han sido completadas con éxito en la rama `features/soporte-multi-idioma`.
 

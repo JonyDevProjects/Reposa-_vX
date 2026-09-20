@@ -1,12 +1,12 @@
-# Informe de Objetivos y Fases: Proyecto Reposa+
+# Informe de Objetivos y Fases Iniciales: Proyecto Reposa+
 
 ## 1. Introducción
-Este informe detalla la hoja de ruta para el desarrollo de **Reposa+**, un e-commerce especializado en almohadas ergonómicas e inteligentes. El proyecto se enmarca en los requisitos de la **EPD 3: Frameworks – Laravel**, integrando un diseño premium basado en la psicología del color (Índigo) y una arquitectura técnica robusta.
+Este informe detalla la hoja de ruta inicial para el desarrollo de **Reposa+**, un e-commerce especializado en almohadas ergonómicas e inteligentes. El proyecto se enmarca en la especificación de requisitos técnicos y funcionales del Trabajo de Fin de Grado (Laravel), integrando un diseño premium basado en la psicología del color (Índigo) y una arquitectura técnica robusta.
 
 ---
 
 ## 2. Objetivos del Proyecto
-Basados en el documento de requisitos `EPD3 - 2526.md`, los objetivos principales son:
+Basados en la especificación formal de requisitos del proyecto, los objetivos principales son:
 
 - **Operaciones CRUD:** Implementar la gestión completa de productos, categorías y pedidos utilizando Laravel y Bootstrap 5.
 - **Caso de Uso Principal:** Garantizar el flujo completo de compra para usuarios registrados, permitiendo a los no registrados navegar por el catálogo.
@@ -18,9 +18,9 @@ Basados en el documento de requisitos `EPD3 - 2526.md`, los objetivos principale
 ---
 
 ## 3. Fases del Proyecto
-El desarrollo se divide en fases incrementales alineadas con los problemas definidos en la EPD:
+El desarrollo se divide en fases incrementales alineadas con los requisitos y objetivos del proyecto:
 
-### Fase 1: Cimentación y Core (v1.0) - *Problema 0, 1 y 2*
+### Fase 1: Cimentación y Core (v1.0) - *Requisitos de Arquitectura y Compra*
 - **Setup Técnico:** Configuración de Laravel, Bootstrap 5 y sistema de autenticación (Fortify/Breeze).
 - **Base de Datos:** Migración del esquema UML (Refactorizado para el nicho de almohadas).
 - **Catálogo Público:** Implementación de la vista de productos accesible para todos los usuarios.
@@ -28,16 +28,16 @@ El desarrollo se divide en fases incrementales alineadas con los problemas defin
 - **Notificaciones:** Integración de Mailtrap para correos de confirmación de pedido y recuperación de claves.
 - **Panel Admin v1:** Gestión básica de productos y visualización de pedidos.
 
-### Fase 2: Clasificación y Gestión Avanzada (v2.0) - *Problema 3*
+### Fase 2: Clasificación y Gestión Avanzada (v2.0) - *Gestión de Categorías*
 - **Sistema de Categorías:** Implementación de la relación N:M entre productos y categorías (Ej: Cervical, Viscoelástica).
 - **CRUD de Categorías:** Interfaz administrativa para gestionar etiquetas y su asociación con almohadas.
 - **Filtrado:** Navegación por categorías en el front-end.
 
-### Fase 3: Internacionalización y Perfil (v2.1) - *Problema 4*
+### Fase 3: Internacionalización y Perfil (v2.1) - *Internacionalización y Cuenta*
 - **Multi-idioma:** Traducción de la Home y vistas principales a Inglés y Español.
 - **Gestión de Perfil:** Panel de usuario para cambiar contraseña, gestionar direcciones (CRUD) y ver historial de pedidos.
 
-### Fase 4: Fidelización y Analítica (v2.2) - *Problema 5*
+### Fase 4: Fidelización y Analítica (v2.2) - *Fidelización y Métricas*
 - **Lista de Favoritos (Wishlist):** Funcionalidad de clic rápido para guardar/quitar productos de favoritos.
 - **Analíticas Admin:** Panel para que el administrador vea las almohadas más populares entre los usuarios.
 
