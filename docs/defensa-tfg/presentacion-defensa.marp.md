@@ -130,7 +130,7 @@ style: |
 
 ### 🌙 La Solución Reposa+ (*Sleep Tech*)
 * **Propuesta de Valor:** *"No vendemos almohadas; vendemos noches de descanso profundo y reparador"*.
-* **Asesor Anatómico en Tiempo Real:** Segmentación del catálogo según postura (lateral, supino, prono) y densidad.
+* **Segmentación Ergonómica Multiatributo:** Filtrado en tiempo real según firmeza, material viscoelástico y densidad anatómica.
 * **Psicología Visual "Midnight Sanctuary":** Paleta índigo/pizarra de bajo contraste pensada para reducir el estrés visual.
 
 </div>
@@ -233,7 +233,7 @@ DB::transaction(function () use ($productId, $quantity) {
 
 ### 🎨 Dirección de Diseño Emocional
 * **Paleta Nocturna Índigo:** Azules profundos (#0f172a, #6366f1) que evocan serenidad y descanso.
-* **Divulgación Progresiva:** El Asesor Anatómico se despliega bajo demanda; los productos son visibles *above-the-fold* de inmediato.
+* **Descubrimiento Directo:** Los productos son visibles *above-the-fold* de inmediato, con píldoras de acceso rápido a categorías y panel de filtros.
 * **Componentes Blade Reutilizables:** Modulares y limpios, maquetados con Bootstrap 5 y SCSS.
 
 </div>
@@ -262,7 +262,7 @@ DB::transaction(function () use ($productId, $quantity) {
 ### Ruta de la Demostración Transaccional sobre Entorno Docker Local
 <br>
 
-**1. Storefront:** Búsqueda en catálogo $\rightarrow$ Asesor de Postura $\rightarrow$ Carrito Reactivo AJAX  
+**1. Storefront:** Búsqueda ágil y píldoras de categoría $\rightarrow$ Panel de filtros $\rightarrow$ Carrito Reactivo AJAX  
 ⬇  
 **2. Checkout:** Compra libre como invitado $\rightarrow$ Dirección postal $\rightarrow$ Simulación de Pago  
 ⬇  

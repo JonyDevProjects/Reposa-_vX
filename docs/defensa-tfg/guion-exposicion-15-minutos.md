@@ -70,8 +70,8 @@
 #### Secuencia de Acciones y Guion en Vivo:
 *(El ponente pasa al navegador web con pestañas previamente preparadas: Storefront en `/catalog`, MailHog en `:8025` y Panel de Administración en `/admin/orders`).*
 
-1. **Catálogo y Divulgación Progresiva (06:00 - 06:45):**
-   > *"Veamos ahora la plataforma en funcionamiento. Nos encontramos en la página del catálogo. Noten cómo aplicamos el principio de **divulgación progresiva**: en lugar de abrumar al comprador con formularios masivos, el 'Asesor Anatómico de Firmeza' se presenta como un banner colapsable. Si lo abro, el usuario puede filtrar almohadas según su postura favorita —de lado, boca arriba o boca abajo—. Además, la barra de filtros rápidos por píldora permite alternar entre categorías con un solo clic.*
+1. **Catálogo Ergonómico y Filtrado Dinámico (06:00 - 06:45):**
+   > *"Veamos ahora la plataforma en funcionamiento. Nos encontramos en la página del catálogo. Noten cómo priorizamos el descubrimiento del producto y la reducción de la carga cognitiva: las almohadas están inmediatamente visibles en primer plano. La barra superior ofrece píldoras rápidas de categoría para alternar colecciones con un solo clic, junto a un panel colapsable de filtros secundarios donde segmentar por firmeza, material ergonómico o precio, y búsqueda en vivo.*
    > *Voy a seleccionar la **Almohada Cervical Ergonómica** (45,00€) y añadirla a nuestra cesta."*
 
 2. **Carrito Reactivo y Umbral de Envío Gratuito (06:45 - 07:30):**
