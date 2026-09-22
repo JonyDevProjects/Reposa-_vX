@@ -125,6 +125,8 @@ node .agent/skills/impeccable/scripts/detect.mjs --json Reposa+/resources/views/
 engram save "<Título>" "<Detalle>" --project reposaplus-tfg
 ```
 
+> **Documentación completa de Engram:** Ver [docs/referencia-rapida-engram.md](referencia-rapida-engram.md)
+
 ---
 
 ## 5. Tabla Comparativa de Entornos para Toma de Decisiones
