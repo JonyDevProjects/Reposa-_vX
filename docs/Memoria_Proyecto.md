@@ -3,10 +3,10 @@
 
 **Universidad Pablo de Olavide — Escuela Politécnica Superior**  
 **Titulación:** Grado en Ingeniería Informática en Sistemas de Información  
-**Código TFG:** 25-26-C13  
-**Autor:** Jonathan Quispe  
-**Tutor:** Rubén Pérez Chacón  
-**Convocatoria Oficial:** Curso Académico 2025/2026 (Septiembre 2026)  
+**Código TFG:**  
+**Autor:** Jonathan Javier Quishpe Maldonado 
+**Tutor:**   
+**Convocatoria Oficial:** Curso Académico  
 
 ---
 

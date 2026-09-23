@@ -48,7 +48,7 @@ it('can view order detail page', function (): void {
 
     $this->actingAs($user)->get("/orders/{$order->id}")
         ->assertOk()
-        ->assertSee('Completed');
+        ->assertSee(Order::getStatusLabel(Order::STATUS_COMPLETED));
 });
 
 it('cannot view another users order', function (): void {

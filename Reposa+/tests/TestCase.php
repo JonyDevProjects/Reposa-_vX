@@ -10,6 +10,7 @@ abstract class TestCase extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
+        config(['database.connections.mysql.database' => 'reposaplus_testing']);
         $this->withoutMiddleware(PreventRequestForgery::class);
         $this->withoutVite();
     }
