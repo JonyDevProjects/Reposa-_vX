@@ -40,7 +40,7 @@ services:
       STRIPE_SECRET: ${STRIPE_SECRET:-sk_test_placeholder}
       STRIPE_KEY: ${STRIPE_KEY:-pk_test_placeholder}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-whsec_test_placeholder}
-    command: sh -c "sleep infinity"
+    command: sh -c "php artisan serve --host=0.0.0.0 --port=8000"
 
   mysql-dev:
     image: mysql:8.0
@@ -57,6 +57,25 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+
+  # ------------------------------------------------------------------
+  # Ngrok Skip Warning Proxy (para auditorías, crawlers y testing)
+  # Inyecta automáticamente 'ngrok-skip-browser-warning: true'
+  # ------------------------------------------------------------------
+  ngrok-proxy:
+    image: igops/ngrok-skip-browser-warning:latest
+    container_name: reposaplus-dev-ngrok-proxy
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - NGROK_HOST=${NGROK_HOST:-https://roping-dainty-finisher.ngrok-free.dev}
+      - UPSTREAM=http://app:8000
+      - ADD_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN=*
+    depends_on:
+      - app
+    profiles:
+      - tunnel
 
 volumes:
   mysql_dev_data:
