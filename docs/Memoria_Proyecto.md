@@ -25,7 +25,12 @@
 * **3. Objetivos y Requisitos del Sistema**
 * **4. Diseño y Arquitectura de Software**
 * **5. Desarrollo e Implementación Técnica**
+  * 5.7. Hardening de Seguridad HTTP y Descubrimiento Estandarizado (Sitemap XML)
 * **6. Calidad, Arquitectura y Pruebas del Software (Testing Trophy)**
+  * 6.6. Auditoría Técnica de Requisitos, Preparación de Entornos y Resiliencia en Proxies
+  * 6.7. Auditoría Técnica Automatizada con Google Lighthouse (Core Web Vitals y Accesibilidad)
+  * 6.8. Marco Formal de Análisis y Gestión de Riesgos de Seguridad: MAGERIT v.3
+  * 6.9. Credenciales y Entorno de Evaluación
 * **7. Conclusiones y Trabajo Futuro**
 * **8. Bibliografía y Referencias Normativas**
 
@@ -63,20 +68,21 @@ La relevancia de este trabajo radica en la combinación de un caso de negocio re
 Para superar la clásica brecha entre los marcos normativos formales exigidos por la universidad y las dinámicas ágiles del desarrollo de software contemporáneo, Reposa+ adopta una **metodología híbrida formal-ágil articulada en tres capas desacopladas**:
 
 1. **Capa de Gobierno y Gestión del Proyecto (Scrumban: Scrum + Kanban):**
-   - **Scrum:** Estructuración temporal mediante *Sprints* orientados a hitos de versión semántica bajo GitFlow (`v1.0.0` Core Transaccional y `v1.1.0` Refinamiento UI/UX y Logística).
+   - **Scrum:** Estructuración temporal mediante *Sprints* orientados a hitos de versión semántica bajo GitFlow (`v1.0.0` Core Transaccional, `v1.1.0` Refinamiento UI/UX y Logística, `v1.1.1` Certificación CI/CD y `v1.2.0` Auditoría Técnica MAGERIT v.3, Hardening HTTP, SEO 100 y Sitemap Dinámico).
    - **Kanban:** Gestión del flujo continuo de trabajo y limitación estricta del trabajo en curso (*WIP = 1*) en el tablero de desarrollo individual, evitando la sobrecarga cognitiva y maximizando el rendimiento.
    - **Simulación de Equipo Profesional (Norma UPO de 400 Horas):** Desglose del esfuerzo en 5 perfiles profesionales de mercado asumidos por el alumno (Jefe de Proyecto a 45 €/h, Analista a 40 €/h, Arquitecto a 40 €/h, Backend a 30 €/h y Frontend a 30 €/h), modelando un presupuesto formal de **13.800 €** en el [Anexo I: Plan de Proyecto](Anexo_I_Plan_de_Proyecto.md).
 
-2. **Capa Normativa, Estructural y Documental (Métrica v3 adaptada a la UPO):**
-   - Adopción del estándar del Consejo Superior de Administración Electrónica para estructurar los Anexos del TFG:
+2. **Capa Normativa, Estructural y de Seguridad (Métrica v3 + MAGERIT v.3 adaptada a la UPO):**
+   - Adopción de los estándares del Consejo Superior de Administración Electrónica y del Centro Criptológico Nacional (CCN-CERT):
      * **PSI (Planificación) $\rightarrow$ Anexo I:** Plan de Proyecto, WBS/EDT, análisis de riesgos y costes.
      * **ASI (Análisis) $\rightarrow$ Anexo II:** Catálogo de Requisitos Funcionales (`RF-xxx`) y No Funcionales (`RNF-xxx`), Casos de Uso (`CU-xxx`), Clases de Negocio (`CN-xxx`), Interfaces (`IU-xxx`) e Informes (`IF-xxx`).
      * **DSI (Diseño) $\rightarrow$ Anexo III:** Modelo Físico Relacional SQL, diagramas de despliegue y clases de controladores (`CL-xxx`).
-   - **Matrices de Trazabilidad Cruzada:** Garantía matemática de coherencia bidireccional desde los Objetivos (`OBJ`) hasta los Casos de Uso y las Pruebas Automatizadas.
+     * **MAGERIT v.3:** Marco metodológico formal para la identificación y valoración de activos de información (`ACT-01..06`), modelado de amenazas web (`TH-01..06`), evaluación de salvaguardas y determinación del riesgo residual aceptado.
+   - **Matrices de Trazabilidad Cruzada:** Garantía matemática de coherencia bidireccional desde los Objetivos (`OBJ`) hasta los Casos de Uso, las Pruebas Automatizadas y las Salvaguardas de Seguridad.
 
 3. **Capa de Producción Técnica e Ingeniería (Spec-Driven Development — SDD):**
    - **La Especificación como Fuente Única de Verdad:** Ninguna funcionalidad se codifica sin un documento de especificación formal previo (Roadmap técnico).
-   - **Especificaciones Ejecutables (Testing Trophy):** Los criterios de aceptación se materializan en una pirámide de **141 pruebas automatizadas en Pest** (29 Unitarias puras + 112 de Integración contra MySQL 8 y Redis en 2.89s) y **8 pruebas de sistema E2E con Microsoft Playwright** sobre navegadores reales.
+   - **Especificaciones Ejecutables (Testing Trophy):** Los criterios de aceptación se materializan en una pirámide de **146 pruebas automatizadas en Pest** (29 Unitarias puras en memoria + 117 de Integración transaccional contra MySQL 8 y Redis en 4.5s) y **8 pruebas de sistema E2E con Microsoft Playwright** sobre navegadores Chromium reales (154 pruebas automatizadas en total).
    - **Orquestación de Agentes de IA (Google Antigravity SDK):** El alumno ejerce como Arquitecto de Software y Tech Lead, delegando tareas mecánicas a agentes autónomos gobernados por especificaciones formales y reglas estrictas de diseño.
    - **Calidad Continua y Memoria Viva:** Pipeline de CI/CD automatizado con 5 jobs en GitHub Actions y persistencia incremental de decisiones de arquitectura en el motor de memoria **Engram CLI**.
 
@@ -196,14 +202,20 @@ Los requisitos funcionales describen los comportamientos y servicios específico
 *   **RF-16:** El administrador debe visualizar un panel analítico (Dashboard) que resuma los pedidos globales y destaque los productos más marcados como favoritos por los usuarios.
 *   **RF-17:** El administrador debe poder actualizar el estado de un pedido (ej. de "Procesando" a "Enviado").
 
+#### Módulo de Indexación y Descubrimiento Estandarizado (SEO)
+*   **RF-18:** El sistema debe exponer un endpoint público `/sitemap.xml` con `Content-Type: text/xml; charset=utf-8` conforme al estándar `sitemaps.org/schemas/sitemap/0.9`, serializando dinámicamente la página principal (`/`), el catálogo (`/catalog`) y cada una de las fichas de producto del catálogo con sus correspondientes metadatos (`loc`, `lastmod`, `changefreq`, `priority`), referenciándolo obligatoriamente en `public/robots.txt` mediante directiva canónica absoluta.
+
 ### 3.3. Requisitos No Funcionales (RNF)
 Los requisitos no funcionales definen los atributos de calidad, restricciones tecnológicas y estándares de diseño del sistema.
 
 *   **RNF-01 (Framework):** El backend debe ser desarrollado íntegramente en Laravel (preparado para escalar a versiones 13+), apoyándose obligatoriamente en PHP 8.3+.
 *   **RNF-02 (Estilos y UI):** El frontend debe estructurarse mediante Bootstrap 5. Es obligatorio que la plantilla base sufra modificaciones profundas (vía SASS/CSS personalizado) para asimilar la identidad visual de la marca (esquema cromático "Índigo").
 *   **RNF-03 (Comunicación Asíncrona):** El envío de notificaciones por correo electrónico (tickets de compra, recuperación de contraseña) debe delegarse a colas de trabajo en segundo plano (Job Queues) para evitar bloqueos en el hilo de ejecución principal y mejorar la percepción de rendimiento.
-*   **RNF-04 (Seguridad):** Todas las contraseñas deben ser almacenadas utilizando algoritmos de hashing fuertes (Bcrypt). El sistema debe estar protegido contra inyecciones SQL (gracias al uso de Eloquent ORM) y ataques CSRF (Cross-Site Request Forgery).
+*   **RNF-04 (Seguridad y Criptografía):** Todas las contraseñas deben ser almacenadas utilizando algoritmos de hashing fuertes (Bcrypt). El sistema debe estar protegido contra inyecciones SQL (gracias al uso de Eloquent ORM) y ataques CSRF (Cross-Site Request Forgery).
 *   **RNF-05 (Multi-idioma):** La interfaz pública principal (Catálogo y Home) debe ser capaz de alternar dinámicamente entre los idiomas Español e Inglés sin refresco forzado o pérdida de sesión.
+*   **RNF-06 (Integridad TLS, Proxies Inversos y Hardening HTTP):** El sistema debe propagar fielmente las cabeceras `X-Forwarded-Proto`, `X-Forwarded-For` y `X-Forwarded-Host` a través de toda la cadena de proxies (`Nginx-LB` → `Nginx` → `PHP-FPM`), forzando esquema `https://` en la generación de URLs y assets cuando el tráfico exterior sea TLS (evitando contenido mixto). Asimismo, debe implementar salvaguardas de defensa en profundidad mediante cabeceras HTTP de seguridad (`X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-XSS-Protection: 1; mode=block`) y erradicar por completo la fuga de información técnica del servidor eliminando la cabecera `X-Powered-By`.
+*   **RNF-07 (Calidad Web Objetiva, Core Web Vitals y Rendimiento UX):** La aplicación debe superar auditorías automatizadas objetivas mediante Google Lighthouse CLI cumpliendo umbrales mínimos de aceptación rigurosos en perfiles Desktop y Mobile: Performance $\ge 85/90$, Accesibilidad $\ge 90$ (WCAG 2.1 Nivel AA), Buenas Prácticas $\ge 90$, SEO $\ge 90$ y estabilidad visual sin saltos de maquetación ($\text{CLS} \le 0.05$, logrando $\text{CLS} = 0.000$).
+*   **RNF-08 (Gestión Formal de Riesgos de Seguridad bajo MAGERIT v.3):** El sistema debe someterse a una evaluación y mitigación estructurada de riesgos bajo la metodología formal **MAGERIT v.3** (CCN-CERT), identificando y valorando sus activos esenciales, modelando las amenazas de comercio electrónico y certificando que el riesgo residual sea asumible tras la aplicación de salvaguardas preventivas y detectivas.
 
 ---
 
@@ -528,6 +540,25 @@ Se crearon archivos de diccionarios en `lang/en/messages.php` y `lang/es/message
 
 Para mantener el estado del idioma seleccionado, se desarrolló un `LanguageController` que captura la elección del usuario (vía *dropdown* en el menú) y la guarda en la sesión activa (`session()->put("locale", $lang)`). Un Middleware global (`SetLocale`) se ejecuta en cada petición HTTP interceptando esta variable e inyectándola al núcleo del framework (`App::setLocale()`), garantizando que la navegación fluya uniformemente en el idioma elegido en cada recarga de página.
 
+### 5.7. Hardening de Seguridad HTTP y Descubrimiento Estandarizado (Sitemap XML)
+En respuesta a los requisitos `RNF-06` y `RF-18` derivados de la auditoría técnica y de seguridad, se implementó una capa integral de hardening en la tubería (*pipeline*) de peticiones HTTP:
+
+1. **Defensa en Profundidad HTTP (`SecurityHeadersMiddleware`):**  
+   Se diseñó y registró globalmente en `bootstrap/app.php` el middleware `App\Http\Middleware\SecurityHeadersMiddleware`, el cual intercepta toda respuesta saliente e inyecta cabeceras de seguridad canónicas:
+   - `X-Content-Type-Options: nosniff`: Neutraliza la reinterpretación fraudulenta de tipos MIME (*MIME confusion attacks*).
+   - `X-Frame-Options: SAMEORIGIN`: Impide el anidamiento de la tienda en iframes externos, mitigando ataques de *Clickjacking*.
+   - `Referrer-Policy: strict-origin-when-cross-origin`: Restringe la fuga de rutas internas en cabeceras de referencia hacia orígenes de terceros.
+   - `X-XSS-Protection: 1; mode=block`: Fuerza la activación del filtro preventivo contra ataques XSS reflejados en navegadores legacy.
+
+2. **Erradicación de Fuga de Información Técnica (*Server Fingerprinting*):**  
+   Para impedir que atacantes automaticen ataques dirigidos identificando la versión de PHP en uso (`TH-01`), se eliminó la cabecera `X-Powered-By` en dos niveles: en el punto de entrada temprano (`public/index.php`) mediante `header_remove('X-Powered-By')` antes de la inicialización de Laravel, y en el middleware de cabeceras mediante `$response->headers->remove('X-Powered-By')`.
+
+3. **Preservación de Esquema HTTPS en Proxies Inversos:**  
+   En la configuración de Nginx (`docker/nginx-lb.conf` y `docker/nginx/default.conf`), se estableció una directiva condicional para propagar fielmente `X-Forwarded-Proto`. En `AppServiceProvider`, se forzó el esquema seguro mediante `URL::forceScheme('https')` cuando la petición proviene de un proxy seguro, erradicando por completo el problema de Contenido Mixto (*Mixed Content*) en assets compilados por Vite.
+
+4. **Endpoint de Indexación Dinámico (`/sitemap.xml`):**  
+   Se implementó el controlador `App\Http\Controllers\SitemapController`, el cual consulta los productos persistidos en base de datos (`Product::orderBy('id')->get()`) y renderiza la vista `sitemap.blade.php`. Dicha vista produce un documento XML estricto (`Content-Type: text/xml; charset=utf-8`) estructurado bajo el esquema `sitemaps.org/schemas/sitemap/0.9`, incluyendo metadatos de frecuencia de cambio (`changefreq`) y prioridad (`priority`) para la raíz, el catálogo y cada producto. Por último, se configuró `public/robots.txt` para referenciar de forma absoluta `http://localhost:8000/sitemap.xml`.
+
 ---
 
 ## 6. Calidad, Arquitectura y Pruebas del Software
@@ -646,17 +677,20 @@ Diseñada bajo el principio de pureza computacional: todas las clases heredan di
    - Comprueba la disponibilidad en stock (`isInStock()`, `hasStock($qty)`) en memoria.
    - Verifica la precisión aritmética en el cálculo de subtotales (`calculateSubtotal($qty)`), previniendo desajustes por redondeo de coma flotante IEEE 754.
 
-#### 6.3.2. Capa de Integración Transaccional (`tests/Feature/`) — 89 Tests, 285 Aserciones, 1.95s
+#### 6.3.2. Capa de Integración Transaccional (`tests/Feature/`) — 117 Tests, 458 Aserciones, 4.49s
 Prueba la interacción armónica entre Controladores, Modelos Eloquent, Middleware, Políticas de Autorización y la base de datos MySQL InnoDB:
 * **`AdminTest` (14 tests):** Control de acceso por roles (RBAC), operaciones CRUD sobre catálogo y categorías, y transiciones de pedidos.
 * **`CartTest` (9 tests):** Carrito asíncrono con AJAX, adición de ítems con tope de stock, actualización y checkout atómico.
 * **`CheckoutStockTest` (2 tests):** Blindaje transaccional contra sobreventa mediante `lockForUpdate` y rollback automático ante stock insuficiente.
 * **`GoogleOAuthTest` (12 tests):** Ciclo completo de autenticación federada con Google, vinculación de cuentas existentes, redirección al onboarding de dirección y preservación del carrito desde checkout.
-* **`GuestCheckoutTest` (8 tests):** Compra como invitado con `guest_token`, validación de campos de envío, seguridad perimetral HTTP 403 y conversión en 1 clic (*Claim Account*).
+* **`GuestCheckoutTest` (11 tests):** Compra como invitado con `guest_token`, validación de campos de envío, seguridad perimetral HTTP 403, persistencia en sesión y conversión en 1 clic (*Claim Account*).
+* **`OrderShipmentLifecycleSyncTest` (11 tests):** Sincronización bidireccional entre ciclo de vida de pedidos y estados de tracking de paquetería, y reembolsos directos con reposición de stock.
 * **`OrderStateTest` (22 tests):** Comportamiento transaccional de órdenes y relaciones con `order_items`, reembolsos y usuario.
 * **`PaymentTest` (10 tests):** Ciclo de pago con Stripe Checkout, sesión de éxito/cancelación, y descarga segura de facturas en PDF.
 * **`RegistrationTest` (3 tests):** Registro de clientes con captura obligatoria de dirección postal y teléfono.
 * **`ShippingServiceTest` (6 tests):** Servicio de paquetería estándar, generación de albaranes de transporte, código de barras Code 128 y sincronización de tracking con pedidos.
+* **`SitemapTest` (5 tests):** Endpoint público `/sitemap.xml` conforme al esquema `sitemaps.org 0.9`, forzado de protocolo HTTPS con `X-Forwarded-Proto` y validación de directiva sitemap en `robots.txt`.
+* **`ViewOrderUserTest` (12 tests):** Control de visibilidad y acceso perimetral a historial de compras y comprobantes de pago.
 
 #### 6.3.3. Capa de Sistema Extremo a Extremo (`e2e/` Playwright) — 8 Tests, 10.7s
 Ejecutada con **Microsoft Playwright** sobre un navegador **Chromium real**, verificando el renderizado CSS/JS, la interacción humana simulada y la respuesta a través del balanceador Nginx:
@@ -701,14 +735,63 @@ El desarrollo del proyecto se articuló sobre el modelo de ramificación **GitFl
 * **Consolidación sin avance rápido (`--no-ff`):** Todas las características se integraron en `develop` mediante fusiones explícitas con `--no-ff` (`git merge --no-ff feature/...`), preservando el grafo de historial de commits y la trazabilidad de los hitos técnicos.
 * **Integración de Fase 5:** La rama `feature/guest-checkout-and-shipping` (19 commits, +6700 líneas) consolidó el checkout de invitados, paquetería estándar, Google OAuth 2.0 y la suite unitaria pura en `develop` tras certificar la ejecución del 100% de las pruebas automatizadas.
 
-### 6.6. Auditoría Técnica de Requisitos y Refinamientos de Resiliencia
-Como paso previo a la homologación, se sometió el código a auditorías técnicas continuas para corregir desviaciones y maximizar la resiliencia operativa:
+### 6.6. Auditoría Técnica de Requisitos, Preparación de Entornos y Resiliencia en Proxies
+Como paso previo a la homologación, se sometió el código e infraestructura a auditorías técnicas continuas para corregir desviaciones y maximizar la resiliencia operativa:
 1. **Vistas SQL Nativas:** Incorporación de `v_order_summary` y `v_top_favorited_products` para optimizar consultas de reporting en el panel administrativo, reduciendo tiempos de respuesta en un 30%.
 2. **Atomicidad Transaccional y Bloqueo Pesimista:** Blindaje del checkout con `DB::transaction()` y `lockForUpdate()`, previniendo sobreventas e inconsistencias de pedidos huérfanos ante excepciones imprevistas.
 3. **Optimización contra el Problema N+1:** Implementación de *Eager Loading* (`with()`, `load()`) en perfiles, catálogos y órdenes de compra, empaquetando consultas dispersas en operaciones masivas indexadas.
-4. **Resiliencia de Conexión en Dev Containers:** Identificación y resolución de resolución DNS interna en entornos virtualizados (utilización del hostname `reposaplus_mysql` frente a `localhost`/`127.0.0.1` en la red puente de Docker).
+4. **Resiliencia de Conexión en Dev Containers:** Identificación y resolución de DNS interna en entornos virtualizados (utilización del hostname `reposaplus_mysql` frente a `localhost`/`127.0.0.1` en la red puente de Docker).
+5. **Neutralización de Contenido Mixto TLS y Preservación de Cabeceras en Proxies:**  
+   En topologías con proxies inversos (Ngrok o balanceadores Nginx hacia PHP-FPM), el servidor web interno operaba en HTTP no cifrado, provocando que Vite y los generadores de URLs inyectasen rutas bajo `http://` (Contenido Mixto). Se subsanó reconfigurando el balanceador `docker/nginx-lb.conf` para capturar la cabecera `X-Forwarded-Proto` entrante mediante directivas `map` y forzando el esquema HTTPS en `AppServiceProvider` mediante `URL::forceScheme('https')`.
+6. **Evaluación Experimental de Exposición Perimetral y Elección de Auditoría Determinista:**  
+   Se evaluó la exposición remota de la plataforma mediante túneles seguros (Ngrok, Cloudflare Quick Tunnels y Localhost.run) para auditoría externa por agentes de IA. El análisis reveló que los firewalls de túneles gratuitos introducen barreras intersticiales (`ERR_NGROK_6024`), cabeceras restrictivas para rastreadores (`x-robots-tag: none`) y denylist perimetrales anti-SSRF en agentes conversacionales. En consecuencia, se adoptó como decisión arquitectónica formal la ejecución de auditorías automatizadas locales deterministas sobre el puerto 8000 mediante **Google Lighthouse CLI**, garantizando mediciones rigurosas y reproducibles de Core Web Vitals sin interferencias de red externa.
+7. **Aislamiento Hermético de Base de Datos para Pruebas Automatizadas:**  
+   Para evitar que la ejecución de pruebas con `RefreshDatabase` vaciase la base de datos de desarrollo (`reposaplus_dev`, que contiene los 8 productos del catálogo), se aisló la configuración en `tests/TestCase.php`, forzando la conexión a la base de datos exclusiva `reposaplus_testing`.
 
-### 6.7. Credenciales y Entorno de Evaluación
+### 6.7. Auditoría Técnica Automatizada con Google Lighthouse: Core Web Vitals, SEO y Accesibilidad
+La evaluación de calidad objetiva de la plataforma se efectuó mediante 6 ejecuciones automatizadas de **Google Lighthouse CLI** sobre las 3 vistas críticas (`/`, `/catalog` y `/catalog/1`) en perfiles **Desktop** (1350x940, sin estrangulamiento) y **Mobile** (412x823, estrangulamiento 4G y ralentización de CPU 4x):
+
+| Vista Auditada | Perfil | Rendimiento | Accesibilidad | Buenas Prácticas | SEO | Cumulative Layout Shift (CLS) |
+|:---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Página de Inicio (`/`)** | Desktop | **100** | **95** | **100** | **100** | **`0.000`** |
+| **Página de Inicio (`/`)** | Mobile | **96** | **95** | **100** | **100** | **`0.000`** |
+| **Catálogo de Productos (`/catalog`)** | Desktop | **100** | **92** | **100** | **100** | **`0.000`** |
+| **Catálogo de Productos (`/catalog`)** | Mobile | **95** | **92** | **100** | **100** | **`0.000`** |
+| **Ficha de Detalle (`/catalog/1`)** | Desktop | **100** | **92** | **100** | **100** | **`0.000`** |
+| **Ficha de Detalle (`/catalog/1`)** | Mobile | **96** | **92** | **100** | **100** | **`0.000`** |
+
+#### Mitigaciones Técnicas de Rendimiento y Experiencia de Usuario:
+1. **Erradicación del Salto de Maquetación (`CLS: 0.131` $\rightarrow$ `0.000`):** Se identificó un desplazamiento de diseño acumulado en la galería táctil de producto originado por la carga asíncrona de imágenes y el retardo tipográfico (FOUT/FOYT). Se subsanó fijando la propiedad `aspect-ratio: 1 / 1` tanto en el contenedor maestro (`.product-gallery-viewport`) como en cada diapositiva en `show.blade.php` y `_mobile.scss`, e incorporando `display=optional` en la carga de Google Fonts.
+2. **Perfección en Posicionamiento Orgánico (SEO: 82 $\rightarrow$ 100/100):** Se incorporó la etiqueta obligatoria `<meta name="description">` en el layout maestro `app.blade.php` y se corrigió la referencia relativa del sitemap en `public/robots.txt` sustituyéndola por la URL canónica absoluta `http://localhost:8000/sitemap.xml`.
+
+### 6.8. Marco Formal de Análisis y Gestión de Riesgos de Seguridad: MAGERIT v.3
+En consonancia con las directrices del Centro Criptológico Nacional (CCN-CERT) y el Consejo Superior de Administración Electrónica para sistemas de información en España, se aplicó la metodología formal **MAGERIT v.3**:
+
+#### 1. Identificación y Valoración de Activos (Escala 1 a 5: D, I, C, A, T)
+* **`[ACT-01]` [DAT] Catálogo de Productos y Precios:** Valor Global **Alto (3.6)**. Integridad y disponibilidad críticas frente a alteraciones no autorizadas.
+* **`[ACT-02]` [COM/SER] Endpoints Públicos y API Web:** Valor Global **Alto (3.4)**. Disponibilidad fundamental para la navegación y compra.
+* **`[ACT-03]` [DAT/SEC] Datos de Sesión, Tokens y Cookies:** Valor Global **Crítico (4.6)**. Confidencialidad, integridad y autenticidad máximas para evitar secuestros de sesión.
+* **`[ACT-04]` [SER] Disponibilidad y Calidad de Servicio:** Valor Global **Medio (2.6)**. Fluidez UX y tiempo de respuesta del contenedor.
+* **`[ACT-05]` [SW] Código Frontend y Assets Compilados:** Valor Global **Medio (2.8)**. Integridad del código Blade, SASS y Vite.
+* **`[ACT-06]` [HW/SO] Runtime del Servidor y Contenedor:** Valor Global **Muy Alto (4.4)**. Estabilidad y aislamiento de Nginx, PHP 8.4 y MySQL 8.
+
+#### 2. Matriz de Amenazas y Salvaguardas Implementadas
+* **`[TH-01]` Fuga de Información Técnica en Cabeceras:** Revelación del runtime PHP en cabeceras HTTP (`X-Powered-By: PHP/8.4.25`).  
+  *Salvaguarda `SF-05`:* Eliminación estricta en bootstrap temprano (`public/index.php`) y en middleware. Riesgo residual: **Bajo (1)**.
+* **`[TH-02]` Inyección de Contenido y Clickjacking:** Inyección en frames maliciosos o suplantación de MIME.  
+  *Salvaguarda `SF-04`:* Cabeceras `X-Content-Type-Options: nosniff` y `X-Frame-Options: SAMEORIGIN` mediante `SecurityHeadersMiddleware`. Riesgo residual: **Bajo (2)**.
+* **`[TH-03]` Interceptación y Contenido Mixto:** Degeneración de tráfico TLS a plano.  
+  *Salvaguardas `SF-01` y `SF-02`:* Forzado de HTTPS en proxies (`X-Forwarded-Proto`), cookies con flags `HttpOnly` y `SameSite=Lax`. Riesgo residual: **Bajo (2)**.
+* **`[TH-04]` Degradación de Core Web Vitals:** Abandono de carritos por latencia o saltos de layout.  
+  *Salvaguarda `SF-06`:* Optimización de assets, `aspect-ratio: 1/1` en catálogo y `display=optional` en fuentes. Riesgo residual: **Bajo (2)**.
+* **`[TH-05]` Incumplimiento de Accesibilidad:** Infracción de WCAG 2.1 AA.  
+  *Salvaguarda `SF-07`:* Certificación automatizada axe-core vía Lighthouse con scores $\ge 92-95$. Riesgo residual: **Bajo (1)**.
+* **`[TH-06]` Deficiencias de Indexación:** Imposibilidad de descubrimiento por motores de búsqueda.  
+  *Salvaguarda `SF-08`:* Endpoint dinámico `/sitemap.xml` compliant con `sitemaps.org 0.9` acoplado a la base de datos de catálogo. Riesgo residual: **Bajo (1)**.
+
+Tras la subsanación técnica, la totalidad de los riesgos evaluados se situó en la zona **Bajo (Riesgo Aceptado)**, certificando la homologación formal de la plataforma para su release `v1.2.0`.
+
+### 6.9. Credenciales y Entorno de Evaluación
 Para la evaluación de la plataforma por parte del tribunal académico y los responsables de QA, el sistema provee mediante *Seeders* los siguientes accesos predefinidos:
 * **Usuario Administrador:** `admin@reposaplus.com` / `admin123` (Acceso completo al back-office `/admin`, gestión de catálogo, pedidos y generación de etiquetas de transporte).
 * **Usuario Registrado Estándar:** `user@reposaplus.com` / `user123` (Acceso a catálogo, carrito, favoritos y perfil con dirección configurada).
@@ -719,28 +802,36 @@ Para la evaluación de la plataforma por parte del tribunal académico y los res
 ## 7. Conclusiones y Trabajo Futuro
 
 ### 7.1. Conclusiones
-El desarrollo de Reposa+ ha demostrado de manera concluyente la viabilidad y la eficiencia de utilizar el framework Laravel para la orquestación de sistemas transaccionales complejos. A través de este proyecto, se han materializado todos los conceptos teóricos de Ingeniería del Software adquiridos: modelado Entidad-Relación avanzado, separación de responsabilidades (MVC), seguridad perimetral de rutas, inyección de dependencias y manipulación de peticiones asíncronas.
+El desarrollo de Reposa+ ha demostrado de manera concluyente la viabilidad y la eficiencia de utilizar el framework Laravel para la orquestación de sistemas transaccionales complejos. A través de este proyecto, se han materializado todos los conceptos teóricos de Ingeniería del Software adquiridos: modelado Entidad-Relación avanzado, separación de responsabilidades (MVC), seguridad perimetral de rutas, inyección de dependencias, manipulación de peticiones asíncronas y auditoría formal de seguridad bajo el estándar MAGERIT v.3.
 
-Más allá del ámbito puramente técnico, la integración experimental de un **Ecosistema de Agentes de IA (Antigravity SDK)** como fuerza de desarrollo auxiliar ha supuesto un caso de éxito. Ha validado que el ingeniero humano contemporáneo ya no es un mero "picador de código", sino un arquitecto de sistemas que orquesta agentes inteligentes para delegar tareas mecánicas, reservando el esfuerzo cognitivo para el diseño del dominio, las reglas del negocio y el aseguramiento de la calidad (QA).
+Asimismo, la culminación de la **Release v1.2.0** certifica la excelencia técnica del producto:
+- **100% de Pruebas en Verde:** 146 pruebas automatizadas en Pest y 8 pruebas de sistema E2E con Playwright ejecutándose en <5 segundos.
+- **Pipeline CI/CD en GitHub Actions:** 5 jobs automatizados con PHP 8.4, MySQL 8 y Redis verificando estilo (Pint), pruebas unitarias, de integración, compilación Vite y tests de navegador.
+- **Calidad Web y SEO Excepcionales:** Puntuación perfecta de 100/100 en SEO y Buenas Prácticas en Google Lighthouse, con erradicación total de saltos de diseño (CLS = 0.000).
+- **Gobernanza Ágil con Agentes de IA:** La integración experimental del Antigravity SDK y la persistencia de memoria técnica en Engram CLI han validado un nuevo paradigma de ingeniería, donde el desarrollador humano actúa como arquitecto y director técnico de una fuerza de desarrollo automatizada.
 
 ### 7.2. Trabajo Futuro y Evolución del Sistema
-Reposa+ cuenta con una arquitectura base sólidamente cimentada. Sin embargo, para su paso a un entorno de producción real y comercialización abierta al público, se contemplan las siguientes líneas de mejora:
+Reposa+ cuenta con una arquitectura base sólidamente cimentada y auditada. Para su futura explotación comercial a gran escala, se contemplan las siguientes líneas de evolución:
 
-1.  **Evolución de Pasarela de Pagos (Suscripciones y Multi-divisa):** Tras la exitosa integración de Stripe Checkout con webhooks asíncronos en la Fase 5, una línea natural de expansión consiste en incorporar modelos de pago recurrente (suscripciones de descanso, sustitución programada de almohadas cada 18 meses) y pagos fraccionados (Klarna / PayPal Sandbox).
-2.  **Métricas Predictivas e Inteligencia de Negocio:** Ampliar el Panel de Administración actual para que no solo muestre datos descriptivos, sino que integre librerías gráficas (Chart.js) y aplique algoritmos que sugieran qué almohadas deben ser repuestas basándose en la velocidad de agotamiento de su stock.
-3.  **Optimización SEO y Accesibilidad (a11y):** Refinar el marcado semántico HTML5 de las fichas de producto, añadir *microdatos* (Schema.org) y pasar una auditoría estricta WCAG (Web Content Accessibility Guidelines). Asegurar que los contrastes de la paleta Índigo sean legibles para personas con daltonismo, haciendo honor a un producto enfocado en la salud universal.
-4.  **Despliegue Continuo (CI/CD):** Habiéndose consolidado la batería de 119 pruebas automatizadas (Unit, Feature y Playwright E2E) con Docker, la siguiente etapa contempla su ejecución automatizada en GitHub Actions y el despliegue automático a infraestructuras en la nube (AWS / DigitalOcean).
+1. **Evolución de Pasarela de Pagos (Suscripciones y Multi-divisa):** Tras la integración de Stripe Checkout con webhooks asíncronos en la Fase 5, una línea natural de expansión consiste en incorporar modelos de pago recurrente (suscripciones de descanso con reposición programada de almohadas ergonómicas cada 18 meses) y pagos aplazados (Klarna / PayPal Sandbox).
+2. **Métricas Predictivas e Inteligencia de Negocio en Back-Office:** Ampliar el panel analítico actual con librerías gráficas interactivas y modelos predictivos que sugieran aprovisionamientos de inventario según la velocidad estacional de rotación de cada producto.
+3. **Integración con Sistemas de Almacén Físico y Lectura Barcode:** Ampliar la operativa de etiquetas térmicas A6 incorporando sincronización bidireccional con pistolas lectoras de código de barras Code 128 para agilizar el empaquetado y despacho físico en naves logísticas.
+4. **Motor de Asesoramiento Ergonómico con Machine Learning On-Device:** Implementar un asistente interactivo ligero en el navegador que recomiende almohadas personalizadas analizando la postura de sueño predominante, morfología corporal y firmeza requerida sin transferir datos de salud a servidores externos.
 
 ---
 
 ## 8. Bibliografía y Recursos
+*   **CCN-CERT (2012):** *MAGERIT – Versión 3.0. Metodología de Análisis y Gestión de Riesgos de los Sistemas de Información*. Consejo Superior de Administración Electrónica / Centro Criptológico Nacional.
 *   **Cohn, M. (2009):** *Succeeding with Agile: Software Development Using Scrum*. Addison-Wesley Professional.
 *   **Dodds, K. C. (2018):** *The Testing Trophy and Testing Classifications*. Kent C. Dodds Publications. https://kentcdodds.com/blog/the-testing-trophy-and-testing-classifications
 *   **Fowler, M. (2012):** *TestPyramid*. MartinFowler.com. https://martinfowler.com/bliki/TestPyramid.html
 *   **Fowler, M. (2014):** *Mocks Aren't Stubs*. MartinFowler.com. https://martinfowler.com/articles/mocksArentStubs.html
-*   **Documentación Oficial de Laravel:** Laravel Testing & Architecture Docs. https://laravel.com/docs/10.x/testing
-*   **Laravel Fortify:** Documentación oficial de autenticación. https://laravel.com/docs/10.x/fortify
+*   **Google Developers (2024):** *Web Vitals: Essential metrics for a healthy site*. Google LLC. https://web.dev/vitals/
+*   **Documentación Oficial de Laravel:** Laravel Testing & Architecture Docs. https://laravel.com/docs/11.x/testing
+*   **Laravel Fortify:** Documentación oficial de autenticación. https://laravel.com/docs/11.x/fortify
 *   **Microsoft Playwright:** Fast and reliable end-to-end testing for modern web apps. https://playwright.dev/
+*   **Sitemaps.org (2008):** *Sitemap XML Protocol 0.9*. https://www.sitemaps.org/protocol.html
+*   **W3C (2018):** *Web Content Accessibility Guidelines (WCAG) 2.1*. World Wide Web Consortium. https://www.w3.org/TR/WCAG21/
 *   **Bootstrap 5:** Componentes y documentación. https://getbootstrap.com/
 *   **MDN Web Docs:** AJAX y Fetch API. https://developer.mozilla.org/es/
 *   **Mailtrap:** Testing de Emails en Desarrollo. https://mailtrap.io/
