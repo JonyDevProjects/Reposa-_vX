@@ -39,3 +39,7 @@ auth.json
 .env.testing
 test-results/
 playwright-report/
+
+# Artefactos de auditoria automatizada (Lighthouse)
+docs/artefactos/lighthouse-*.html
+docs/artefactos/lighthouse-*.json

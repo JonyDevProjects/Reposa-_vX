@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Reposa+') - {{ __('messages.app.tagline') }}</title>
+    <meta name="description" content="@yield('meta_description', 'Reposa+ — Tienda especializada en descanso ergonómico, almohadas anatómicas y tecnología sleep-tech de máxima calidad.')">
 
     <!-- Fonts & Core Web Vitals Preconnect/Prefetch -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +14,7 @@
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     <!-- impeccable-disable-next-line overused-font -- Brand approved dual typography in DESIGN.md -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=optional" rel="stylesheet">
 
     <!-- Scripts and Styles -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])

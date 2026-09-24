@@ -9,6 +9,7 @@ use App\Services\Shipping\ShippingServiceInterface;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Http\Controllers\PaymentController;
@@ -31,6 +32,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (
+            request()->header('x-forwarded-proto') === 'https'
+            || str_starts_with((string) config('app.url'), 'https://')
+            || (! app()->environment('testing') && ! in_array(request()->getHost(), ['localhost', '127.0.0.1']))
+        ) {
+            URL::forceScheme('https');
+        }
+
         Event::listen(
             Login::class,
             MergeCartOnLogin::class

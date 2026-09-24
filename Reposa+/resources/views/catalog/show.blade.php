@@ -36,11 +36,12 @@
             <!-- Product Gallery (Touch-Optimized, CLS 0 & Multi-View) -->
             <div class="col-md-6">
                 <div class="card border-0 shadow-sm overflow-hidden rounded-4 position-relative product-gallery-card">
-                    <div class="product-gallery-viewport" id="product-gallery-viewport">
+                    <div class="product-gallery-viewport w-100" id="product-gallery-viewport" style="aspect-ratio: 1 / 1; width: 100%; min-height: 320px;">
                         @foreach($galleryImages as $index => $img)
                             <div class="product-gallery-slide {{ $index === 0 ? 'active' : '' }}" 
                                  id="gallery-slide-{{ $index }}" 
-                                 data-index="{{ $index }}">
+                                 data-index="{{ $index }}"
+                                 style="aspect-ratio: 1 / 1; width: 100%;">
                                 <img src="{{ $img['url'] }}" 
                                      onerror="this.onerror=null; this.src='/images/product-placeholder.svg';"
                                      class="img-fluid product-main-img w-100 object-fit-cover" 
