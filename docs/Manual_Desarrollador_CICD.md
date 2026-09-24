@@ -12,8 +12,9 @@
 8. [Tabla Resumen de Puertos y Servicios](#8-tabla-resumen-de-puertos-y-servicios)
 9. [Credenciales de Prueba](#9-credenciales-de-prueba)
 10. [Guia de Seleccion de Entorno](#10-guia-de-seleccion-de-entorno)
-11. [Comandos Utiles de Referencia Rapida](#11-comandos-utiles-de-referencia-rapida)
-12. [Troubleshooting](#12-troubleshooting)
+11. [Flujo de Trabajo Operativo para Nuevas Features, Fixes y Releases (GitFlow + Quality Gate)](#11-flujo-de-trabajo-operativo-para-nuevas-features-fixes-y-releases-gitflow--quality-gate)
+12. [Comandos Utiles de Referencia Rapida](#12-comandos-utiles-de-referencia-rapida)
+13. [Troubleshooting](#13-troubleshooting)
 
 ---
 
@@ -576,7 +577,159 @@ STRIPE_KEY=pk_test_51U9... [Clave Publicable Test de Stripe]
 
 ---
 
-## 11. Comandos Utiles de Referencia Rapida
+## 11. Flujo de Trabajo Operativo para Nuevas Features, Fixes y Releases (GitFlow + Quality Gate)
+
+Para garantizar la coherencia arquitectónica, la estabilidad del código y el cumplimiento de las certificaciones técnicas obtenidas (auditoría MAGERIT v.3, Lighthouse 100/100 y Testing Trophy), todo avance en el proyecto —ya sea una nueva funcionalidad de gran escala o una modificación menor en vistas o controladores— debe seguir estrictamente este flujo de trabajo estandarizado.
+
+### 11.1 Marco de Gobernanza (La Tríada Metodológica en la Práctica)
+
+El ciclo de desarrollo diario traduce operativamente los tres pilares de la metodología:
+1. **Capa 1 (Scrumban):** Límite estricto de trabajo en curso (*WIP = 1*). Cada desarrollador o agente aborda una única tarea atómica a la vez.
+2. **Capa 2 (Métrica v3):** Cada rama y commit debe mantener trazabilidad hacia un requisito (`RF-xxx`, `RNF-xxx`) o caso de uso (`CU-xxx`) formalizado en el Anexo II.
+3. **Capa 3 (Spec-Driven Development — SDD):** Ningún código se fusiona sin un roadmap/especificación técnica previa y sin superar la batería de especificaciones ejecutables (Testing Trophy).
+4. **GitFlow:** Es el modelo de ramificación que articula las ramas `main`, `develop`, `feature/*`, `release/*` y `hotfix/*`.
+
+```text
+develop ────────┬──────────────────────────────────────────┬──────────────┬──────────────>
+                │                                          │              ▲
+                ▼ (Crear feature/*)                        │              │ (Back-merge)
+        ┌───────────────────────────┐                      ▼              │
+        │ feature/nueva-funcionalidad│                release/vX.Y.Z ──────┘
+        └─────────────┬─────────────┘                (Metadatos y docs)
+                      │ (Merge --no-ff tras Gate)          │
+                      ▼                                    ▼ (Merge --no-ff + tag)
+develop ──────────────┴────────────────────────────────────┴─────────────────────────────>
+                                                           │
+main ──────────────────────────────────────────────────────┴─────────────────────────────>
+                                                      Tag: vX.Y.Z
+```
+
+---
+
+### 11.2 Protocolo Paso a Paso para Nuevas Features y Fixes
+
+#### Paso 1: Crear la rama de trabajo desde `develop`
+Asegúrate de que la rama `develop` local está limpia y sincronizada:
+```bash
+git checkout develop
+git pull origin develop
+git checkout -b feature/nombre-descriptivo
+```
+*Convenciones de nomenclatura de ramas:*
+- `feature/<nombre-descriptivo>`: Nuevas funcionalidades, mejoras o refinamientos.
+- `fix/<nombre-descriptivo>`: Correcciones de defectos sobre código en desarrollo.
+
+#### Paso 2: Implementación y Compilación de Assets
+Desarrolla los cambios respetando las capas arquitectónicas del proyecto:
+- **Si modificas frontend (vistas Blade, estilos SCSS o JavaScript):**
+  Es imperativo recompilar los assets con Vite para que se generen los bundles en `public/build/`:
+  ```bash
+  # Modo desarrollo interactivo (hot-reload):
+  npm run dev
+
+  # O compilación para verificación:
+  npm run build
+  ```
+- **Si modificas backend (Controladores, Modelos, Migraciones o Middlewares):**
+  Asegúrate de respetar el estándar de codificación PSR-12 y la inyección de dependencias de Laravel.
+
+#### Paso 3: Ejecución Obligatoria del Quality Gate Local
+Antes de realizar cualquier commit, es **estrictamente obligatorio** ejecutar la pirámide tripartita de pruebas y análisis estático en local:
+
+```bash
+# 1. Verificación de estilo PSR-12 (Laravel Pint)
+docker exec -i reposaplus-dev-app ./vendor/bin/pint --test
+
+# Si Pint reporta inconsistencias, corregirlas automáticamente con:
+docker exec -i reposaplus-dev-app ./vendor/bin/pint
+
+# 2. Batería de Pruebas Unitarias y de Integración (Pest PHP)
+# NOTA: Usar siempre DB_DATABASE=reposaplus_testing para preservar los datos de reposaplus_dev
+docker exec -i -e DB_DATABASE=reposaplus_testing reposaplus-dev-app ./vendor/bin/pest tests/Feature tests/Unit
+
+# 3. Pruebas de Sistema Extremo a Extremo (Playwright Chromium)
+# (Obligatorio si se alteran vistas Blade, formularios, checkout o panel administrativo)
+BASE_URL=http://localhost:8000 npx playwright test
+```
+*Criterio de Aceptación:* El 100% de los tests en Pest (146 tests, 697 aserciones) y Playwright (8 suites E2E) deben finalizar en estado `PASS` verde.
+
+#### Paso 4: Commit Semántico y Fusión hacia `develop`
+Una vez certificado el Quality Gate:
+```bash
+# 1. Comprobar que no hay archivos residuales o no deseados
+git status
+
+# 2. Registrar cambios con Conventional Commits
+git add .
+git commit -m "feat(scope): descripción clara del incremento o corrección"
+
+# 3. Fusión en develop SIN avance rápido (--no-ff) para preservar el grafo histórico
+git checkout develop
+git merge --no-ff feature/nombre-descriptivo -m "Merge branch 'feature/nombre-descriptivo' into develop"
+
+# 4. Eliminar la rama de trabajo temporal
+git branch -d feature/nombre-descriptivo
+```
+
+---
+
+### 11.3 Matriz de Precauciones Críticas Específicas de Reposa+
+
+Al intervenir en componentes visuales o transaccionales del proyecto, se deben observar estrictamente las siguientes directrices para no degradar las certificaciones auditadas:
+
+| Componente / Área | Riesgo Técnico | Directriz Obligatoria en Reposa+ |
+|---|---|---|
+| **Galería de Producto (`show.blade.php`, `_mobile.scss`)** | Pérdida de estabilidad visual (**CLS > 0.000**) | Mantener inalterada la directiva CSS `aspect-ratio: 1 / 1;` tanto en `.product-gallery-viewport` como en `.product-gallery-slide`. |
+| **Fuentes Tipográficas Web** | Salto de maquetación FOUT/FOYT | Utilizar siempre `display=optional` en las URLs de Google Fonts en `layouts/app.blade.php`. |
+| **Accesibilidad Web (WCAG 2.1 AA)** | Caída del score de a11y (<90) en Lighthouse | Todas las imágenes deben incluir atributo `alt` descriptivo. Todos los botones con iconos o desplegables deben incorporar `aria-label` o `aria-expanded`. |
+| **Internacionalización (i18n)** | Regresión en soporte multi-idioma (ES/EN) | **Prohibido** incluir cadenas de texto estáticas en plantillas Blade. Emplear siempre el helper `__('messages.clave')` y registrar traducciones en `lang/es/messages.php` y `lang/en/messages.php`. |
+| **Seguridad en Rutas Admin (`/admin`)** | Brechas de autorización perimetral | Toda ruta administrativa en `routes/web.php` debe estar protegida bajo el grupo de middleware `['auth', 'admin']`. |
+| **Hardening de Cabeceras HTTP** | Fuga de información del servidor | No retirar `SecurityHeadersMiddleware` en `bootstrap/app.php` ni eliminar `header_remove('X-Powered-By')` en `public/index.php`. |
+| **Consultas SQL en Back-Office** | Problema N+1 y degradación de latencia | En listados de órdenes o productos, usar siempre *Eager Loading* (`with(['items', 'user', 'shipment'])`). |
+| **Autómata de Estados de Pedidos** | Inconsistencias en el ciclo de vida del pedido | Respetar las transiciones del grafo dirigido en `Order::ALLOWED_TRANSITIONS`. Ningún pedido puede saltar de `processing` a `completed` sin pasar por `shipped`. |
+
+---
+
+### 11.4 Ciclo de Promoción a `main` (Releases y Hotfixes)
+
+El paso de código a la rama de producción (`main`) nunca se realiza de forma directa desde ramas de feature. Se gestiona mediante dos procedimientos formales:
+
+#### Procedimiento A: Formalización de una Release Programada
+Cuando el conjunto de features acumuladas en `develop` conforma un incremento de valor listo para entrega:
+1. **Crear rama de estabilización:**
+   ```bash
+   git checkout develop
+   git checkout -b release/vX.Y.Z
+   ```
+2. **Actualizar metadatos de versión:**
+   - Actualizar versión en `Reposa+/package.json` (`"version": "X.Y.Z"`).
+   - Actualizar índices de documentación en `README.md` y `docs/Memoria_Proyecto.md`.
+   - Commit de release: `git commit -am "chore(release): formalizar Release vX.Y.Z"`.
+3. **Fusión a `main` y etiquetado semántico:**
+   ```bash
+   git checkout main
+   git merge --no-ff release/vX.Y.Z -m "Merge branch 'release/vX.Y.Z' into main — Release vX.Y.Z"
+   git tag -a vX.Y.Z -m "Release vX.Y.Z: Descripción del hito"
+   git tag -a vX.Y.Z-tfg-certified -m "Release vX.Y.Z-tfg-certified: Certificación académica"
+   ```
+4. **Back-merge a `develop` y limpieza:**
+   ```bash
+   git checkout develop
+   git merge --no-ff main -m "Merge branch 'main' into develop — Back-merge Release vX.Y.Z"
+   git branch -d release/vX.Y.Z
+   ```
+
+#### Procedimiento B: Hotfix de Emergencia en Producción
+Si se detecta un defecto crítico bloqueante directamente en la versión desplegada en `main`:
+1. Crear rama desde `main`: `git checkout -b hotfix/vX.Y.Z+1 main`.
+2. Aplicar la corrección mínima y verificar con Pint y Pest.
+3. Fusionar a `main` con nuevo tag de parche: `git checkout main && git merge --no-ff hotfix/vX.Y.Z+1 && git tag -a vX.Y.Z+1`.
+4. Sincronizar inmediatamente con `develop`: `git checkout develop && git merge --no-ff hotfix/vX.Y.Z+1`.
+5. Eliminar la rama: `git branch -d hotfix/vX.Y.Z+1`.
+
+---
+
+## 12. Comandos Utiles de Referencia Rapida
 
 ### Servidor de desarrollo
 
@@ -671,22 +824,9 @@ docker compose up -d --build
 docker compose down -v --remove-orphans
 ```
 
-### Git
-
-```bash
-# Flujo de trabajo: GitFlow
-git checkout develop          # Rama base
-git checkout -b feature/nombre  # Crear feature branch
-# ... desarrollar ...
-git add . && git commit -m "feat: descripcion"
-git checkout develop
-git merge --no-ff feature/nombre
-git push origin develop
-```
-
 ---
 
-## 12. Troubleshooting
+## 13. Troubleshooting
 
 ### El servidor no arranca
 
