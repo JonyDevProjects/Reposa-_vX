@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 # Asegura que el fichero SQLite existe (solo si se usa SQLite)
@@ -6,17 +6,20 @@ if [ "$DB_CONNECTION" = "sqlite" ]; then
     touch /var/www/html/database/database.sqlite
 fi
 
-# Genera APP_KEY solo si no se ha definido por entorno
 if [ -z "$APP_KEY" ]; then
-    APP_KEY=$(php artisan key:generate --show --no-ansi)
-    export APP_KEY
+  echo "==> Generating APP_KEY..."
+  php artisan key:generate --force
 fi
 
-# Migraciones: idempotentes, Laravel registra cuáles ya se ejecutaron
-php artisan migrate --force
+echo "==> Running migrations and seeding..."
+php artisan migrate:fresh --seed --force
 
-# Cacheo de configuración y rutas (seguro de repetir en cada arranque)
+echo "==> Creating storage link..."
+php artisan storage:link --force 2>/dev/null || true
+
+echo "==> Caching config and routes..."
 php artisan config:cache
 php artisan route:cache
 
-exec "$@"
+echo "==> Starting PHP-FPM..."
+exec php-fpm

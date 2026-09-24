@@ -5,8 +5,48 @@ services:
   app:
     build:
       context: .
-      target: app
-    container_name: reposaplus_app
+      dockerfile: docker/php/Dockerfile
+    container_name: reposa_app
+    restart: unless-stopped
+    entrypoint: ["bash", "/var/www/html/docker/entrypoint.sh"]
+    volumes:
+      - ./:/var/www/html
+      - storage_data:/var/www/html/storage/app/public
+    depends_on:
+      frontend:
+        condition: service_completed_successfully
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - reposa_network
+
+  # ------------------------------------------------------------------
+  # Laravel Queue Worker
+  # ------------------------------------------------------------------
+  queue:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: reposa_queue
+    restart: unless-stopped
+    command: php artisan queue:work --tries=3 --sleep=3
+    volumes:
+      - ./:/var/www/html
+      - storage_data:/var/www/html/storage/app/public
+    depends_on:
+      app:
+        condition: service_completed_successfully
+    networks:
+      - reposa_network
+
+  # ------------------------------------------------------------------
+  # Nginx Web Server
+  # ------------------------------------------------------------------
+  nginx:
+    image: nginx:alpine
+    container_name: reposa_nginx
     restart: unless-stopped
     expose:
       - "80"
@@ -128,7 +168,55 @@ services:
     volumes:
       - minio_data:/data
     networks:
-      - reposaplus
+      - reposa_network
+
+  # ------------------------------------------------------------------
+  # MySQL 8
+  # ------------------------------------------------------------------
+  mysql:
+    image: mysql:8.0
+    container_name: reposa_mysql
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password --skip-ssl
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: reposaplus
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysql", "-h", "localhost", "-u", "root", "-proot", "-e", "SELECT 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - reposa_network
+
+  # ------------------------------------------------------------------
+  # Redis (caché + colas)
+  # ------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: reposa_redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    networks:
+      - reposa_network
+
+  # ------------------------------------------------------------------
+  # MailHog (SMTP + Web UI)
+  # ------------------------------------------------------------------
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: reposa_mailhog
+    restart: unless-stopped
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - reposa_network
 
   # ------------------------------------------------------------------
   # Ngrok Skip Warning Proxy (Opcional para túneles y herramientas externas)
@@ -156,5 +244,5 @@ volumes:
   storage_data:
 
 networks:
-  reposaplus:
+  reposa_network:
     driver: bridge

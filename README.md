@@ -25,10 +25,14 @@ Toda la documentación relacionada con el diseño, los requisitos, la base de da
 ### Documentación Técnica y Roadmaps de Ingeniería
 
 - 🚀 [**Manual del Desarrollador — CI/CD**](./docs/Manual_Desarrollador_CICD.md): Entornos Docker, Dev Containers, configuración hermética y pipeline de GitHub Actions.
-- 🧪 [**Roadmap de Estrategia de Testing**](./docs/progreso/roadmap-estrategia-testing-y-pruebas-unitarias.md): Trofeo de pruebas (*Testing Trophy*), pirámide tripartita (149 tests: Pest + Playwright) y justificación metodológica.
+- 🛡️ [**Matriz de Evaluación de Riesgos MAGERIT v.3**](./docs/artefactos/matriz-evaluacion-magerit-reposaplus.md): Identificación de activos (ACT-01..06), evaluación de amenazas, efectividad de salvaguardas y riesgo residual aceptado.
+- ⚡ [**Roadmap de Auditoría Técnica y Seguridad (Lighthouse & MAGERIT)**](./docs/progreso/roadmap-auditoria-tecnica-seguridad-magerit-lighthouse.md): Medición rigurosa de Core Web Vitals (SEO 100, CLS 0, Performance 95-100), sitemap dinámico y hardening HTTP.
+- 🌐 [**Informe de Entorno de Red, Proxies y Túneles**](./docs/informe-entorno-ngrok.md): Resolución de contenido mixto TLS (`X-Forwarded-Proto`), bypass de interstitials y análisis de viabilidad perimetral.
+- 🧪 [**Roadmap de Estrategia de Testing**](./docs/progreso/roadmap-estrategia-testing-y-pruebas-unitarias.md): Trofeo de pruebas (*Testing Trophy*), pirámide tripartita (154 tests: Pest + Playwright) y justificación metodológica.
 - 📦 [**Roadmap de Checkout, Paquetería y Google OAuth**](./docs/progreso/roadmap-flujos-checkout-paqueteria-oauth.md): Pasarelas de pago, autenticación federada y neutralización de BFCache.
 - 🚀 [**Roadmap de CI/CD, Releases y GitFlow**](./docs/progreso/roadmap-release-cicd-y-defensa-tfg.md): Automatización del pipeline, ciclo de promociones semánticas y trazabilidad.
 - 🤖 [**Ecosistema de Agentes de IA**](./docs/Documentacion_Ecosistema_Agentes.md): Arquitectura multi-agente, subagentes especializados y gobernanza mediante *Spec-Driven Development*.
+- 🧠 [**Referencia Rápida de Engram CLI**](./docs/referencia-rapida-engram.md): Arquitectura de memoria persistente para agentes IA en SQLite FTS5 y comandos del proyecto.
 - 🐳 [**Referencia de Entornos: Dev Containers vs. Docker CLI Directo**](./docs/referencia-entorno-dev-containers-vs-docker-cli.md): Decisión técnica y operatividad de desarrollo.
 
 ---
